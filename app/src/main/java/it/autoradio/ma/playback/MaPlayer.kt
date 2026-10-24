@@ -1,0 +1,570 @@
+package it.autoradio.ma.playback
+
+import android.net.Uri
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
+import androidx.annotation.OptIn
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.HeartRating
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.SimpleBasePlayer
+import androidx.media3.common.util.UnstableApi
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
+import it.autoradio.ma.data.Connection
+import it.autoradio.ma.data.MaImage
+import it.autoradio.ma.data.MaRepository
+import it.autoradio.ma.data.QueueItem
+import it.autoradio.ma.data.QueueState
+import it.autoradio.ma.data.objects
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONArray
+import org.json.JSONObject
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * Il lettore che vede Gearslip: rispecchia la coda del telefono in Music Assistant.
+ *
+ * La coda, il brano e la posizione li decide Music Assistant e arrivano con i suoi eventi; play,
+ * pausa, salti, ricerca, casuale e ripeti diventano comandi alla coda. L'audio vero lo suona
+ * [it.autoradio.ma.sendspin.AudioEngine], che arriva per conto suo con Sendspin.
+ *
+ * Tutto gira sul thread principale.
+ */
+@OptIn(UnstableApi::class)
+class MaPlayer(
+    looper: Looper,
+    private val repo: MaRepository,
+    private val queueId: String,
+    /** Vero quando API e audio sono collegati: solo allora la coda del telefono esiste. */
+    private val ready: StateFlow<Boolean>,
+    /** Vero mentre la musica esce davvero dal telefono. */
+    private val outputting: StateFlow<Boolean>,
+    private val artwork: (MaImage?, Int) -> Uri?,
+) : SimpleBasePlayer(looper) {
+
+    /** Suona un elemento scelto dall'auto (vedi [BrowseTree.play]). */
+    var onPlayRequest: (suspend (MediaItem) -> Unit)? = null
+
+    private val handler = Handler(looper)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    private var queue: QueueState? = null
+    private var window: List<QueueItem> = emptyList()
+    private var windowStart = 0
+    private var windowJob: Job? = null
+
+    // La posizione nel brano: l'ultima detta da Music Assistant e quando.
+    private var positionMs = 0L
+    private var positionAt = 0L
+    private var discontinuity = false
+
+    private var audible = false
+    private var problem: String? = null
+    private val favorites = mutableMapOf<String, Boolean>()
+
+    /** L'inizio della finestra della coda usata nell'ultimo stato pubblicato: serve a tradurre gli indici. */
+    private var stateStart = 0
+
+    /** Quando la rete cade a metà di un brano: per riprendere lì appena torna. */
+    private class Drop(val index: Int, val positionMs: Long, val at: Long)
+    private var drop: Drop? = null
+    private var lastPlayingAt = 0L
+
+    private class Expectation(val test: (QueueState?) -> Boolean, val future: SettableFuture<Void?>)
+    private val expectations = mutableListOf<Expectation>()
+
+    private val listener: (String, String?, Any?) -> Unit = { event, objectId, data ->
+        if (objectId == queueId) handler.post { onEvent(event, data) }
+    }
+
+    init {
+        repo.addEventListener(listener)
+        scope.launch {
+            repo.connection.collect { connection ->
+                problem = when (connection) {
+                    is Connection.Connected -> null
+                    Connection.NotConfigured -> "Configura Autoradio sul telefono"
+                    is Connection.Failed -> connection.message
+                    is Connection.Connecting -> problem
+                }
+                invalidateState()
+            }
+        }
+        scope.launch {
+            ready.collect { isReady ->
+                if (isReady) onReady() else onLost()
+            }
+        }
+        scope.launch {
+            outputting.collect { on ->
+                if (on != audible) {
+                    // Da qui la posizione corre (o si ferma) davvero.
+                    positionMs = currentPositionMs()
+                    positionAt = SystemClock.elapsedRealtime()
+                    audible = on
+                    invalidateState()
+                }
+            }
+        }
+    }
+
+    // ---------- Stato ----------
+
+    override fun getState(): State {
+        val q = queue
+        val builder = State.Builder()
+            .setAvailableCommands(commands(q))
+            .setPlayWhenReady(q?.playing == true, Player.PLAY_WHEN_READY_CHANGE_REASON_REMOTE)
+            .setShuffleModeEnabled(q?.shuffle == true)
+            .setRepeatMode(
+                when (q?.repeat) {
+                    "one" -> Player.REPEAT_MODE_ONE
+                    "all" -> Player.REPEAT_MODE_ALL
+                    else -> Player.REPEAT_MODE_OFF
+                },
+            )
+            .setAudioAttributes(AUDIO_ATTRIBUTES)
+
+        val (start, items) = visibleWindow(q)
+        stateStart = start
+        if (q == null || items.isEmpty()) {
+            builder.setPlaylist(emptyList()).setPlaybackState(Player.STATE_IDLE)
+            problem?.let { builder.setPlayerError(PlaybackException(it, null, PlaybackException.ERROR_CODE_REMOTE_ERROR)) }
+            return builder.build()
+        }
+        val current = ((q.currentIndex ?: start) - start).coerceIn(0, items.size - 1)
+        builder
+            .setPlaylist(items.mapIndexed { i, item -> itemData(item, i == current, q) })
+            .setCurrentMediaItemIndex(current)
+            .setContentPositionMs(positionSupplier(q, items[current]))
+            .setPlaybackState(if (q.playing && !audible) Player.STATE_BUFFERING else Player.STATE_READY)
+        if (discontinuity) {
+            discontinuity = false
+            builder.setPositionDiscontinuity(Player.DISCONTINUITY_REASON_INTERNAL, currentPositionMs())
+        }
+        return builder.build()
+    }
+
+    /** La parte di coda da mostrare (qualche brano prima e una cinquantina dopo), con il suo inizio. */
+    private fun visibleWindow(q: QueueState?): Pair<Int, List<QueueItem>> {
+        val index = q?.currentIndex
+        val current = q?.current
+        if (q == null || index == null || current == null) return 0 to emptyList()
+        // Finché la finestra non è aggiornata (dopo un salto o un casuale) si mostra solo il brano in corso:
+        // un brano non deve mai comparire due volte.
+        val position = index - windowStart
+        if (window.getOrNull(position)?.id != current.id) return index to listOf(current)
+        // Il brano in corso viene dall'evento più recente: per le radio cambia il titolo trasmesso.
+        val items = window.mapIndexed { i, item -> if (i == position) current else item }
+        if (items.distinctBy { it.id }.size != items.size) return index to listOf(current)
+        return windowStart to items
+    }
+
+    private fun commands(q: QueueState?): Player.Commands {
+        val builder = Player.Commands.Builder().addAll(*BASE_COMMANDS)
+        val current = q?.current
+        if (current != null && current.durationSec > 0 && current.mediaType != "radio") {
+            builder.add(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)
+        }
+        return builder.build()
+    }
+
+    private fun itemData(item: QueueItem, isCurrent: Boolean, q: QueueState): MediaItemData {
+        val radio = item.mediaType == "radio"
+        val streamTitle = q.streamTitle?.takeIf { isCurrent && radio && it.isNotBlank() }
+        val favorite = favorites[item.id] ?: item.favorite
+        val metadata = MediaMetadata.Builder()
+            // Per le radio il titolo è quello che sta trasmettendo, e la stazione fa da artista.
+            .setTitle(streamTitle ?: item.title)
+            .setArtist(if (streamTitle != null) item.title else item.artist)
+            .setAlbumTitle(item.album)
+            .setArtworkUri(artwork(item.image, NOW_PLAYING_ART))
+            .setMediaType(
+                when (item.mediaType) {
+                    "radio" -> MediaMetadata.MEDIA_TYPE_RADIO_STATION
+                    "podcast_episode" -> MediaMetadata.MEDIA_TYPE_PODCAST_EPISODE
+                    "audiobook" -> MediaMetadata.MEDIA_TYPE_AUDIO_BOOK_CHAPTER
+                    else -> MediaMetadata.MEDIA_TYPE_MUSIC
+                },
+            )
+            .setIsPlayable(true)
+            .setIsBrowsable(false)
+            .setUserRating(HeartRating(favorite))
+            .apply { if (item.durationSec > 0) setDurationMs(item.durationSec * 1000L) }
+            .build()
+        val mediaItem = MediaItem.Builder()
+            .setMediaId(item.uri ?: item.id)
+            .setMediaMetadata(metadata)
+            .build()
+        val seekable = item.durationSec > 0 && !radio
+        return MediaItemData.Builder(item.id)
+            .setMediaItem(mediaItem)
+            .setMediaMetadata(metadata)
+            .setDurationUs(if (seekable) item.durationSec * 1_000_000L else C.TIME_UNSET)
+            .setIsSeekable(seekable)
+            .build()
+    }
+
+    private fun positionSupplier(q: QueueState, current: QueueItem): PositionSupplier {
+        val base = positionMs
+        val at = positionAt
+        val moving = q.playing && audible
+        val duration = current.durationSec * 1000L
+        return PositionSupplier {
+            val now = if (moving) base + (SystemClock.elapsedRealtime() - at) else base
+            if (duration > 0) min(now, duration) else now
+        }
+    }
+
+    private fun currentPositionMs(): Long {
+        val q = queue ?: return positionMs
+        val moving = q.playing && audible
+        return if (moving) positionMs + (SystemClock.elapsedRealtime() - positionAt) else positionMs
+    }
+
+    // ---------- Eventi di Music Assistant ----------
+
+    private fun onEvent(event: String, data: Any?) {
+        when (event) {
+            "queue_updated", "queue_added" -> QueueState.from(data as? JSONObject)?.let { apply(it) }
+            "queue_items_updated" -> {
+                QueueState.from(data as? JSONObject)?.let { apply(it, itemsChanged = true) }
+                refreshWindow()
+            }
+            "queue_time_updated" -> (data as? Number)?.let { setElapsed(it.toDouble(), fromServer = true) }
+            "player_added" -> if (queue == null) fetchQueue()
+        }
+    }
+
+    private fun apply(q: QueueState, itemsChanged: Boolean = false) {
+        val old = queue
+        queue = q
+        if (q.playing) lastPlayingAt = SystemClock.elapsedRealtime()
+        val jumped = old == null || old.currentIndex != q.currentIndex || old.current?.id != q.current?.id
+        setElapsed(q.elapsedSec, fromServer = !jumped)
+        val index = q.currentIndex
+        val needsWindow = itemsChanged || old == null || old.items != q.items || old.shuffle != q.shuffle ||
+            (index != null && (index < windowStart || index >= windowStart + window.size - AHEAD_MARGIN))
+        if (needsWindow && !itemsChanged) refreshWindow()
+        checkExpectations()
+        invalidateState()
+    }
+
+    /** Nuova posizione dal server; se è vicina a quella prevista non si disturba nessuno. */
+    private fun setElapsed(seconds: Double, fromServer: Boolean) {
+        val ms = (seconds * 1000).toLong().coerceAtLeast(0)
+        val expected = currentPositionMs()
+        positionMs = ms
+        positionAt = SystemClock.elapsedRealtime()
+        if (abs(expected - ms) > POSITION_TOLERANCE_MS) {
+            if (fromServer) discontinuity = true
+            invalidateState()
+        }
+    }
+
+    private fun refreshWindow() {
+        windowJob?.cancel()
+        windowJob = scope.launch {
+            delay(WINDOW_DEBOUNCE_MS)
+            val q = queue ?: return@launch
+            val start = max(0, (q.currentIndex ?: 0) - BEHIND)
+            val items = try {
+                repo.command("player_queues/items") {
+                    put("queue_id", queueId)
+                    put("offset", start)
+                    put("limit", BEHIND + AHEAD + 1)
+                } as? JSONArray
+            } catch (e: Exception) {
+                Log.w(TAG, "Coda non disponibile: ${e.message}")
+                null
+            } ?: return@launch
+            window = items.objects().mapNotNull(QueueItem::from)
+            windowStart = start
+            favorites.clear()
+            invalidateState()
+        }
+    }
+
+    private fun fetchQueue(then: (() -> Unit)? = null) {
+        scope.launch {
+            val q = try {
+                QueueState.from(repo.command("player_queues/get") { put("queue_id", queueId) } as? JSONObject)
+            } catch (e: Exception) {
+                null
+            }
+            if (q != null) {
+                apply(q)
+                refreshWindow()
+            }
+            then?.invoke()
+        }
+    }
+
+    private fun onReady() {
+        fetchQueue { resumeAfterDrop() }
+    }
+
+    /** La rete è caduta: se stava suonando, ci si ricorda dove, per riprendere lì. */
+    private fun onLost() {
+        val q = queue ?: return
+        val now = SystemClock.elapsedRealtime()
+        val index = q.currentIndex ?: return
+        if (q.playing || now - lastPlayingAt < RECENT_PLAY_MS) drop = Drop(index, currentPositionMs(), now)
+    }
+
+    /**
+     * Music Assistant ferma la coda quando il telefono sparisce. Al ritorno si riparte da dove la
+     * musica sarebbe arrivata: nel frattempo il telefono ha suonato quello che aveva già ricevuto.
+     */
+    private fun resumeAfterDrop() {
+        val d = drop ?: return
+        drop = null
+        val q = queue ?: return
+        val away = SystemClock.elapsedRealtime() - d.at
+        if (away > RESUME_WINDOW_MS || q.playing || q.currentIndex != d.index) return
+        val target = d.positionMs + min(away, BUFFER_GUESS_MS)
+        val duration = (q.current?.durationSec ?: 0) * 1000L
+        Log.i(TAG, "Riprendo dopo ${away / 1000} s senza rete")
+        scope.launch {
+            try {
+                if (duration > 0 && target < duration - 2_000) {
+                    repo.command("player_queues/play_index") {
+                        put("queue_id", queueId)
+                        put("index", d.index)
+                        put("seek_position", target / 1000)
+                    }
+                } else {
+                    repo.command("player_queues/play") { put("queue_id", queueId) }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Ripresa non riuscita: ${e.message}")
+            }
+        }
+    }
+
+    // ---------- Comandi ----------
+
+    override fun handleSetPlayWhenReady(playWhenReady: Boolean): ListenableFuture<*> {
+        val q = queue ?: return Futures.immediateVoidFuture()
+        if (q.playing == playWhenReady) return Futures.immediateVoidFuture()
+        return command(if (playWhenReady) "player_queues/play" else "player_queues/pause") { it?.playing == playWhenReady }
+    }
+
+    override fun handlePrepare(): ListenableFuture<*> {
+        if (repo.connection.value !is Connection.Connected) repo.reconnect()
+        return Futures.immediateVoidFuture()
+    }
+
+    override fun handleStop(): ListenableFuture<*> = command("player_queues/stop") { it?.playing != true }
+
+    override fun handleSeek(mediaItemIndex: Int, positionMs: Long, seekCommand: Int): ListenableFuture<*> {
+        val q = queue ?: return Futures.immediateVoidFuture()
+        val index = q.currentIndex
+        val target = stateStart + mediaItemIndex
+        return when (seekCommand) {
+            Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM ->
+                command("player_queues/next") { it?.currentIndex != index }
+            Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM ->
+                if (target == index) seekTo(0) else command("player_queues/previous") { it?.currentIndex != index }
+            Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM -> seekTo(positionMs)
+            else ->
+                if (target == index) {
+                    seekTo(if (positionMs == C.TIME_UNSET) 0 else positionMs)
+                } else {
+                    command("player_queues/play_index", args = {
+                        put("index", target)
+                        if (positionMs != C.TIME_UNSET && positionMs > 0) put("seek_position", positionMs / 1000)
+                    }) { it?.currentIndex == target }
+                }
+        }
+    }
+
+    private fun seekTo(positionMs: Long): ListenableFuture<*> {
+        val seconds = (positionMs.coerceAtLeast(0) / 1000).toInt()
+        this.positionMs = seconds * 1000L
+        positionAt = SystemClock.elapsedRealtime()
+        return command("player_queues/seek", args = { put("position", seconds) }) {
+            it != null && abs(it.elapsedSec - seconds) < 2
+        }
+    }
+
+    override fun handleSetShuffleModeEnabled(shuffleModeEnabled: Boolean): ListenableFuture<*> =
+        command("player_queues/shuffle", args = { put("shuffle_enabled", shuffleModeEnabled) }) {
+            it?.shuffle == shuffleModeEnabled
+        }
+
+    override fun handleSetRepeatMode(repeatMode: Int): ListenableFuture<*> {
+        val mode = when (repeatMode) {
+            Player.REPEAT_MODE_ONE -> "one"
+            Player.REPEAT_MODE_ALL -> "all"
+            else -> "off"
+        }
+        return command("player_queues/repeat", args = { put("repeat_mode", mode) }) { it?.repeat == mode }
+    }
+
+    override fun handleSetMediaItems(mediaItems: List<MediaItem>, startIndex: Int, startPositionMs: Long): ListenableFuture<*> {
+        val item = mediaItems.getOrNull(if (startIndex == C.INDEX_UNSET) 0 else startIndex)
+        val request = onPlayRequest
+        if (item == null || request == null) return Futures.immediateVoidFuture()
+        val done = SettableFuture.create<Void?>()
+        val before = queue
+        scope.launch {
+            try {
+                awaitReady()
+                request(item)
+                // Si aspetta che la coda lo mostri, così l'auto non vede un attimo il brano di prima.
+                withTimeoutOrNull(PLAY_SETTLE_MS) {
+                    while (true) {
+                        val q = queue
+                        if (q != null && q.playing && (before == null || q.current?.id != before.current?.id || !before.playing)) break
+                        delay(100)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Non riesco a suonare ${item.mediaId}: ${e.message}")
+            } finally {
+                done.set(null)
+            }
+        }
+        return done
+    }
+
+    override fun handleRelease(): ListenableFuture<*> {
+        repo.removeEventListener(listener)
+        scope.cancel()
+        handler.removeCallbacksAndMessages(null)
+        expectations.forEach { it.future.set(null) }
+        expectations.clear()
+        return Futures.immediateVoidFuture()
+    }
+
+    /** Lo stesso play o pausa, ma deciso dal telefono (chiamata in arrivo, cuffie staccate). */
+    fun pauseFromSystem() {
+        val q = queue ?: return
+        if (q.playing) command("player_queues/pause") { it?.playing != true }
+    }
+
+    fun resumeFromSystem() {
+        val q = queue ?: return
+        if (!q.playing && q.current != null) command("player_queues/play") { it?.playing == true }
+    }
+
+    val isPlayingOnServer: Boolean get() = queue?.playing == true
+
+    /** Il brano in corso, per i preferiti. */
+    val currentItem: QueueItem? get() = queue?.current
+
+    /** Cambia subito il cuore del brano, prima che Music Assistant confermi. */
+    fun showFavorite(item: QueueItem, favorite: Boolean) {
+        favorites[item.id] = favorite
+        invalidateState()
+    }
+
+    /** Aspetta che il telefono sia un lettore di Music Assistant: al primo avvio ci vuole un attimo. */
+    private suspend fun awaitReady() {
+        withTimeoutOrNull(READY_TIMEOUT_MS) { ready.first { it } }
+            ?: throw IllegalStateException("Music Assistant non è pronto")
+    }
+
+    /**
+     * Manda un comando alla coda e restituisce un futuro che si completa quando Music Assistant
+     * mostra l'effetto (o dopo qualche secondo): fino ad allora l'auto vede già il nuovo stato.
+     */
+    private fun command(
+        name: String,
+        args: JSONObject.() -> Unit = {},
+        until: (QueueState?) -> Boolean,
+    ): ListenableFuture<*> {
+        val future = SettableFuture.create<Void?>()
+        val expectation = Expectation(until, future)
+        expectations += expectation
+        handler.postDelayed({ if (expectations.remove(expectation)) future.set(null) }, EXPECT_TIMEOUT_MS)
+        scope.launch {
+            try {
+                repo.command(name) {
+                    put("queue_id", queueId)
+                    args()
+                }
+                checkExpectations()
+            } catch (e: Exception) {
+                Log.w(TAG, "$name non riuscito: ${e.message}")
+                if (expectations.remove(expectation)) future.set(null)
+            }
+        }
+        return future
+    }
+
+    private fun checkExpectations() {
+        val q = queue
+        val iterator = expectations.iterator()
+        while (iterator.hasNext()) {
+            val expectation = iterator.next()
+            if (expectation.test(q)) {
+                iterator.remove()
+                expectation.future.set(null)
+            }
+        }
+    }
+
+    private companion object {
+        const val TAG = "Autoradio"
+        const val BEHIND = 3
+        const val AHEAD = 50
+        const val AHEAD_MARGIN = 5
+        const val NOW_PLAYING_ART = 512
+        const val POSITION_TOLERANCE_MS = 1_500L
+        const val WINDOW_DEBOUNCE_MS = 150L
+        const val EXPECT_TIMEOUT_MS = 3_000L
+        const val PLAY_SETTLE_MS = 4_000L
+        const val READY_TIMEOUT_MS = 20_000L
+        const val RECENT_PLAY_MS = 30_000L
+        const val RESUME_WINDOW_MS = 10 * 60_000L
+
+        /** Quanto audio il telefono ha di solito in serbo quando la rete cade. */
+        const val BUFFER_GUESS_MS = 25_000L
+
+        val AUDIO_ATTRIBUTES: AudioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            .build()
+
+        val BASE_COMMANDS = intArrayOf(
+            Player.COMMAND_PLAY_PAUSE,
+            Player.COMMAND_PREPARE,
+            Player.COMMAND_STOP,
+            Player.COMMAND_RELEASE,
+            Player.COMMAND_SEEK_TO_DEFAULT_POSITION,
+            Player.COMMAND_SEEK_TO_MEDIA_ITEM,
+            Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM,
+            Player.COMMAND_SEEK_TO_NEXT,
+            Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM,
+            Player.COMMAND_SEEK_TO_PREVIOUS,
+            Player.COMMAND_SET_SHUFFLE_MODE,
+            Player.COMMAND_SET_REPEAT_MODE,
+            Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+            Player.COMMAND_GET_TIMELINE,
+            Player.COMMAND_GET_METADATA,
+            Player.COMMAND_SET_MEDIA_ITEM,
+            Player.COMMAND_GET_AUDIO_ATTRIBUTES,
+        )
+    }
+}

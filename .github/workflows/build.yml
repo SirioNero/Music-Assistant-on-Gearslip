@@ -1,0 +1,113 @@
+name: Compila Autoradio
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+
+      # Dal telefono non si possono caricare cartelle: si carica Autoradio.zip
+      # e questo passaggio lo scompatta nel repository, al posto dello zip.
+      - name: Estrai Autoradio.zip, se presente
+        if: github.event_name != 'pull_request'
+        run: |
+          if [ -f Autoradio.zip ]; then
+            unzip -q -o Autoradio.zip -d /tmp/autoradio
+            cp -r /tmp/autoradio/Autoradio/. .
+            git rm -q --cached --ignore-unmatch Autoradio.zip
+            rm -f Autoradio.zip
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            if ! git diff --cached --quiet; then
+              git commit -q -m "Aggiorna il progetto da Autoradio.zip"
+              git push
+            fi
+          fi
+
+      - name: Controlla il progetto
+        run: |
+          if [ ! -f settings.gradle.kts ]; then
+            echo "Manca il progetto: carica Autoradio.zip nel repository."
+            exit 1
+          fi
+
+      - name: Prepara Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # Va bene anche la chiave di Plancia (secret PLANCIA_KEYSTORE): l'alias si legge dalla chiave stessa.
+      - name: Prepara la chiave di firma
+        env:
+          AUTORADIO_KEYSTORE: ${{ secrets.AUTORADIO_KEYSTORE }}
+          PLANCIA_KEYSTORE: ${{ secrets.PLANCIA_KEYSTORE }}
+          KEYSTORE_PASSWORD: ${{ secrets.AUTORADIO_KEYSTORE_PASSWORD }}
+        run: |
+          KEY="${AUTORADIO_KEYSTORE:-$PLANCIA_KEYSTORE}"
+          if [ -z "$KEY" ]; then
+            echo "Nessuna chiave di firma: compilo solo per controllo, senza pubblicare."
+            exit 0
+          fi
+          echo "$KEY" | base64 -d > app/autoradio.keystore
+          if [ -n "$KEYSTORE_PASSWORD" ]; then
+            PASSWORDS="$KEYSTORE_PASSWORD"
+          elif [ -n "$AUTORADIO_KEYSTORE" ]; then
+            PASSWORDS="autoradio-android"
+          else
+            PASSWORDS="plancia-android"
+          fi
+          ALIAS=$(keytool -list -keystore app/autoradio.keystore -storepass "$PASSWORDS" 2>/dev/null \
+            | grep -E "PrivateKeyEntry" | head -n 1 | cut -d, -f1)
+          if [ -z "$ALIAS" ]; then
+            echo "::error title=Chiave di firma::Non riesco ad aprire la chiave: controlla il secret AUTORADIO_KEYSTORE_PASSWORD."
+            exit 1
+          fi
+          echo "AUTORADIO_KEYSTORE_PASSWORD=$PASSWORDS" >> "$GITHUB_ENV"
+          echo "AUTORADIO_KEY_ALIAS=$ALIAS" >> "$GITHUB_ENV"
+          echo "SIGNED=true" >> "$GITHUB_ENV"
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Compila l'APK
+        run: |
+          set -o pipefail
+          gradle :app:assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
+
+      # Gli errori diventano un'annotazione della compilazione, leggibile senza scaricare il log.
+      - name: Riassumi gli errori
+        if: failure()
+        run: |
+          errors=$(grep -E "^e: |error:|What went wrong" -A3 build.log | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+          if [ -n "$errors" ]; then echo "::error title=Compilazione non riuscita::$errors"; fi
+
+      # Solo il ramo main pubblica una release: gli altri rami si compilano per controllo.
+      - name: Rinomina l'APK
+        if: env.SIGNED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p apk
+          cp app/build/outputs/apk/release/app-release.apk apk/Autoradio.apk
+
+      - name: Pubblica la release
+        if: env.SIGNED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          # Il tag è la versione dell'app (versionName in app/build.gradle.kts): Obtainium li confronta.
+          tag_name: v0.1.${{ github.run_number }}
+          name: Autoradio 0.1.${{ github.run_number }}
+          body: Installa Autoradio.apk sul telefono; in auto la trovi tra le app musicali di Gearslip.
+          files: apk/*.apk
