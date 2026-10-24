@@ -57,7 +57,7 @@ jobs:
         run: |
           KEY="${XONOS_KEYSTORE:-$PLANCIA_KEYSTORE}"
           if [ -z "$KEY" ]; then
-            echo "Nessuna chiave di firma: compilo solo per controllo, senza pubblicare."
+            echo "::notice title=Firma::Nessuna chiave di firma (secret XONOS_KEYSTORE o PLANCIA_KEYSTORE): compilo senza pubblicare."
             exit 0
           fi
           echo "$KEY" | base64 -d > app/xonos.keystore
@@ -77,6 +77,7 @@ jobs:
           echo "XONOS_KEYSTORE_PASSWORD=$PASSWORDS" >> "$GITHUB_ENV"
           echo "XONOS_KEY_ALIAS=$ALIAS" >> "$GITHUB_ENV"
           echo "SIGNED=true" >> "$GITHUB_ENV"
+          echo "::notice title=Firma::Chiave trovata (alias $ALIAS)."
 
       - name: Prepara Gradle
         uses: gradle/actions/setup-gradle@v4
