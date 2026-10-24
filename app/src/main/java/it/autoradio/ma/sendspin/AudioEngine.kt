@@ -357,27 +357,50 @@ class AudioEngine(
         } else {
             smoothedErrorUs = smoothedErrorUs * 0.9 + error * 0.1
             if (abs(smoothedErrorUs) > SOFT_US && count > 200) {
-                // Un passo piccolo, mezzo per cento al massimo: non si sente.
+                // Mezzo per cento al massimo, un campione alla volta sparso nel blocco: non si sente.
                 val step = max(1, count / 200)
-                if (smoothedErrorUs > 0) {
-                    start = step
-                    count -= step
-                } else {
-                    val stretched = ShortArray((count + step) * format.channels)
-                    System.arraycopy(pcm, 0, stretched, step * format.channels, count * format.channels)
-                    for (i in 0 until step) System.arraycopy(pcm, 0, stretched, i * format.channels, format.channels)
-                    if (writeFrames(out, stretched, 0, count + step, gen)) markAudio()
-                    return
-                }
+                val delta = if (smoothedErrorUs > 0) -step else step
+                if (writeFrames(out, adjust(pcm, count, format.channels, delta), 0, count + delta, gen)) markAudio()
+                return
             }
         }
         if (writeFrames(out, pcm, start, count, gen)) markAudio()
     }
 
+    /** Toglie ([delta] negativo) o ripete singoli campioni, a distanza regolare l'uno dall'altro. */
+    private fun adjust(pcm: ShortArray, frames: Int, channels: Int, delta: Int): ShortArray {
+        val result = ShortArray((frames + delta) * channels)
+        val spacing = frames / (abs(delta) + 1)
+        var from = 0
+        var to = 0
+        for (k in 1..abs(delta)) {
+            val n = k * spacing - from
+            System.arraycopy(pcm, from * channels, result, to * channels, n * channels)
+            from += n
+            to += n
+            if (delta > 0) {
+                System.arraycopy(pcm, (from - 1) * channels, result, to * channels, channels)
+                to++
+            } else {
+                from++
+            }
+        }
+        System.arraycopy(pcm, from * channels, result, to * channels, (frames - from) * channels)
+        return result
+    }
+
     /** Ogni tanto nei log: quanto è lontano l'ascolto dal momento voluto dal server. */
     private fun report(error: Long, fresh: Boolean) {
         val now = clock()
-        if (fresh) Log.d(TAG, "Avvio a ${error / 1000} ms dal momento giusto")
+        if (fresh) {
+            // L'attesa iniziale non è uno scarto: le statistiche partono da dopo l'allineamento.
+            Log.d(TAG, "Avvio a ${error / 1000} ms dal momento giusto")
+            statSince = now
+            statBlocks = 0
+            statSum = 0
+            statMax = 0
+            return
+        }
         statBlocks++
         statSum += abs(error)
         statMax = max(statMax, abs(error))

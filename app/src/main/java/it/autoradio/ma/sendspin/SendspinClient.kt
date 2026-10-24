@@ -259,7 +259,8 @@ class SendspinClient(
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            // Tipo 4: audio, con il tempo del server (8 byte) e il margine di invio (4 byte).
+            // Tipo 4: audio, preceduto dal tempo del server (8 byte). Il margine di invio (send_ahead)
+            // che la specifica mette dopo il tempo il server lo manda solo ai client cifrati, non a questo.
             if (bytes.size < AUDIO_HEADER || bytes[0].toInt() != AUDIO_CHUNK) return
             val data = bytes.toByteArray()
             val timestamp = ByteBuffer.wrap(data, 1, 8).long
@@ -356,7 +357,7 @@ class SendspinClient(
         const val PRODUCT_NAME = "Mobile Application"
         val COMMANDS = listOf("volume", "mute")
         const val AUDIO_CHUNK = 4
-        const val AUDIO_HEADER = 13
+        const val AUDIO_HEADER = 9
 
         /** Fino a qualche minuto di Opus, una decina di secondi di PCM: il server ne manda al massimo mezzo minuto. */
         const val BUFFER_CAPACITY = 2_000_000

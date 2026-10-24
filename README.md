@@ -23,7 +23,7 @@ The app’s interface is in Italian for now.
 - **The menu** lists Ascoltati di recente (recently played), Per te (recommendations from your library and services), Playlist, Album, Artisti (artists), Brani preferiti (favorite tracks), Radio, Podcast, Audiolibri (audiobooks) and Sfoglia i servizi (browse your providers). Empty ones are hidden.
 - **Albums and playlists** open with a tap; the play button next to them plays them whole. A track inside an album or playlist plays the album or playlist from that track on, so next and previous stay inside it.
 - **Search** with Gearslip’s search key: Autoradio searches every service in Music Assistant.
-- **The heart** adds the track to your Music Assistant favorites (and to Spotify’s liked songs, if the track comes from there). Shuffle and repeat work on the Music Assistant queue.
+- **The heart** marks the track as a favorite in Music Assistant: you find it in Brani preferiti. Shuffle and repeat work on the Music Assistant queue.
 - **Calls and the voice assistant** pause the music, which comes back afterwards. Navigation prompts lower it. If the car’s Bluetooth disconnects, the music pauses instead of moving to the phone’s speaker.
 - **No signal** (a tunnel): the phone keeps playing what it has already received, up to about half a minute, then picks up where the music would have been.
 
@@ -52,7 +52,7 @@ Home Assistant Cloud (Nabu Casa) only reaches Home Assistant, not Music Assistan
 
 ### Requirements
 
-- Music Assistant 2.7.5 or later (tested with 2.10 and the 2.11 betas).
+- Music Assistant 2.7.5 or later (checked against 2.10.8 and 2.11.0 beta 7).
 - For Spotify, Music Assistant’s Spotify provider, which needs Spotify Premium.
 
 ### Troubleshooting
@@ -111,7 +111,7 @@ Autoradio trasforma il telefono in un lettore di [Music Assistant](https://music
 - **Il menu** elenca Ascoltati di recente, Per te (i consigli della libreria e dei servizi), Playlist, Album, Artisti, Brani preferiti, Radio, Podcast, Audiolibri e Sfoglia i servizi. Le voci vuote non compaiono.
 - **Album e playlist** si aprono con un tocco; il tasto play accanto li suona interi. Un brano dentro un album o una playlist li fa partire da quel brano, così avanti e indietro restano lì dentro.
 - **La ricerca** è il tasto cerca di Gearslip: Autoradio cerca in tutti i servizi di Music Assistant.
-- **Il cuore** aggiunge il brano ai preferiti di Music Assistant (e ai brani che ti piacciono di Spotify, se viene da lì). Casuale e ripeti agiscono sulla coda di Music Assistant.
+- **Il cuore** segna il brano tra i preferiti di Music Assistant: lo ritrovi in Brani preferiti. Casuale e ripeti agiscono sulla coda di Music Assistant.
 - **Telefonate e assistente vocale** mettono in pausa la musica, che poi riprende. Le indicazioni del navigatore la abbassano. Se il Bluetooth dell’auto si stacca, la musica si ferma invece di passare all’altoparlante del telefono.
 - **Senza campo** (una galleria) il telefono continua a suonare quello che ha già ricevuto, fino a una mezzo minuto, poi riprende da dove la musica sarebbe arrivata.
 
@@ -140,7 +140,7 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 
 ### Requisiti
 
-- Music Assistant 2.7.5 o successivo (provato con la 2.10 e le beta della 2.11).
+- Music Assistant 2.7.5 o successivo (verificato con la 2.10.8 e la 2.11.0 beta 7).
 - Per Spotify, il provider Spotify di Music Assistant, che vuole Spotify Premium.
 
 ### Se qualcosa non va
