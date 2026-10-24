@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Autoradio" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Xonos" parent="android:Theme.Material.NoActionBar">
         <item name="android:colorAccent">@color/warm</item>
         <item name="android:windowBackground">@color/ink</item>
         <item name="android:statusBarColor">@color/ink</item>

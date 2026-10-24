@@ -1,4 +1,4 @@
-package it.autoradio.ma.playback
+package it.xonos.ma.playback
 
 import android.content.Context
 import android.media.AudioAttributes

@@ -8,18 +8,18 @@ plugins {
 // Su GitHub ogni compilazione ha un numero crescente: così ogni APK nuovo si installa sopra il precedente.
 val buildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
 
-// La chiave di firma NON sta nel repository: la compilazione su GitHub la ricrea dal secret AUTORADIO_KEYSTORE.
+// La chiave di firma NON sta nel repository: la compilazione su GitHub la ricrea dal secret XONOS_KEYSTORE.
 // Senza chiave (per esempio chi contribuisce, o una build sul proprio computer) si usa la chiave di debug di Android.
-val autoradioKeystore = file("autoradio.keystore")
-val hasAutoradioKey = autoradioKeystore.exists()
-val keystorePassword = System.getenv("AUTORADIO_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "autoradio-android"
+val xonosKeystore = file("xonos.keystore")
+val hasXonosKey = xonosKeystore.exists()
+val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "xonos-android"
 
 android {
-    namespace = "it.autoradio.ma"
+    namespace = "it.xonos.ma"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "it.autoradio.ma"
+        applicationId = "it.xonos.ma"
         minSdk = 26
         targetSdk = 34
         versionCode = buildNumber
@@ -28,12 +28,12 @@ android {
     }
 
     signingConfigs {
-        if (hasAutoradioKey) {
-            create("autoradio") {
-                storeFile = autoradioKeystore
+        if (hasXonosKey) {
+            create("xonos") {
+                storeFile = xonosKeystore
                 storePassword = keystorePassword
                 // Il workflow legge l'alias dalla chiave stessa: va bene anche quella di Plancia.
-                keyAlias = System.getenv("AUTORADIO_KEY_ALIAS")?.ifBlank { null } ?: "autoradio"
+                keyAlias = System.getenv("XONOS_KEY_ALIAS")?.ifBlank { null } ?: "xonos"
                 keyPassword = keystorePassword
             }
         }
@@ -41,11 +41,11 @@ android {
 
     buildTypes {
         getByName("debug") {
-            if (hasAutoradioKey) signingConfig = signingConfigs.getByName("autoradio")
+            if (hasXonosKey) signingConfig = signingConfigs.getByName("xonos")
         }
         getByName("release") {
             isMinifyEnabled = false
-            if (hasAutoradioKey) signingConfig = signingConfigs.getByName("autoradio")
+            if (hasXonosKey) signingConfig = signingConfigs.getByName("xonos")
         }
     }
 

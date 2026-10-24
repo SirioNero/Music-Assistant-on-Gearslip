@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Autoradio</string>
+    <string name="app_name">Xonos</string>
     <string name="tagline">Music Assistant in auto, tramite Gearslip: la musica parte dal telefono e arriva alle casse dell’auto.</string>
     <string name="label_home">Indirizzo di casa</string>
     <string name="label_remote">Indirizzo da fuori casa (facoltativo)</string>
@@ -9,14 +9,14 @@
     <string name="hint_home">http://homeassistant.local:8095</string>
     <string name="hint_remote">https://… oppure l’indirizzo VPN</string>
     <string name="hint_token">Incolla qui il token</string>
-    <string name="hint_name">Autoradio</string>
+    <string name="hint_name">Xonos</string>
     <string name="help_home">L’indirizzo dell’interfaccia di Music Assistant, di solito sulla porta 8095.</string>
-    <string name="help_remote">In auto il telefono è fuori dalla rete di casa: Autoradio prova prima l’indirizzo di casa, poi questo.</string>
+    <string name="help_remote">In auto il telefono è fuori dalla rete di casa: Xonos prova prima l’indirizzo di casa, poi questo.</string>
     <string name="help_token">Crealo in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine.</string>
     <string name="help_name">Come compare il telefono tra i lettori di Music Assistant.</string>
     <string name="save">Salva e prova la connessione</string>
-    <string name="battery_needed">Android può fermare la musica a schermo spento per risparmiare batteria. Consenti ad Autoradio di funzionare in background.</string>
-    <string name="battery_ok">✓ Android lascia suonare Autoradio anche a schermo spento.</string>
+    <string name="battery_needed">Android può fermare la musica a schermo spento per risparmiare batteria. Consenti a Xonos di funzionare in background.</string>
+    <string name="battery_ok">✓ Android lascia suonare Xonos anche a schermo spento.</string>
     <string name="battery_button">Consenti in background</string>
-    <string name="help_car">In auto apri Gearslip: Autoradio compare tra le app musicali.</string>
+    <string name="help_car">In auto apri Gearslip: Xonos compare tra le app musicali.</string>
 </resources>

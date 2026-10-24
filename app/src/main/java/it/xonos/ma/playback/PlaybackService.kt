@@ -1,4 +1,4 @@
-package it.autoradio.ma.playback
+package it.xonos.ma.playback
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -34,16 +34,16 @@ import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import it.autoradio.ma.AutoradioApp
-import it.autoradio.ma.BuildConfig
-import it.autoradio.ma.R
-import it.autoradio.ma.data.Connection
-import it.autoradio.ma.phone.SettingsActivity
-import it.autoradio.ma.sendspin.AndroidAudio
-import it.autoradio.ma.sendspin.AudioEngine
-import it.autoradio.ma.sendspin.SendspinClient
-import it.autoradio.ma.sendspin.StreamFormat
-import it.autoradio.ma.sendspin.TimeFilter
+import it.xonos.ma.XonosApp
+import it.xonos.ma.BuildConfig
+import it.xonos.ma.R
+import it.xonos.ma.data.Connection
+import it.xonos.ma.phone.SettingsActivity
+import it.xonos.ma.sendspin.AndroidAudio
+import it.xonos.ma.sendspin.AudioEngine
+import it.xonos.ma.sendspin.SendspinClient
+import it.xonos.ma.sendspin.StreamFormat
+import it.xonos.ma.sendspin.TimeFilter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,13 +56,13 @@ import kotlin.math.min
  * Il cuore dell'app: è il "lettore musicale" che Gearslip trova e apre, con il menu della libreria
  * e i comandi. Tiene il telefono collegato a Music Assistant come lettore e lo fa suonare.
  *
- * Gearslip si collega quando si apre Autoradio in auto; mentre la musica suona il servizio resta
+ * Gearslip si collega quando si apre Xonos in auto; mentre la musica suona il servizio resta
  * in primo piano (con la sua notifica) anche a schermo spento.
  */
 @OptIn(UnstableApi::class)
 class PlaybackService : MediaLibraryService() {
 
-    private lateinit var app: AutoradioApp
+    private lateinit var app: XonosApp
     private lateinit var engine: AudioEngine
     private lateinit var sendspin: SendspinClient
     private lateinit var player: MaPlayer
@@ -87,7 +87,7 @@ class PlaybackService : MediaLibraryService() {
 
     override fun onCreate() {
         super.onCreate()
-        app = application as AutoradioApp
+        app = application as XonosApp
         connectivity = getSystemService(ConnectivityManager::class.java)
         val settings = app.settings
         val artwork = Artwork(this)
@@ -159,7 +159,7 @@ class PlaybackService : MediaLibraryService() {
             clientId = settings.playerId,
             name = settings.playerName,
             manufacturer = Build.MANUFACTURER.replaceFirstChar { it.titlecase() },
-            softwareVersion = "Autoradio ${BuildConfig.VERSION_NAME}",
+            softwareVersion = "Xonos ${BuildConfig.VERSION_NAME}",
             formats = formats,
             // In rete mobile un margine più largo: meglio mezzo secondo in più all'avvio che un buco in galleria.
             leadTimeMs = if (metered) 1_500 else 800,
@@ -250,12 +250,12 @@ class PlaybackService : MediaLibraryService() {
     @Suppress("DEPRECATION")
     private fun acquireLocks() {
         val wake = wakeLock ?: getSystemService(PowerManager::class.java)
-            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Autoradio:audio")
+            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Xonos:audio")
             .apply { setReferenceCounted(false) }
             .also { wakeLock = it }
         wake.acquire(LOCK_TIMEOUT_MS)
         val wifi = wifiLock ?: applicationContext.getSystemService(WifiManager::class.java)
-            ?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Autoradio:audio")
+            ?.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "Xonos:audio")
             ?.apply { setReferenceCounted(false) }
             ?.also { wifiLock = it }
         wifi?.acquire()
@@ -419,7 +419,7 @@ class PlaybackService : MediaLibraryService() {
     }
 
     private companion object {
-        const val TAG = "Autoradio"
+        const val TAG = "Xonos"
         const val RATE = 48_000
         const val FOCUS_GRACE_MS = 30_000L
         const val LOCK_TIMEOUT_MS = 6 * 60 * 60 * 1000L

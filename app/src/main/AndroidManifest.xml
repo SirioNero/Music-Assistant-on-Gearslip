@@ -11,12 +11,12 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
-        android:name=".AutoradioApp"
+        android:name=".XonosApp"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Autoradio"
+        android:theme="@style/Theme.Xonos"
         android:usesCleartextTraffic="true">
 
         <!-- Gearslip elenca tra le app musicali chi ha un MediaBrowserService e questo descrittore. -->

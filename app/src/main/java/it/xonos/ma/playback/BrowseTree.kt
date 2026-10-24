@@ -1,11 +1,11 @@
-package it.autoradio.ma.playback
+package it.xonos.ma.playback
 
 import android.util.Log
 import android.util.LruCache
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import it.autoradio.ma.data.Library
-import it.autoradio.ma.data.MaItem
+import it.xonos.ma.data.Library
+import it.xonos.ma.data.MaItem
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -48,7 +48,7 @@ class BrowseTree(
     /** Le righe di "Per te", con il loro contenuto se il server l'ha già mandato. */
     private val rows = LruCache<String, MaItem>(64)
 
-    fun root(): MediaItem = folder(ROOT, "Autoradio", null, "track")
+    fun root(): MediaItem = folder(ROOT, "Xonos", null, "track")
 
     fun item(mediaId: String): MediaItem? = if (mediaId == ROOT) root() else known.get(mediaId)
 
@@ -215,7 +215,7 @@ class BrowseTree(
     }
 
     companion object {
-        private const val TAG = "Autoradio"
+        private const val TAG = "Xonos"
         const val ROOT = "root"
 
         /** La ripresa della coda quando l'auto preme play e il telefono non ha ancora niente in mano. */

@@ -1,4 +1,4 @@
-package it.autoradio.ma.data
+package it.xonos.ma.data
 
 import android.content.Context
 import android.util.Base64
@@ -14,7 +14,7 @@ class Settings(context: Context) {
         val isComplete: Boolean get() = urls.isNotEmpty() && token.isNotBlank()
     }
 
-    private val prefs = context.getSharedPreferences("autoradio", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("xonos", Context.MODE_PRIVATE)
 
     fun load() = Config(
         homeUrl = prefs.getString(KEY_HOME, "").orEmpty(),
@@ -44,7 +44,7 @@ class Settings(context: Context) {
     val playerId: String
         @Synchronized get() {
             prefs.getString(KEY_PLAYER_ID, null)?.let { return it }
-            val id = "autoradio-" + randomBytes(6).joinToString("") { "%02x".format(it) }
+            val id = "xonos-" + randomBytes(6).joinToString("") { "%02x".format(it) }
             prefs.edit().putString(KEY_PLAYER_ID, id).apply()
             return id
         }
@@ -81,7 +81,7 @@ class Settings(context: Context) {
         private const val KEY_MUTED = "muted"
         private const val KEY_ART = "art_key"
 
-        const val DEFAULT_NAME = "Autoradio"
+        const val DEFAULT_NAME = "Xonos"
 
         /** La porta di Music Assistant, quando l'indirizzo non ne indica una. */
         private const val DEFAULT_PORT = 8095

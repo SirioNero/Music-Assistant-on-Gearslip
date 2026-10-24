@@ -1,4 +1,4 @@
-package it.autoradio.ma.sendspin
+package it.xonos.ma.sendspin
 
 import kotlin.math.abs
 import kotlin.math.floor

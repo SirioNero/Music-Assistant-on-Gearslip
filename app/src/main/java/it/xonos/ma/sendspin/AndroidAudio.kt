@@ -1,4 +1,4 @@
-package it.autoradio.ma.sendspin
+package it.xonos.ma.sendspin
 
 import android.media.AudioAttributes
 import android.media.AudioFormat
@@ -14,7 +14,7 @@ import java.nio.ByteOrder
 /** Le uscite e i decoder veri, quelli del telefono. */
 object AndroidAudio {
 
-    private const val TAG = "Autoradio"
+    private const val TAG = "Xonos"
 
     fun output(sampleRate: Int, channels: Int): PcmOutput? = try {
         AudioTrackOutput(sampleRate, channels)
@@ -170,7 +170,7 @@ private class MediaCodecDecoder(format: StreamFormat, mime: String) : AudioDecod
             buffer.put(data, offset, length)
             codec.queueInputBuffer(index, 0, length, timestampUs, 0)
         } else {
-            Log.w("Autoradio", "Decoder pieno: pacchetto audio saltato")
+            Log.w("Xonos", "Decoder pieno: pacchetto audio saltato")
         }
         drain(out)
     }

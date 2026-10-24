@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Autoradio"
+rootProject.name = "Xonos"
 include(":app")

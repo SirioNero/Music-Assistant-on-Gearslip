@@ -1,4 +1,4 @@
-package it.autoradio.ma.data
+package it.xonos.ma.data
 
 import android.util.Log
 import kotlinx.coroutines.CompletableDeferred
@@ -179,7 +179,7 @@ class MaClient(private val http: OkHttpClient) {
     }
 
     companion object {
-        private const val TAG = "Autoradio"
+        private const val TAG = "Xonos"
 
         /** L'indirizzo WebSocket di un percorso del server: http diventa ws, https diventa wss. */
         fun websocketUrl(base: String, path: String = "/ws"): String {

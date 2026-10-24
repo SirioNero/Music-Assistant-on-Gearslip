@@ -1,4 +1,4 @@
-package it.autoradio.ma.playback
+package it.xonos.ma.playback
 
 import android.net.Uri
 import android.os.Handler
@@ -18,12 +18,12 @@ import androidx.media3.common.util.UnstableApi
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
-import it.autoradio.ma.data.Connection
-import it.autoradio.ma.data.MaImage
-import it.autoradio.ma.data.MaRepository
-import it.autoradio.ma.data.QueueItem
-import it.autoradio.ma.data.QueueState
-import it.autoradio.ma.data.objects
+import it.xonos.ma.data.Connection
+import it.xonos.ma.data.MaImage
+import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.QueueItem
+import it.xonos.ma.data.QueueState
+import it.xonos.ma.data.objects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,7 +45,7 @@ import kotlin.math.min
  *
  * La coda, il brano e la posizione li decide Music Assistant e arrivano con i suoi eventi; play,
  * pausa, salti, ricerca, casuale e ripeti diventano comandi alla coda. L'audio vero lo suona
- * [it.autoradio.ma.sendspin.AudioEngine], che arriva per conto suo con Sendspin.
+ * [it.xonos.ma.sendspin.AudioEngine], che arriva per conto suo con Sendspin.
  *
  * Tutto gira sul thread principale.
  */
@@ -102,7 +102,7 @@ class MaPlayer(
             repo.connection.collect { connection ->
                 problem = when (connection) {
                     is Connection.Connected -> null
-                    Connection.NotConfigured -> "Configura Autoradio sul telefono"
+                    Connection.NotConfigured -> "Configura Xonos sul telefono"
                     is Connection.Failed -> connection.message
                     is Connection.Connecting -> problem
                 }
@@ -526,7 +526,7 @@ class MaPlayer(
     }
 
     private companion object {
-        const val TAG = "Autoradio"
+        const val TAG = "Xonos"
         const val BEHIND = 3
         const val AHEAD = 50
         const val AHEAD_MARGIN = 5

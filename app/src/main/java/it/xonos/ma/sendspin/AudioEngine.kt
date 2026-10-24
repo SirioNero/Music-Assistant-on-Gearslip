@@ -1,4 +1,4 @@
-package it.autoradio.ma.sendspin
+package it.xonos.ma.sendspin
 
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -236,7 +236,7 @@ class AudioEngine(
             lock.notifyAll()
         }
         if (thread == null) {
-            thread = Thread(::run, "autoradio-audio").apply {
+            thread = Thread(::run, "xonos-audio").apply {
                 priority = Thread.MAX_PRIORITY
                 start()
             }
@@ -472,7 +472,7 @@ class AudioEngine(
     private fun framesFor(us: Long, rate: Int): Long = us * rate / 1_000_000
 
     private companion object {
-        const val TAG = "Autoradio"
+        const val TAG = "Xonos"
 
         /** Oltre questo scarto si salta o si aspetta; sotto si corregge piano. */
         const val HARD_US = 400_000L

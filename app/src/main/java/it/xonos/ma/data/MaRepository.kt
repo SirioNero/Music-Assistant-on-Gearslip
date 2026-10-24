@@ -1,4 +1,4 @@
-package it.autoradio.ma.data
+package it.xonos.ma.data
 
 import android.util.Log
 import kotlinx.coroutines.CancellationException
@@ -150,7 +150,7 @@ class MaRepository(private val settings: Settings) {
     }
 
     companion object {
-        private const val TAG = "Autoradio"
+        private const val TAG = "Xonos"
 
         /**
          * L'indirizzo di un'immagine: dal proxy di Music Assistant, che la rimpicciolisce, oppure

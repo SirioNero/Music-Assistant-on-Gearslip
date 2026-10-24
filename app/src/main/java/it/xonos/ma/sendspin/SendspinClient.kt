@@ -1,7 +1,7 @@
-package it.autoradio.ma.sendspin
+package it.xonos.ma.sendspin
 
 import android.util.Log
-import it.autoradio.ma.data.MaClient
+import it.xonos.ma.data.MaClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -353,7 +353,7 @@ class SendspinClient(
     }
 
     private companion object {
-        const val TAG = "Autoradio"
+        const val TAG = "Xonos"
         const val PRODUCT_NAME = "Mobile Application"
         val COMMANDS = listOf("volume", "mute")
         const val AUDIO_CHUNK = 4

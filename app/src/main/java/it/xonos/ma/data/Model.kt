@@ -1,4 +1,4 @@
-package it.autoradio.ma.data
+package it.xonos.ma.data
 
 import org.json.JSONArray
 import org.json.JSONObject

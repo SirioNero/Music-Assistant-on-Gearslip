@@ -1,4 +1,4 @@
-package it.autoradio.ma.playback
+package it.xonos.ma.playback
 
 import android.content.ContentProvider
 import android.content.ContentValues
@@ -12,10 +12,10 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.core.content.ContextCompat
-import it.autoradio.ma.AutoradioApp
-import it.autoradio.ma.R
-import it.autoradio.ma.data.MaImage
-import it.autoradio.ma.data.MaRepository
+import it.xonos.ma.XonosApp
+import it.xonos.ma.R
+import it.xonos.ma.data.MaImage
+import it.xonos.ma.data.MaRepository
 import okhttp3.Request
 import java.io.File
 import java.io.FileNotFoundException
@@ -33,7 +33,7 @@ import javax.crypto.spec.SecretKeySpec
  */
 class Artwork(private val context: Context) {
 
-    private val key: ByteArray by lazy { (context.applicationContext as AutoradioApp).settings.artKey }
+    private val key: ByteArray by lazy { (context.applicationContext as XonosApp).settings.artKey }
 
     /** L'indirizzo content:// di un'immagine di Music Assistant, alla misura richiesta. */
     fun uriFor(image: MaImage?, size: Int): Uri? {
@@ -63,7 +63,7 @@ class Artwork(private val context: Context) {
         .build()
 
     companion object {
-        private const val TAG = "Autoradio"
+        private const val TAG = "Xonos"
         private const val MAX_FILES = 400
 
         /** Le icone del menu, disegnate dall'app. */
@@ -100,7 +100,7 @@ class Artwork(private val context: Context) {
 
         /** Il file con l'immagine chiesta, scaricato o disegnato se non c'è ancora. Gira su un thread del binder. */
         fun open(context: Context, uri: Uri): File? {
-            val app = context.applicationContext as AutoradioApp
+            val app = context.applicationContext as XonosApp
             val dir = File(context.cacheDir, "art").apply { mkdirs() }
             return when (uri.pathSegments.firstOrNull()) {
                 "icon" -> icon(context, dir, uri.lastPathSegment ?: return null)
@@ -109,7 +109,7 @@ class Artwork(private val context: Context) {
             }
         }
 
-        private fun image(app: AutoradioApp, dir: File, uri: Uri): File? {
+        private fun image(app: XonosApp, dir: File, uri: Uri): File? {
             val encoded = uri.getQueryParameter("v") ?: return null
             val size = uri.getQueryParameter("s")?.toIntOrNull() ?: return null
             val signature = uri.getQueryParameter("h") ?: return null
@@ -134,7 +134,7 @@ class Artwork(private val context: Context) {
             return download(app, url, file)
         }
 
-        private fun download(app: AutoradioApp, url: String, file: File): File? {
+        private fun download(app: XonosApp, url: String, file: File): File? {
             val http = app.repo.http.newBuilder().readTimeout(10, TimeUnit.SECONDS).callTimeout(15, TimeUnit.SECONDS).build()
             val request = try {
                 Request.Builder().url(url).build()

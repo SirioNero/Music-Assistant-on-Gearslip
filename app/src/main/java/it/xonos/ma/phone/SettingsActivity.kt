@@ -1,4 +1,4 @@
-package it.autoradio.ma.phone
+package it.xonos.ma.phone
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,10 +12,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import it.autoradio.ma.AutoradioApp
-import it.autoradio.ma.R
-import it.autoradio.ma.data.MaClient
-import it.autoradio.ma.data.Settings
+import it.xonos.ma.XonosApp
+import it.xonos.ma.R
+import it.xonos.ma.data.MaClient
+import it.xonos.ma.data.Settings
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.MainScope
@@ -40,7 +40,7 @@ class SettingsActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val app = application as AutoradioApp
+        val app = application as XonosApp
         val home = findViewById<EditText>(R.id.url_home)
         val remote = findViewById<EditText>(R.id.url_remote)
         val token = findViewById<EditText>(R.id.token)
@@ -80,7 +80,7 @@ class SettingsActivity : Activity() {
         updateBattery()
     }
 
-    private fun test(app: AutoradioApp, config: Settings.Config) {
+    private fun test(app: XonosApp, config: Settings.Config) {
         if (!config.isComplete) {
             status.text = "Servono almeno un indirizzo e il token."
             return
@@ -114,7 +114,7 @@ class SettingsActivity : Activity() {
     }
 
     /** Apre /sendspin come farà il lettore e controlla che il server accetti il token. */
-    private suspend fun testAudio(app: AutoradioApp, url: String, token: String): String {
+    private suspend fun testAudio(app: XonosApp, url: String, token: String): String {
         val answer = CompletableDeferred<String>()
         val request = Request.Builder().url(MaClient.websocketUrl(url, "/sendspin")).build()
         val socket = app.repo.http.newWebSocket(request, object : WebSocketListener() {
