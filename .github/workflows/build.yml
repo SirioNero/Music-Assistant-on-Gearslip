@@ -61,15 +61,12 @@ jobs:
             exit 0
           fi
           echo "$KEY" | base64 -d > app/xonos.keystore
-          if [ -n "$KEYSTORE_PASSWORD" ]; then
-            PASSWORDS="$KEYSTORE_PASSWORD"
-          elif [ -n "$XONOS_KEYSTORE" ]; then
-            PASSWORDS="xonos-android"
-          else
-            PASSWORDS="plancia-android"
-          fi
-          ALIAS=$(keytool -list -keystore app/xonos.keystore -storepass "$PASSWORDS" 2>/dev/null \
-            | grep -E "PrivateKeyEntry" | head -n 1 | cut -d, -f1)
+          # Senza password esplicita si provano quella di Xonos e quella di Plancia.
+          for PASSWORDS in ${KEYSTORE_PASSWORD:+"$KEYSTORE_PASSWORD"} xonos-android plancia-android; do
+            ALIAS=$(keytool -list -keystore app/xonos.keystore -storepass "$PASSWORDS" 2>/dev/null \
+              | grep -E "PrivateKeyEntry" | head -n 1 | cut -d, -f1)
+            [ -n "$ALIAS" ] && break
+          done
           if [ -z "$ALIAS" ]; then
             echo "::error title=Chiave di firma::Non riesco ad aprire la chiave: controlla il secret XONOS_KEYSTORE_PASSWORD."
             exit 1
