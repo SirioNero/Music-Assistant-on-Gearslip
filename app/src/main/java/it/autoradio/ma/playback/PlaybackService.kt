@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.os.Process
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
@@ -91,7 +92,9 @@ class PlaybackService : MediaLibraryService() {
         val settings = app.settings
         val artwork = Artwork(this)
 
-        engine = AudioEngine(AndroidAudio::output, AndroidAudio::decoder, TimeFilter())
+        engine = AudioEngine(AndroidAudio::output, AndroidAudio::decoder, TimeFilter()) {
+            Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO)
+        }
         engine.setVolume(settings.volume, settings.muted)
         sendspin = SendspinClient(app.repo.http, engine, ::identity) { volume, muted ->
             settings.volume = volume

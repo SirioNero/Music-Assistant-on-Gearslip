@@ -384,11 +384,11 @@ class MaPlayer(
             Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM ->
                 command("player_queues/next") { it?.currentIndex != index }
             Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM ->
-                if (target == index) seekTo(0) else command("player_queues/previous") { it?.currentIndex != index }
-            Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM -> seekTo(positionMs)
+                if (target == index) seekWithin(0) else command("player_queues/previous") { it?.currentIndex != index }
+            Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM -> seekWithin(positionMs)
             else ->
                 if (target == index) {
-                    seekTo(if (positionMs == C.TIME_UNSET) 0 else positionMs)
+                    seekWithin(if (positionMs == C.TIME_UNSET) 0 else positionMs)
                 } else {
                     command("player_queues/play_index", args = {
                         put("index", target)
@@ -398,7 +398,7 @@ class MaPlayer(
         }
     }
 
-    private fun seekTo(positionMs: Long): ListenableFuture<*> {
+    private fun seekWithin(positionMs: Long): ListenableFuture<*> {
         val seconds = (positionMs.coerceAtLeast(0) / 1000).toInt()
         this.positionMs = seconds * 1000L
         positionAt = SystemClock.elapsedRealtime()

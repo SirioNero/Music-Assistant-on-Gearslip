@@ -118,6 +118,8 @@ class AudioEngine(
     private val decoders: (StreamFormat) -> AudioDecoder?,
     val filter: TimeFilter,
     private val clock: () -> Long = { System.nanoTime() / 1000 },
+    /** Chiamato sul thread audio appena parte: sul telefono gli dà la priorità dell'audio. */
+    private val onAudioThread: () -> Unit = {},
 ) {
     private sealed interface Event
     private class Start(val format: StreamFormat, val fresh: Boolean) : Event
@@ -138,7 +140,6 @@ class AudioEngine(
     // Lo stato del protocollo, visto dal thread della rete.
     private var streamOpen = false
     private var freshNeeded = true
-    private var lastChunkUs = Long.MIN_VALUE
 
     // Lo stato dell'uscita, visto dal thread audio.
     private var format: StreamFormat? = null
@@ -158,9 +159,6 @@ class AudioEngine(
     /** Vero mentre esce davvero musica: falso in attesa del primo audio, in pausa o se la rete si è fermata. */
     val outputting: StateFlow<Boolean> = _outputting.asStateFlow()
 
-    /** Fin dove arriva l'audio ricevuto, sull'orologio del server; utile per riprendere dopo un buco di rete. */
-    val bufferedUntilServerUs: Long get() = lastChunkUs
-
     /** Inizia uno stream, o ne cambia il formato senza interromperlo. */
     fun startStream(format: StreamFormat) {
         val fresh = !streamOpen || freshNeeded
@@ -173,7 +171,6 @@ class AudioEngine(
     /** Un pacchetto audio: [timestampUs] è il tempo del server in cui va ascoltato il primo campione. */
     fun audio(timestampUs: Long, data: ByteArray, offset: Int = 0, length: Int = data.size - offset) {
         if (!streamOpen || freshNeeded || length <= 0) return
-        lastChunkUs = timestampUs
         post(Chunk(generation, timestampUs, data, offset, length))
     }
 
@@ -226,7 +223,6 @@ class AudioEngine(
 
     private fun interrupt() {
         generation++
-        lastChunkUs = Long.MIN_VALUE
         synchronized(outputLock) { output?.interrupt() }
         synchronized(lock) { events.removeAll { it is Chunk } }
     }
@@ -248,6 +244,7 @@ class AudioEngine(
     }
 
     private fun run() {
+        onAudioThread()
         while (!released) {
             val event = synchronized(lock) {
                 if (events.isEmpty()) lock.wait(IDLE_WAIT_MS)
