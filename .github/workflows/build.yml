@@ -3,6 +3,8 @@ name: Compila Xonos
 on:
   push:
     branches: ["**"]
+    # Appunti, README e strumenti di prova non cambiano l'app: non serve compilarla.
+    paths-ignore: ["**.md", "tools/**"]
   pull_request:
   workflow_dispatch:
 
@@ -15,6 +17,9 @@ jobs:
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v5
+        with:
+          # Tutta la storia, per vedere se il push ha cambiato l'app.
+          fetch-depth: 0
 
       # Dal telefono non si possono caricare cartelle: si carica Xonos.zip
       # e questo passaggio lo scompatta nel repository, al posto dello zip.
@@ -93,15 +98,27 @@ jobs:
           errors=$(grep -E "^e: |error:|What went wrong" -A3 build.log | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
           if [ -n "$errors" ]; then echo "::error title=Compilazione non riuscita::$errors"; fi
 
+      # Un push che cambia solo il workflow o gli strumenti non è un aggiornamento dell'app.
+      - name: Controlla se l'app è cambiata
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -n "$BEFORE" ] && git cat-file -e "$BEFORE" 2>/dev/null \
+            && git diff --quiet "$BEFORE" HEAD -- app build.gradle.kts settings.gradle.kts gradle.properties gradle; then
+            echo "APP_CHANGED=false" >> "$GITHUB_ENV"
+            echo "::notice title=Release::L'app non è cambiata: niente release."
+          fi
+
       # Solo il ramo main pubblica una release: gli altri rami si compilano per controllo.
       - name: Rinomina l'APK
-        if: env.SIGNED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        if: env.SIGNED == 'true' && env.APP_CHANGED != 'false' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
           mkdir -p apk
           cp app/build/outputs/apk/release/app-release.apk apk/Xonos.apk
 
       - name: Pubblica la release
-        if: env.SIGNED == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        if: env.SIGNED == 'true' && env.APP_CHANGED != 'false' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           # Il tag è la versione dell'app (versionName in app/build.gradle.kts): Obtainium li confronta.
