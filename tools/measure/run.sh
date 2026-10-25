@@ -10,6 +10,13 @@ ARGS=(
   "-Pandroid.testInstrumentationRunnerArguments.xonosUrl=http://10.0.2.2:8095"
 )
 
+# Appena acceso l'emulatore è lento e il launcher può andare in "non risponde": il suo dialogo
+# coprirebbe l'app. Niente dialoghi di errore (gli arresti restano nel log) e un minuto per assestarsi.
+adb shell settings put global hide_error_dialogs 1
+sleep 60
+adb shell input keyevent KEYCODE_WAKEUP
+adb shell input keyevent KEYCODE_HOME
+
 adb logcat -c
 adb logcat -v threadtime > "$OUT/logcat.txt" 2>&1 &
 LOGCAT=$!
