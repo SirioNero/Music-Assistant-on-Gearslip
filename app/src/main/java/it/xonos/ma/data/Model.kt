@@ -75,12 +75,17 @@ data class MaItem(
     val path: String?,
     /** Le righe di "Per te" che le versioni vecchie mandano già piene. */
     val inline: List<MaItem> = emptyList(),
+    /** Il nome con cui Music Assistant mette in ordine alfabetico (minuscolo, senza articoli). */
+    val sortName: String? = null,
+    val year: Int = 0,
+    /** In quali servizi si trova: istanza del provider e id dell'elemento lì. */
+    val mappings: List<Pair<String, String>> = emptyList(),
 ) {
     /** Cosa si apre come elenco; il resto si suona e basta. */
     val browsable: Boolean get() = mediaType in BROWSABLE
 
     companion object {
-        private val BROWSABLE = setOf("album", "playlist", "artist", "podcast", "folder")
+        private val BROWSABLE = setOf("album", "playlist", "artist", "podcast", "genre", "folder")
 
         fun from(o: JSONObject): MaItem? {
             val uri = o.str("uri") ?: return null
@@ -100,6 +105,13 @@ data class MaItem(
                 durationSec = o.optInt("duration"),
                 path = o.str("path"),
                 inline = items.objects().mapNotNull(::from),
+                sortName = o.str("sort_name"),
+                year = o.optInt("year"),
+                mappings = o.optJSONArray("provider_mappings").objects().mapNotNull { m ->
+                    val instance = m.str("provider_instance") ?: return@mapNotNull null
+                    val id = m.str("item_id") ?: return@mapNotNull null
+                    instance to id
+                },
             )
         }
 
@@ -107,6 +119,7 @@ data class MaItem(
             "track" -> listOfNotNull(artistsOf(o), o.optJSONObject("album")?.str("name")).joinToString(" · ")
             "album" -> listOfNotNull(artistsOf(o), o.optInt("year").takeIf { it > 0 }?.toString()).joinToString(" · ")
             "playlist" -> o.str("owner")
+            "podcast" -> o.str("publisher")
             "podcast_episode" -> o.optJSONObject("podcast")?.str("name")
             "audiobook" -> o.optJSONArray("authors")?.let { authors ->
                 (0 until authors.length()).mapNotNull { authors.optString(it).takeIf(String::isNotEmpty) }.joinToString(", ")

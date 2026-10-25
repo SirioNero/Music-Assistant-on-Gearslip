@@ -1,5 +1,8 @@
 package it.xonos.ma.data
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -11,23 +14,70 @@ class Library(private val repo: MaRepository) {
         return result.objects().mapNotNull(MaItem::from)
     }
 
+    /**
+     * Un elenco intero, a pagine di [PAGE] come le chiede Music Assistant stesso: dopo la prima
+     * ne chiede alcune insieme, finché una non arriva incompleta.
+     */
+    private suspend fun paged(command: String, fill: JSONObject.() -> Unit): List<MaItem> = coroutineScope {
+        val all = items(command) {
+            fill()
+            put("limit", PAGE)
+            put("offset", 0)
+        }.toMutableList()
+        var offset = PAGE
+        var complete = all.size < PAGE
+        while (!complete && offset < MAX_ITEMS) {
+            val pages = (0 until PAGES_AT_ONCE).map { i ->
+                async {
+                    items(command) {
+                        fill()
+                        put("limit", PAGE)
+                        put("offset", offset + i * PAGE)
+                    }
+                }
+            }.awaitAll()
+            for (page in pages) {
+                all += page
+                if (page.size < PAGE) {
+                    complete = true
+                    break
+                }
+            }
+            offset += PAGES_AT_ONCE * PAGE
+        }
+        all
+    }
+
     /** Gli ultimi ascolti, anche quelli interrotti a metà. */
     suspend fun recent(limit: Int = 40) = items("music/recently_played_items") {
         put("limit", limit)
         put("fully_played_only", false)
     }
 
-    /** Gli elementi della libreria di un tipo ("albums", "artists", "playlists", "tracks", "radios", ...). */
-    suspend fun libraryItems(
-        kind: String,
-        favorite: Boolean? = null,
-        orderBy: String = "sort_name",
-        limit: Int = LIST_LIMIT,
-    ) = items("music/$kind/library_items") {
-        if (favorite != null) put("favorite", favorite)
-        put("order_by", orderBy)
-        put("limit", limit)
+    /** Tutti gli elementi della libreria di un tipo ("albums", "artists", "playlists", "tracks", "radios", ...). */
+    suspend fun libraryItems(kind: String, favorite: Boolean? = null, orderBy: String = "sort_name") =
+        paged("music/$kind/library_items") {
+            if (favorite != null) put("favorite", favorite)
+            put("order_by", orderBy)
+        }
+
+    /** I generi musicali che hanno qualcosa dentro (Music Assistant 2.10 o successivo: prima i generi non c'erano). */
+    suspend fun genres() = paged("music/genres/library_items") {
+        put("hide_empty", true)
+        put("content_type", "music")
+        put("order_by", "sort_name")
     }
+
+    /** Se c'è almeno un genere musicale con qualcosa dentro. */
+    suspend fun hasGenres() = items("music/genres/library_items") {
+        put("hide_empty", true)
+        put("content_type", "music")
+        put("limit", 1)
+    }.isNotEmpty()
+
+    suspend fun genreTracks(genre: MaItem) = paged("music/genres/tracks") { put("item_id", genre.itemId) }
+
+    suspend fun genreAlbums(genre: MaItem) = paged("music/genres/albums") { put("item_id", genre.itemId) }
 
     /** Quanti elementi di un tipo ci sono in libreria; -1 se il server non lo sa dire. */
     suspend fun count(kind: String, favoriteOnly: Boolean = false): Int =
@@ -38,9 +88,22 @@ class Library(private val repo: MaRepository) {
     /** Le playlist lunghe arrivano a pezzi e un servizio come Spotify può metterci un po'. */
     suspend fun playlistTracks(playlist: MaItem) = items("music/playlists/playlist_tracks", 90_000) { identify(playlist) }
 
-    suspend fun artistAlbums(artist: MaItem) = items("music/artists/artist_albums") { identify(artist) }
+    /** Gli album di un artista: quelli della libreria e tutti quelli dei servizi dove l'artista c'è. */
+    suspend fun artistAlbums(artist: MaItem) = everywhere(artist) { provider, id ->
+        items("music/artists/artist_albums", 60_000) { identify(provider, id) }
+    }
 
-    suspend fun artistTracks(artist: MaItem) = items("music/artists/artist_tracks") { identify(artist) }
+    /** I brani di un artista: quelli della libreria e quelli che ne conoscono i servizi. */
+    suspend fun artistTracks(artist: MaItem) = everywhere(artist) { provider, id ->
+        items("music/artists/artist_tracks", 60_000) { identify(provider, id) }
+    }
+
+    /** I brani più ascoltati di un artista, da tutti i servizi; vuoto se il server è più vecchio della 2.10. */
+    suspend fun artistTopTracks(artist: MaItem): List<MaItem> = try {
+        items("music/artists/top_tracks", 60_000) { identify(artist.provider, artist.itemId) }
+    } catch (e: MaException) {
+        emptyList()
+    }
 
     suspend fun podcastEpisodes(podcast: MaItem) = items("music/podcasts/podcast_episodes", 60_000) { identify(podcast) }
 
@@ -61,13 +124,18 @@ class Library(private val repo: MaRepository) {
         if (path != null) put("path", path)
     }.filter { it.name != ".." }
 
-    /** Cerca dappertutto: prima gli artisti, poi brani, album, playlist e il resto. */
-    suspend fun search(query: String, limit: Int = 8): List<MaItem> {
+    /**
+     * Cerca nella libreria e in tutti i servizi collegati, ogni tipo di elemento: i risultati
+     * arrivano divisi per tipo ("artists", "tracks", "podcasts"...), i più pertinenti per primi.
+     */
+    suspend fun search(query: String, limit: Int = SEARCH_LIMIT): Map<String, List<MaItem>> {
         val result = repo.command("music/search", 45_000) {
             put("search_query", query)
             put("limit", limit)
-        } as? JSONObject ?: return emptyList()
-        return SEARCH_ORDER.flatMap { key -> result.optJSONArray(key).objects().mapNotNull(MaItem::from) }
+        } as? JSONObject ?: return emptyMap()
+        // Lo stesso podcast o brano può arrivare da più servizi: resta il primo, che è il più pertinente.
+        return SEARCH_TYPES.associateWith { key -> dedupe(result.optJSONArray(key).objects().mapNotNull(MaItem::from)) }
+            .filterValues { it.isNotEmpty() }
     }
 
     suspend fun item(uri: String): MaItem? =
@@ -102,15 +170,54 @@ class Library(private val repo: MaRepository) {
         }
     }
 
-    private fun JSONObject.identify(item: MaItem) {
-        put("item_id", item.itemId)
-        put("provider_instance_id_or_domain", item.provider)
+    /**
+     * Chiede la stessa cosa all'elemento e a ciascuno dei servizi dove si trova: per un artista
+     * della libreria, Music Assistant risponde solo con ciò che è in libreria, i servizi con tutto.
+     */
+    private suspend fun everywhere(item: MaItem, fetch: suspend (provider: String, id: String) -> List<MaItem>): List<MaItem> =
+        coroutineScope {
+            val others = item.mappings.filter { (provider, _) -> provider != item.provider }.distinct().map { (provider, id) ->
+                // Un servizio che non risponde non deve togliere il resto.
+                async {
+                    try {
+                        fetch(provider, id)
+                    } catch (e: MaException) {
+                        emptyList()
+                    }
+                }
+            }
+            dedupe(fetch(item.provider, item.itemId) + others.awaitAll().flatten())
+        }
+
+    /** Lo stesso elemento visto da più servizi una volta sola: vince il primo, di solito quello della libreria. */
+    private fun dedupe(items: List<MaItem>): List<MaItem> {
+        val seen = HashSet<String>()
+        return items.filter { item ->
+            val keys = listOf("${item.provider}/${item.itemId}") + item.mappings.map { (provider, id) -> "$provider/$id" } +
+                "${item.mediaType}:${item.name.lowercase()}|${item.subtitle?.lowercase()}"
+            val fresh = keys.none { it in seen }
+            seen += keys
+            fresh
+        }
+    }
+
+    private fun JSONObject.identify(item: MaItem) = identify(item.provider, item.itemId)
+
+    private fun JSONObject.identify(provider: String, itemId: String) {
+        put("item_id", itemId)
+        put("provider_instance_id_or_domain", provider)
     }
 
     companion object {
-        /** Più di così un elenco in auto non si scorre: e si risparmia memoria e dati. */
-        const val LIST_LIMIT = 500
+        private const val PAGE = 500
+        private const val PAGES_AT_ONCE = 4
 
-        private val SEARCH_ORDER = listOf("artists", "tracks", "albums", "playlists", "radio", "podcasts", "audiobooks")
+        /** Un tetto solo contro gli errori: nessuna libreria vera ci arriva vicino. */
+        private const val MAX_ITEMS = 50_000
+
+        /** Risultati per tipo: il valore predefinito di Music Assistant. */
+        const val SEARCH_LIMIT = 25
+
+        val SEARCH_TYPES = listOf("artists", "tracks", "albums", "playlists", "podcasts", "audiobooks", "radio", "genres")
     }
 }

@@ -20,9 +20,10 @@ The app’s interface is in Italian for now.
 
 ### Getting around
 
-- **The menu** lists Ascoltati di recente (recently played), Per te (recommendations from your library and services), Playlist, Album, Artisti (artists), Brani preferiti (favorite tracks), Radio, Podcast, Audiolibri (audiobooks) and Sfoglia i servizi (browse your providers). Empty ones are hidden.
+- **The menu** lists Ascoltati di recente (recently played), Per te (recommendations from your library and services), Playlist, Album, Artisti (artists), Brani (every track in the library), Brani preferiti (favorite tracks), Generi (genres), Radio, Podcast, Audiolibri (audiobooks) and Sfoglia i servizi (browse each service’s own folders). Empty ones are hidden. Lists are complete, however long: past 150 items they split by initial, A to Z.
 - **Albums and playlists** open with a tap; the play button next to them plays them whole. A track inside an album or playlist plays the album or playlist from that track on, so next and previous stay inside it.
-- **Search** with Gearslip’s search key: Xonos searches every service in Music Assistant.
+- **An artist** shows the most played tracks, every album (those in the library and the whole discography on the services where the artist is), and all the tracks.
+- **Search** with Gearslip’s search key: Xonos searches the library and every service connected to Music Assistant, for every kind of item. The best matches come first, one per kind, then a folder per kind with all its results: Brani, Artisti, Album, Playlist, Podcast, Audiolibri, Radio, Generi. Starting or ending with a kind (“podcast morning”, “morning podcast”, “radio deejay”) puts that kind first.
 - **The heart** marks the track as a favorite in Music Assistant: you find it in Brani preferiti. Shuffle and repeat work on the Music Assistant queue.
 - **Calls and the voice assistant** pause the music, which comes back afterwards. Navigation prompts lower it. If the car’s Bluetooth disconnects, the music pauses instead of moving to the phone’s speaker.
 - **No signal** (a tunnel): the phone keeps playing what it has already received, up to about half a minute, then picks up where the music would have been.
@@ -88,7 +89,8 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `sendspin/AndroidAudio.kt` | The phone’s audio output and Opus decoder |
 | `playback/PlaybackService.kt` | The music app Gearslip opens: session, menu, focus, notification |
 | `playback/MaPlayer.kt` | The player Gearslip sees, mirroring the Music Assistant queue |
-| `playback/BrowseTree.kt` | The menu in the car and what each item plays |
+| `playback/Menu.kt` | The menu in the car, the search, and what each item plays |
+| `playback/BrowseTree.kt` | The menu as Media3 items for Gearslip |
 | `playback/Artwork.kt` | Cover art served to Gearslip |
 | `phone/SettingsActivity.kt` | The settings screen on the phone |
 
@@ -108,9 +110,10 @@ Xonos trasforma il telefono in un lettore di [Music Assistant](https://music-ass
 
 ### Come si naviga
 
-- **Il menu** elenca Ascoltati di recente, Per te (i consigli della libreria e dei servizi), Playlist, Album, Artisti, Brani preferiti, Radio, Podcast, Audiolibri e Sfoglia i servizi. Le voci vuote non compaiono.
+- **Il menu** elenca Ascoltati di recente, Per te (i consigli della libreria e dei servizi), Playlist, Album, Artisti, Brani (tutti quelli della libreria), Brani preferiti, Generi, Radio, Podcast, Audiolibri e Sfoglia i servizi (le cartelle di ciascun servizio). Le voci vuote non compaiono. Gli elenchi sono completi, anche lunghissimi: oltre i 150 elementi si dividono per iniziale, dalla A alla Z.
 - **Album e playlist** si aprono con un tocco; il tasto play accanto li suona interi. Un brano dentro un album o una playlist li fa partire da quel brano, così avanti e indietro restano lì dentro.
-- **La ricerca** è il tasto cerca di Gearslip: Xonos cerca in tutti i servizi di Music Assistant.
+- **Un artista** mostra i brani più ascoltati, tutti gli album (quelli in libreria e la discografia intera dei servizi dove l’artista c’è) e tutti i brani.
+- **La ricerca** è il tasto cerca di Gearslip: Xonos cerca nella libreria e in tutti i servizi collegati a Music Assistant, ogni tipo di elemento. In cima ci sono i risultati migliori, uno per tipo, poi una cartella per tipo con tutti i suoi risultati: Brani, Artisti, Album, Playlist, Podcast, Audiolibri, Radio, Generi. Se cominci o finisci con un tipo (“podcast morning”, “morning podcast”, “radio deejay”) quel tipo va per primo.
 - **Il cuore** segna il brano tra i preferiti di Music Assistant: lo ritrovi in Brani preferiti. Casuale e ripeti agiscono sulla coda di Music Assistant.
 - **Telefonate e assistente vocale** mettono in pausa la musica, che poi riprende. Le indicazioni del navigatore la abbassano. Se il Bluetooth dell’auto si stacca, la musica si ferma invece di passare all’altoparlante del telefono.
 - **Senza campo** (una galleria) il telefono continua a suonare quello che ha già ricevuto, fino a una mezzo minuto, poi riprende da dove la musica sarebbe arrivata.
@@ -176,6 +179,7 @@ Segnalazioni e pull request sono benvenute, soprattutto da chi prova Xonos in au
 | `sendspin/AndroidAudio.kt` | L’uscita audio del telefono e il decoder Opus |
 | `playback/PlaybackService.kt` | L’app musicale che apre Gearslip: sessione, menu, audio condiviso, notifica |
 | `playback/MaPlayer.kt` | Il lettore che vede Gearslip, specchio della coda di Music Assistant |
-| `playback/BrowseTree.kt` | Il menu in auto e cosa suona ogni voce |
+| `playback/Menu.kt` | Il menu in auto, la ricerca e cosa suona ogni voce |
+| `playback/BrowseTree.kt` | Il menu come voci di Media3 per Gearslip |
 | `playback/Artwork.kt` | Le copertine passate a Gearslip |
 | `phone/SettingsActivity.kt` | La schermata di configurazione sul telefono |

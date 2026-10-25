@@ -101,7 +101,7 @@ class PlaybackService : MediaLibraryService() {
             settings.muted = muted
         }
         player = MaPlayer(mainLooper, app.repo, settings.playerId, ready, engine.outputting, artwork::uriFor)
-        tree = BrowseTree(app.library, { settings.playerId }, artwork)
+        tree = BrowseTree(Menu(app.library) { settings.playerId }, artwork)
         player.onPlayRequest = { item -> tree.play(item) }
 
         val openSettings = PendingIntent.getActivity(
@@ -374,7 +374,7 @@ class PlaybackService : MediaLibraryService() {
             isForPlayback: Boolean,
         ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> = Futures.immediateFuture(
             MediaSession.MediaItemsWithStartPosition(
-                listOf(MediaItem.Builder().setMediaId(BrowseTree.RESUME).build()),
+                listOf(MediaItem.Builder().setMediaId(Menu.RESUME).build()),
                 0,
                 C.TIME_UNSET,
             ),

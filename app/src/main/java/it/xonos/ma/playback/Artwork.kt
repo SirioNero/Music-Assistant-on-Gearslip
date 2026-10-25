@@ -79,6 +79,7 @@ class Artwork(private val context: Context) {
             "audiobook" to R.drawable.ic_cat_audiobook,
             "browse" to R.drawable.ic_cat_browse,
             "track" to R.drawable.ic_cat_track,
+            "genre" to R.drawable.ic_cat_genre,
         )
 
         fun authority(context: Context) = "${context.packageName}.art"
