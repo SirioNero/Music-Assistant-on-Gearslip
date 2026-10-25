@@ -26,6 +26,7 @@ concurrency:
 jobs:
   screens:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v5
@@ -57,6 +58,7 @@ jobs:
           fc-cache -f > /dev/null
 
       - name: Disegna le schermate
+        timeout-minutes: 15
         run: |
           set -o pipefail
           cd tools/screens
@@ -69,11 +71,13 @@ jobs:
       - name: Riassumi gli errori
         if: failure()
         run: |
-          errors=$(grep -E "^e: |error:|Exception|What went wrong" -A3 tools/screens/build.log | head -n 60 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+          errors=$(tail -n 70 tools/screens/build.log | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
           if [ -n "$errors" ]; then echo "::error title=Schermate non riuscite::$errors"; fi
 
       # Le librerie androidx che Gradle ha scaricato, nella forma di un repository Maven (per tools/screens/libs).
+      # Anche se il disegno non è riuscito: con queste lo si può ripetere e correggere nella sandbox.
       - name: Metti da parte le librerie di Google
+        if: always()
         run: |
           OUT="$GITHUB_WORKSPACE/tools/screens/out/libs"
           cd ~/.gradle/caches/modules-2/files-2.1
@@ -85,13 +89,15 @@ jobs:
           du -sh "$OUT"
 
       - name: Pubblica in refs/xonos/screens
+        if: always()
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cd tools/screens/out
+          mkdir -p tools/screens/out && cd tools/screens/out
+          cp ../build.log . 2>/dev/null || true
           git init -q
           git add -A
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "Schermate di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
           git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/xonos/screens
-          echo "::notice title=Schermate::$(ls *.png | wc -l) schermate in refs/xonos/screens"
+          echo "::notice title=Schermate::$(ls *.png 2>/dev/null | wc -l) schermate in refs/xonos/screens"

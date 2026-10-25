@@ -53,6 +53,18 @@ import kotlin.system.exitProcess
  * -Dxonos.only=home,player (solo alcune scene).
  */
 fun main() {
+    // Un errore non deve lasciare il processo appeso ai thread del server finto e di OkHttp.
+    val code = try {
+        draw()
+        0
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        1
+    }
+    exitProcess(code)
+}
+
+private fun draw() {
     val server = FakeServer(::answer)
     Catalog.colors.forEach { (id, colors) -> server.covers[id] = colors }
     System.setProperty("xonos.url", server.start())
@@ -65,11 +77,36 @@ fun main() {
     val only = System.getProperty("xonos.only")?.split(',')?.toSet()
     for ((name, scene) in SCENES) {
         if (only != null && name !in only) continue
-        shoot(File(out, "$name-$lang.png"), lang, scene)
-        println("$name-$lang.png")
+        val t0 = System.nanoTime()
+        println("$name-$lang...")
+        watchdog(name) { shoot(File(out, "$name-$lang.png"), lang, scene) }
+        println("$name-$lang.png in ${(System.nanoTime() - t0) / 1_000_000} ms")
     }
     server.stop()
-    exitProcess(0)
+}
+
+/** Se una scena non finisce in un minuto, si stampano i thread (per capire dove si è fermata) e si esce. */
+private fun watchdog(name: String, block: () -> Unit) {
+    val timer = java.util.Timer(true)
+    timer.schedule(
+        object : java.util.TimerTask() {
+            override fun run() {
+                System.err.println("La scena $name non finisce: ecco i thread")
+                Thread.getAllStackTraces().forEach { (thread, stack) ->
+                    System.err.println("--- ${thread.name}")
+                    stack.take(25).forEach { System.err.println("    at $it") }
+                }
+                System.err.flush()
+                Runtime.getRuntime().halt(2)
+            }
+        },
+        60_000,
+    )
+    try {
+        block()
+    } finally {
+        timer.cancel()
+    }
 }
 
 private const val WIDTH = 1080
