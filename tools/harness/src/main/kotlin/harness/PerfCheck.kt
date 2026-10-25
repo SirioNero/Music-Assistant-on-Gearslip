@@ -106,7 +106,10 @@ fun main(): Unit = runBlocking {
     } else {
         val page = ItemPage(playlist)
         scope.launch { model.push(page); model.start(page) }
-        phase("Playlist \"${playlist.name}\" aperta") { page.tracks !is Load.Loading }
+        // I primi brani si vedono quando arriva il primo pezzo (500), il resto dopo.
+        phase("Playlist \"${playlist.name}\": primi brani") { page.tracks !is Load.Loading }
+        println("   ${page.tracks.value?.size} brani${if (page.more) ", ne arrivano altri" else ""}")
+        phase("Playlist \"${playlist.name}\": tutta") { !page.more && page.tracks is Load.Ready }
         println("   ${page.tracks.value?.size} brani")
 
         // La sola conversione, come fa Library.items: prima a freddo, poi a caldo.

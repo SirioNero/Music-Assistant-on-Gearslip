@@ -209,8 +209,9 @@ fun main(): Unit = runBlocking {
     model.open(artists.items.first { it.name == "Vasco Rossi" })
     val artistPage = model.page as ArtistPage
     model.start(artistPage)
-    val artistAlbums = loaded { artistPage.albums }.orEmpty()
-    val artistTracks = loaded { artistPage.tracks }.orEmpty()
+    // Prima arriva la libreria, poi i servizi: si aspetta l'elenco intero.
+    val artistAlbums = loaded { artistPage.albums.takeUnless { artistPage.albumsMore } }.orEmpty()
+    val artistTracks = loaded { artistPage.tracks.takeUnless { artistPage.tracksMore } }.orEmpty()
     check("Artista: album dal più recente", artistAlbums.firstOrNull()?.year == 2014 && artistAlbums.size == 5, artistAlbums.joinToString { "${it.name} ${it.year}" })
     check("Artista: tutti i brani", artistTracks.size == 28)
     model.openArtistTracks(artistPage, "Tutti i brani", top = false)
@@ -233,6 +234,21 @@ fun main(): Unit = runBlocking {
     model.play(episodes, 2, podcastPage.context)
     q = settle { it?.playing == true && it.current?.title == episodes[2].name }
     check("Podcast: suona l'episodio scelto", q?.current?.title == episodes[2].name, "${q?.items} in coda")
+
+    // ---------- Una playlist lunga: i primi brani si vedono prima del resto ----------
+    val big = library.libraryPage("playlists", 0, search = "Playlist grande").firstOrNull { it.name == "Playlist grande" }
+    check("Playlist grande nella libreria", big != null)
+    if (big != null) {
+        model.open(big)
+        val bigPage = model.page as ItemPage
+        model.start(bigPage)
+        val first = loaded { bigPage.tracks }.orEmpty()
+        val partial = bigPage.more
+        withTimeoutOrNull(60_000) { while (bigPage.more) delay(20) }
+        val all = bigPage.tracks.value.orEmpty()
+        check("Playlist lunga: prima un pezzo, poi tutta", partial && first.size == 500 && all.size == 2880, "${first.size} poi ${all.size}")
+        model.back()
+    }
 
     // ---------- Ricerca ----------
     model.select(Tab.SEARCH)

@@ -101,9 +101,10 @@ class MaRepository(private val settings: Settings) {
         timeoutMs: Long = 30_000,
         transform: (JSONObject) -> T?,
         fill: JSONObject.() -> Unit = {},
+        onPart: ((List<T>) -> Unit)? = null,
     ): List<T> {
         val c = client ?: throw MaException("Music Assistant non è collegato", problem = Problem.NOT_CONNECTED)
-        return c.items(name, timeoutMs, transform, fill)
+        return c.items(name, timeoutMs, transform, fill, onPart)
     }
 
     private suspend fun connectLoop() {

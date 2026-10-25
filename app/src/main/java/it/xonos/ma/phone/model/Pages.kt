@@ -111,6 +111,9 @@ class LibraryPage : Page() {
 /** Album, playlist, podcast o genere: i suoi brani (o episodi); per un genere anche gli album. */
 class ItemPage(val item: MaItem) : Page() {
     var tracks by mutableStateOf<Load<List<MaItem>>>(Load.Loading)
+
+    /** Vero mentre arrivano altri brani: quelli già arrivati si vedono (le playlist lunghe dei servizi). */
+    var more by mutableStateOf(false)
     var albums by mutableStateOf<Load<List<MaItem>>>(Load.Ready(emptyList()))
     var favorite by mutableStateOf(item.favorite)
 
@@ -123,6 +126,10 @@ class ArtistPage(val artist: MaItem) : Page() {
     var top by mutableStateOf<Load<List<MaItem>>>(Load.Loading)
     var albums by mutableStateOf<Load<List<MaItem>>>(Load.Loading)
     var tracks by mutableStateOf<Load<List<MaItem>>>(Load.Loading)
+
+    /** Veri mentre rispondono ancora dei servizi: intanto si vede la libreria. */
+    var albumsMore by mutableStateOf(false)
+    var tracksMore by mutableStateOf(false)
     var favorite by mutableStateOf(artist.favorite)
 }
 

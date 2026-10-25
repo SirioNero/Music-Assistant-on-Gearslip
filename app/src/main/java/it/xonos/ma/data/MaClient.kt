@@ -40,6 +40,9 @@ class MaClient(
     // Per gli elenchi chiesti con [items]: come trasformare ogni elemento, e quelli già trasformati.
     private val transforms = ConcurrentHashMap<String, (JSONObject) -> Any?>()
     private val converted = ConcurrentHashMap<String, ArrayList<Any?>>()
+
+    // Chi vuole vedere un elenco lungo mentre arriva: riceve gli elementi fin lì a ogni pezzo.
+    private val progress = ConcurrentHashMap<String, (List<Any?>) -> Unit>()
     private val serverInfo = CompletableDeferred<JSONObject>()
 
     /** Si completa (con il motivo) quando la connessione si chiude. */
@@ -127,6 +130,8 @@ class MaClient(
      * Un comando che risponde con un elenco: ogni elemento diventa subito un [T] con [transform],
      * pezzo per pezzo man mano che arriva, sul thread della rete. Così un elenco di migliaia di
      * elementi non resta mai tutto in memoria come JSON, e il thread principale non lo tocca.
+     * Music Assistant manda gli elenchi lunghi a pezzi di 500 man mano che li riceve dai servizi:
+     * [onPart], se c'è, riceve a ogni pezzo gli elementi arrivati fin lì (sul thread della rete).
      */
     @Suppress("UNCHECKED_CAST")
     suspend fun <T : Any> items(
@@ -134,9 +139,16 @@ class MaClient(
         timeoutMs: Long = 30_000,
         transform: (JSONObject) -> T?,
         fill: JSONObject.() -> Unit = {},
-    ): List<T> = send(name, timeoutMs, transform, fill) as? List<T> ?: emptyList()
+        onPart: ((List<T>) -> Unit)? = null,
+    ): List<T> = send(name, timeoutMs, transform, fill, onPart as ((List<Any?>) -> Unit)?) as? List<T> ?: emptyList()
 
-    private suspend fun send(name: String, timeoutMs: Long, transform: ((JSONObject) -> Any?)?, fill: JSONObject.() -> Unit): Any? {
+    private suspend fun send(
+        name: String,
+        timeoutMs: Long,
+        transform: ((JSONObject) -> Any?)?,
+        fill: JSONObject.() -> Unit,
+        onPart: ((List<Any?>) -> Unit)? = null,
+    ): Any? {
         val ws = socket
         if (ws == null || closed.isCompleted) throw closeError ?: MaException("Non collegato a Music Assistant", problem = Problem.NOT_CONNECTED)
         val id = ids.getAndIncrement().toString()
@@ -146,6 +158,7 @@ class MaClient(
             .put("args", JSONObject().apply(fill))
         val deferred = CompletableDeferred<Box>()
         if (transform != null) transforms[id] = transform
+        if (onPart != null) progress[id] = onPart
         pending[id] = deferred
         if (!ws.send(message.toString())) {
             forget(id)
@@ -166,6 +179,7 @@ class MaClient(
         partials.remove(id)
         transforms.remove(id)
         converted.remove(id)
+        progress.remove(id)
     }
 
     fun close() {
@@ -236,7 +250,16 @@ class MaClient(
             // Un elenco da trasformare: questo pezzo diventa subito elementi, il JSON si butta.
             val list = converted.getOrPut(id) { ArrayList() }
             (result as? JSONArray)?.let { chunk -> traced("Xonos.items") { chunk.objects().mapNotNullTo(list, transform) } }
-            if (msg.optBoolean("partial")) return
+            if (msg.optBoolean("partial")) {
+                progress[id]?.let { show ->
+                    try {
+                        show(ArrayList(list))
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Errore mostrando un pezzo di elenco", e)
+                    }
+                }
+                return
+            }
             val deferred = pending[id]
             forget(id)
             deferred?.complete(Box(list))

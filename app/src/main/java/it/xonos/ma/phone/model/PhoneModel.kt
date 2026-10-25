@@ -467,16 +467,19 @@ class PhoneModel(
     private fun loadItem(page: ItemPage) {
         val item = page.item
         page.tracks = Load.Loading
-        launchLoad({ page.tracks = Load.Failed(it) }) {
-            page.tracks = Load.Ready(
-                when (item.mediaType) {
-                    "album" -> library.albumTracks(item)
-                    "playlist" -> library.playlistTracks(item)
-                    "podcast" -> library.podcastEpisodes(item)
-                    "genre" -> library.genreTracks(item)
-                    else -> emptyList()
-                },
-            )
+        page.more = false
+        // Le playlist lunghe arrivano a pezzi: quelli arrivati si vedono subito.
+        val part = parts({ page.more || page.tracks is Load.Loading }) { page.more = true; page.tracks = Load.Ready(it) }
+        launchLoad({ error -> page.more = false; partFailed(error, page.tracks is Load.Ready) { page.tracks = Load.Failed(error) } }) {
+            val all = when (item.mediaType) {
+                "album" -> library.albumTracks(item)
+                "playlist" -> library.playlistTracks(item, part)
+                "podcast" -> library.podcastEpisodes(item, part)
+                "genre" -> library.genreTracks(item)
+                else -> emptyList()
+            }
+            page.more = false
+            page.tracks = Load.Ready(all)
         }
         if (item.mediaType == "genre") {
             page.albums = Load.Loading
@@ -489,11 +492,38 @@ class PhoneModel(
         page.top = Load.Loading
         page.albums = Load.Loading
         page.tracks = Load.Loading
+        page.albumsMore = false
+        page.tracksMore = false
         launchLoad({ page.top = Load.Failed(it) }) { page.top = Load.Ready(library.artistTopTracks(artist)) }
-        launchLoad({ page.albums = Load.Failed(it) }) {
-            page.albums = Load.Ready(library.artistAlbums(artist).sortedByDescending { it.year })
+        // Prima la libreria, poi la discografia di ogni servizio appena risponde.
+        val albums = parts({ page.albumsMore || page.albums is Load.Loading }) { part ->
+            page.albumsMore = true
+            page.albums = Load.Ready(part.sortedByDescending { it.year })
         }
-        launchLoad({ page.tracks = Load.Failed(it) }) { page.tracks = Load.Ready(library.artistTracks(artist)) }
+        launchLoad({ error -> page.albumsMore = false; partFailed(error, page.albums is Load.Ready) { page.albums = Load.Failed(error) } }) {
+            val all = library.artistAlbums(artist, albums).sortedByDescending { it.year }
+            page.albumsMore = false
+            page.albums = Load.Ready(all)
+        }
+        val tracks = parts({ page.tracksMore || page.tracks is Load.Loading }) { page.tracksMore = true; page.tracks = Load.Ready(it) }
+        launchLoad({ error -> page.tracksMore = false; partFailed(error, page.tracks is Load.Ready) { page.tracks = Load.Failed(error) } }) {
+            val all = library.artistTracks(artist, tracks)
+            page.tracksMore = false
+            page.tracks = Load.Ready(all)
+        }
+    }
+
+    /**
+     * I pezzi di un elenco che arriva a poco a poco: si mostrano con [show] finché [waiting] (finché
+     * non è arrivato l'elenco intero). Un pezzo in ritardo non torna indietro sull'elenco intero.
+     */
+    private fun parts(waiting: () -> Boolean, show: (List<MaItem>) -> Unit): (List<MaItem>) -> Unit = { part ->
+        scope.launch { if (waiting()) show(part) }
+    }
+
+    /** Un elenco interrotto a metà: il pezzo che si vede resta, con l'avviso; se non si vedeva niente, l'errore. */
+    private fun partFailed(error: Throwable, shown: Boolean, fail: () -> Unit) {
+        if (shown) notice = Notice.Failed(error) else fail()
     }
 
     private fun load(page: ListPage) {
@@ -503,7 +533,8 @@ class PhoneModel(
 
     /** Tutti i brani di un artista, su una schermata loro. */
     fun openArtistTracks(page: ArtistPage, title: String, top: Boolean) {
-        val tracks = (if (top) page.top else page.tracks).value
+        // Se i brani arrivano ancora, la pagina se li carica interi.
+        val tracks = if (top) page.top.value else page.tracks.value.takeUnless { page.tracksMore }
         push(
             ListPage(title, page.artist.name, page.artist.image) {
                 tracks ?: if (top) library.artistTopTracks(page.artist) else library.artistTracks(page.artist)

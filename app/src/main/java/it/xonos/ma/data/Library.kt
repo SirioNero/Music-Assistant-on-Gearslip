@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -11,9 +12,16 @@ import org.json.JSONObject
 /** Le domande che il menu dell'auto fa alla libreria di Music Assistant, e i comandi della coda. */
 class Library(private val repo: MaRepository) {
 
-    /** Un elenco di elementi: diventano MaItem man mano che arrivano, lontano dal thread principale. */
-    private suspend fun items(command: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): List<MaItem> =
-        repo.items(command, timeoutMs, MaItem::from, fill)
+    /**
+     * Un elenco di elementi: diventano MaItem man mano che arrivano, lontano dal thread principale.
+     * [onPart] riceve quelli arrivati fin lì a ogni pezzo (gli elenchi lunghi arrivano a pezzi di 500).
+     */
+    private suspend fun items(
+        command: String,
+        timeoutMs: Long = 30_000,
+        onPart: ((List<MaItem>) -> Unit)? = null,
+        fill: JSONObject.() -> Unit = {},
+    ): List<MaItem> = repo.items(command, timeoutMs, MaItem::from, fill, onPart)
 
     /**
      * Un elenco intero, a pagine di [PAGE] come le chiede Music Assistant stesso: dopo la prima
@@ -109,16 +117,20 @@ class Library(private val repo: MaRepository) {
 
     suspend fun albumTracks(album: MaItem) = items("music/albums/album_tracks") { identify(album) }
 
-    /** Le playlist lunghe arrivano a pezzi e un servizio come Spotify può metterci un po'. */
-    suspend fun playlistTracks(playlist: MaItem) = items("music/playlists/playlist_tracks", 90_000) { identify(playlist) }
+    /**
+     * Le playlist lunghe arrivano a pezzi e un servizio come Spotify può metterci un po': [onPart]
+     * riceve i brani arrivati fin lì, per mostrarli subito.
+     */
+    suspend fun playlistTracks(playlist: MaItem, onPart: ((List<MaItem>) -> Unit)? = null) =
+        items("music/playlists/playlist_tracks", 90_000, onPart) { identify(playlist) }
 
     /** Gli album di un artista: quelli della libreria e tutti quelli dei servizi dove l'artista c'è. */
-    suspend fun artistAlbums(artist: MaItem) = everywhere(artist) { provider, id ->
+    suspend fun artistAlbums(artist: MaItem, onPart: ((List<MaItem>) -> Unit)? = null) = everywhere(artist, onPart) { provider, id ->
         items("music/artists/artist_albums", 60_000) { identify(provider, id) }
     }
 
     /** I brani di un artista: quelli della libreria e quelli che ne conoscono i servizi. */
-    suspend fun artistTracks(artist: MaItem) = everywhere(artist) { provider, id ->
+    suspend fun artistTracks(artist: MaItem, onPart: ((List<MaItem>) -> Unit)? = null) = everywhere(artist, onPart) { provider, id ->
         items("music/artists/artist_tracks", 60_000) { identify(provider, id) }
     }
 
@@ -129,7 +141,8 @@ class Library(private val repo: MaRepository) {
         emptyList()
     }
 
-    suspend fun podcastEpisodes(podcast: MaItem) = items("music/podcasts/podcast_episodes", 60_000) { identify(podcast) }
+    suspend fun podcastEpisodes(podcast: MaItem, onPart: ((List<MaItem>) -> Unit)? = null) =
+        items("music/podcasts/podcast_episodes", 60_000, onPart) { identify(podcast) }
 
     /** Le righe di "Per te" (consigli della libreria e dei servizi), senza il loro contenuto. */
     suspend fun recommendations() = items("music/recommendations", 60_000)
@@ -235,20 +248,38 @@ class Library(private val repo: MaRepository) {
      * Chiede la stessa cosa all'elemento e a ciascuno dei servizi dove si trova: per un artista
      * della libreria, Music Assistant risponde solo con ciò che è in libreria, i servizi con tutto.
      */
-    private suspend fun everywhere(item: MaItem, fetch: suspend (provider: String, id: String) -> List<MaItem>): List<MaItem> =
-        coroutineScope {
-            val others = item.mappings.filter { (provider, _) -> provider != item.provider }.distinct().map { (provider, id) ->
-                // Un servizio che non risponde non deve togliere il resto.
-                async {
-                    try {
-                        fetch(provider, id)
-                    } catch (e: MaException) {
-                        emptyList()
+    private suspend fun everywhere(
+        item: MaItem,
+        onPart: ((List<MaItem>) -> Unit)?,
+        fetch: suspend (provider: String, id: String) -> List<MaItem>,
+    ): List<MaItem> = coroutineScope {
+        val others = item.mappings.filter { (provider, _) -> provider != item.provider }.distinct().map { (provider, id) ->
+            // Un servizio che non risponde non deve togliere il resto.
+            async {
+                try {
+                    fetch(provider, id)
+                } catch (e: MaException) {
+                    emptyList()
+                }
+            }
+        }
+        val own = fetch(item.provider, item.itemId)
+        if (onPart != null && others.isNotEmpty()) {
+            // Prima la libreria, poi ogni servizio appena risponde, sempre nello stesso ordine.
+            val done = arrayOfNulls<List<MaItem>>(others.size)
+            onPart(dedupe(own))
+            others.forEachIndexed { i, other ->
+                launch {
+                    val part = other.await()
+                    synchronized(done) {
+                        done[i] = part
+                        onPart(dedupe(own + done.filterNotNull().flatten()))
                     }
                 }
             }
-            dedupe(fetch(item.provider, item.itemId) + others.awaitAll().flatten())
         }
+        dedupe(own + others.awaitAll().flatten())
+    }
 
     /** Lo stesso elemento visto da più servizi una volta sola: vince il primo, di solito quello della libreria. */
     private fun dedupe(items: List<MaItem>): List<MaItem> {

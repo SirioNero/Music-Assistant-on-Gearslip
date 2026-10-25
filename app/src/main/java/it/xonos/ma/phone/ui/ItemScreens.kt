@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -106,6 +107,9 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
                     )
                 }
             }
+            if (page.more) {
+                item(key = "more", contentType = "more") { More() }
+            }
             if (item.mediaType == "genre") {
                 loaded(page.albums, host, { model.reload(page) }) { albums ->
                     if (albums.isNotEmpty()) {
@@ -154,6 +158,10 @@ internal fun ArtistScreen(page: ArtistPage, model: PhoneModel, host: Host) {
                     }
                 }
             }
+            // La discografia dei servizi arriva dopo quella della libreria.
+            if (page.albumsMore) {
+                item(key = "albums_more", contentType = "more") { More() }
+            }
             val tracks = page.tracks.value.orEmpty()
             if (tracks.isNotEmpty()) {
                 item(key = "all", contentType = "all") {
@@ -165,6 +173,10 @@ internal fun ArtistScreen(page: ArtistPage, model: PhoneModel, host: Host) {
                         Icon(XIcons.Track, null, tint = MaterialTheme.colorScheme.primary)
                         Spacer(Modifier.width(16.dp))
                         Text(tracksSummary(tracks), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                        if (page.tracksMore) {
+                            CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                            Spacer(Modifier.width(8.dp))
+                        }
                         Icon(XIcons.Chevron, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -277,6 +289,14 @@ private fun TopBar(title: String, state: LazyListState, model: PhoneModel) {
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f).graphicsLayer { alpha = if (solid) 1f else 0f },
         )
+    }
+}
+
+/** Sotto un elenco di cui arrivano ancora dei pezzi. */
+@Composable
+private fun More() {
+    Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
     }
 }
 

@@ -314,6 +314,21 @@ private val SCENES = listOf(
             },
         )
     },
+    // L'artista mentre i servizi rispondono ancora: si vede la libreria, con le rotelle (senza i più
+    // ascoltati, che li danno solo i servizi).
+    "artist-more" to Scene {
+        select(Tab.LIBRARY)
+        push(
+            ArtistPage(Catalog.artist("battisti")).apply {
+                top = ready(emptyList())
+                albums = ready(listOf("emozioni").map(Catalog::album))
+                tracks = ready(EMOZIONI)
+                albumsMore = true
+                tracksMore = true
+                started = true
+            },
+        )
+    },
     "search" to Scene {
         select(Tab.SEARCH)
         val search = page as SearchPage
