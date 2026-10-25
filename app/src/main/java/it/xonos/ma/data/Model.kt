@@ -225,8 +225,29 @@ data class QueueItem(
     /** Per aprire dal telefono l'album e l'artista del brano. */
     val albumRef: Ref? = null,
     val artistRef: Ref? = null,
+    /**
+     * I servizi da cui può arrivare l'audio (domini, come "spotify" o "filesystem_local"): quello che
+     * Music Assistant ha scelto, se il brano ha già suonato, altrimenti tutti quelli che lo hanno.
+     */
+    val sources: Set<String> = emptySet(),
 ) {
+    /**
+     * Vero se l'audio può arrivare da un servizio che dà un flusso alla volta: lì i salti fatti in
+     * fretta vanno raccolti in uno. Senza notizie si fa come se lo fosse.
+     */
+    val singleStream: Boolean get() = sources.isEmpty() || sources.any { it in SINGLE_STREAM_SOURCES }
+
     companion object {
+        /**
+         * I servizi con un solo flusso alla volta in Music Assistant (max_concurrent_streams = 1):
+         * Spotify con il motore Soloist (dal telefono non si distingue da librespot, che ne ha 3),
+         * Tidal, Apple Music, Pandora.
+         */
+        val SINGLE_STREAM_SOURCES = setOf("spotify", "tidal", "apple_music", "pandora")
+
+        /** Il dominio di un servizio dal suo instance_id ("spotify--Ab12" → "spotify"). */
+        fun domainOf(instanceId: String): String = instanceId.substringBefore("--")
+
         fun from(o: JSONObject?): QueueItem? {
             if (o == null) return null
             val id = o.str("queue_item_id") ?: return null
@@ -246,7 +267,17 @@ data class QueueItem(
                 albumRef = Ref.from(media?.optJSONObject("album")),
                 artistRef = media?.optJSONArray("artists").objects().firstNotNullOfOrNull(Ref::from)
                     ?: Ref.from(media?.optJSONObject("podcast")),
+                sources = sourcesOf(o, media),
             )
+        }
+
+        private fun sourcesOf(o: JSONObject, media: JSONObject?): Set<String> {
+            o.optJSONObject("streamdetails")?.str("provider")?.let { return setOf(domainOf(it)) }
+            val mapped = media?.optJSONArray("provider_mappings").objects().mapNotNull { m ->
+                m.str("provider_domain") ?: m.str("provider_instance")?.let(::domainOf)
+            }
+            if (mapped.isNotEmpty()) return mapped.toSet()
+            return setOfNotNull(media?.str("provider")?.takeIf { it != "library" }?.let(::domainOf))
         }
     }
 }

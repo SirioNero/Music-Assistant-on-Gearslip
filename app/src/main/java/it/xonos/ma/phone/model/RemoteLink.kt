@@ -7,6 +7,7 @@ import it.xonos.ma.data.MaImage
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.QueueItem
 import it.xonos.ma.data.QueueState
+import it.xonos.ma.data.SkipSender
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -57,7 +58,7 @@ class RemoteLink internal constructor(
 
     /** Il brano verso cui si sta saltando: lo schermo lo mostra subito, Music Assistant ci arriva dopo. */
     private var pendingIndex: Int? = null
-    private var skipJob: Job? = null
+    private val skips = SkipSender(scope) { index -> devices.command("play_index", device.id) { put("index", index) } }
 
     private val listener: (String, String?, Any?) -> Unit = { event, objectId, data ->
         if (objectId == device.id) onEvent(event, data)
@@ -211,35 +212,27 @@ class RemoteLink internal constructor(
         skipBy(-1)
     }
 
-    /**
-     * Avanti e indietro premuti in fretta diventano un salto solo, al brano dove ci si ferma: ogni
-     * salto fa partire un flusso nuovo, e con Spotify Soloist o Tidal se ne può avere uno alla volta.
-     */
+    /** Avanti e indietro premuti in fretta finiscono al brano dove ci si ferma (vedi [SkipSender]). */
     private fun skipBy(step: Int) {
+        var gather = true
         val target = synchronized(lock) {
             val q = queue ?: return
+            gather = q.current?.singleStream != false
             val base = pendingIndex ?: q.currentIndex ?: return
             (base + step).coerceIn(0, max(0, q.items - 1)).also { pendingIndex = it }
         }
         publish()
-        jumpTo(target, SKIP_GATHER_MS)
+        jumpTo(target, gather)
     }
 
-    private fun jumpTo(target: Int, waitMs: Long) {
-        skipJob?.cancel()
-        skipJob = scope.launch {
-            delay(waitMs)
-            try {
-                devices.command("play_index", device.id) { put("index", target) }
-                // Se Music Assistant non ci arriva, lo schermo torna a quello che dice lui.
+    private fun jumpTo(target: Int, gather: Boolean) {
+        skips.request(target, gather) {
+            // Se Music Assistant non ci arriva, lo schermo torna a quello che dice lui.
+            scope.launch {
                 delay(PENDING_TIMEOUT_MS)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                // Come sotto.
+                synchronized(lock) { if (pendingIndex == target) pendingIndex = null }
+                publish()
             }
-            synchronized(lock) { if (pendingIndex == target) pendingIndex = null }
-            publish()
         }
     }
 
@@ -286,7 +279,7 @@ class RemoteLink internal constructor(
     override fun skipTo(index: Int) {
         val target = synchronized(lock) { (windowStart + index).also { pendingIndex = it } }
         publish()
-        jumpTo(target, 0)
+        jumpTo(target, gather = false)
     }
 
     fun setVolume(level: Int) {
@@ -307,7 +300,6 @@ class RemoteLink internal constructor(
         const val AHEAD = 60
         const val AHEAD_MARGIN = 10
         const val WINDOW_DEBOUNCE_MS = 300L
-        const val SKIP_GATHER_MS = 400L
         const val PENDING_TIMEOUT_MS = 8_000L
         const val RESTART_MS = 3_000L
     }

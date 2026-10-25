@@ -4,6 +4,8 @@ import it.xonos.ma.data.Connection
 import it.xonos.ma.data.Devices
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.QueueItem
+import it.xonos.ma.data.SkipSender
 import it.xonos.ma.data.QueueState
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONObject
 
 /**
  * "Suona su" dal [PhoneModel] contro Music Assistant: il telefono e una cassa finta sono due
@@ -60,6 +63,23 @@ private fun checks(): Unit = runBlocking {
         while (!ok()) delay(200)
         true
     } ?: false
+
+    // L'invio dei salti da solo: una raffica con un servizio a un flusso diventa un comando; senza
+    // aspettare, i comandi partono uno alla volta e l'ultimo è sempre il brano chiesto per ultimo.
+    run {
+        val sent = java.util.Collections.synchronizedList(mutableListOf<Int>())
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        val gathered = SkipSender(scope) { sent += it; delay(300) }
+        var done = 0
+        for (i in 1..3) { gathered.request(i, gather = true) { done++ }; delay(100) }
+        delay(1_200)
+        check("Salti raccolti: un comando solo, all'ultimo brano", sent == listOf(3) && done == 3, "$sent, conclusi $done")
+        sent.clear()
+        val immediate = SkipSender(scope) { sent += it; delay(300) }
+        for (i in 1..3) { immediate.request(i, gather = false); delay(50) }
+        delay(1_200)
+        check("Salti subito: uno alla volta, l'ultimo è quello chiesto", sent.first() == 1 && sent.last() == 3 && sent.size <= 3, "$sent")
+    }
 
     class Speaker(val id: String, name: String, product: String) {
         val outputs = mutableListOf<FakeOutput>()
@@ -128,19 +148,26 @@ private fun checks(): Unit = runBlocking {
     val shown = remote.nowPlaying.value
     check("Lo schermo mostra la cassa", shown?.title == moved?.current?.title && shown?.playing == true && remote.positionMs() > 0, "${shown?.title} ${remote.positionMs()} ms, coda ${shown?.queue?.size}")
 
-    // Due "avanti" di fila: lo schermo mostra subito il brano d'arrivo, e Music Assistant fa un salto solo.
+    // Da quale servizio arriva l'audio: decide se i salti si raccolgono (un flusso alla volta) o partono subito.
+    val playingNow = queue(speaker.id)?.current
+    check("Il brano in corso dice da dove arriva l'audio", playingNow?.sources == setOf("filesystem_local") && playingNow.singleStream == false, "${playingNow?.sources}")
+    val spotify = QueueItem.from(JSONObject("""{"queue_item_id":"a","name":"x","streamdetails":{"provider":"spotify--Ab12"},"media_item":{"name":"x","provider":"library","provider_mappings":[{"provider_domain":"filesystem_local"}]}}"""))
+    val tidal = QueueItem.from(JSONObject("""{"queue_item_id":"b","name":"y","media_item":{"name":"y","provider":"library","provider_mappings":[{"provider_domain":"tidal","provider_instance":"tidal--x"}]}}"""))
+    val unknown = QueueItem.from(JSONObject("""{"queue_item_id":"c","name":"z"}"""))
+    check("Spotify, Tidal e i brani senza notizie: un flusso alla volta", spotify?.singleStream == true && tidal?.singleStream == true && unknown?.singleStream == true, "${spotify?.sources} ${tidal?.sources} ${unknown?.sources}")
+
+    // Due "avanti" di fila: lo schermo mostra subito il brano d'arrivo; con i file locali i salti partono subito.
     val index = queue(speaker.id)?.currentIndex ?: 0
     val expected = devices.items(speaker.id, index + 2, 1).firstOrNull()?.title
-    val streams = room.outputs.size
     remote.next()
     remote.next()
     check("Due avanti: lo schermo mostra subito il brano d'arrivo", remote.nowPlaying.value?.title == expected && remote.positionMs() == 0L, "${remote.nowPlaying.value?.title} (atteso $expected)")
-    until { queue(speaker.id)?.currentIndex == index + 2 }
-    delay(1_500)
+    val jumped = until(3_000) { queue(speaker.id)?.currentIndex == index + 2 }
+    delay(1_000)
     check(
-        "Due avanti: un salto solo",
-        queue(speaker.id)?.currentIndex == index + 2 && remote.nowPlaying.value?.title == expected && room.outputs.size - streams <= 1,
-        "brano ${queue(speaker.id)?.currentIndex}, flussi nuovi ${room.outputs.size - streams}",
+        "Due avanti con i file locali: arrivati subito, senza aspettare",
+        jumped && queue(speaker.id)?.currentIndex == index + 2 && remote.nowPlaying.value?.title == expected,
+        "brano ${queue(speaker.id)?.currentIndex}",
     )
     remote.playPause()
     until { queue(speaker.id)?.playing == false }
