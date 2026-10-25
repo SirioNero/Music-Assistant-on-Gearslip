@@ -59,6 +59,8 @@ class SendspinClient(
         val minBufferMs: Int,
         val volume: Int,
         val muted: Boolean,
+        /** "Mobile Application" per il telefono; nel banco di prova un altro nome fa una cassa finta, visibile a tutti. */
+        val productName: String = PRODUCT_NAME,
     )
 
     enum class Phase { STOPPED, CONNECTING, READY }
@@ -310,7 +312,7 @@ class SendspinClient(
                     "device_info",
                     JSONObject()
                         // Con questo nome Music Assistant lo tratta come l'app ufficiale: un lettore privato dell'app.
-                        .put("product_name", PRODUCT_NAME)
+                        .put("product_name", id.productName)
                         .put("manufacturer", utf8Limit(id.manufacturer, 64))
                         .put("software_version", utf8Limit(id.softwareVersion, 64)),
                 )

@@ -172,7 +172,6 @@
     <string name="lyrics_none">Для этого трека нет текста</string>
     <string name="queue">Далее в очереди</string>
     <string name="live">Прямой эфир</string>
-    <string name="playing_on">Играет на %s</string>
     <string name="search_hint">Исполнители, треки, подкасты…</string>
     <string name="search_start">Ищите в своей библиотеке и во всех сервисах, подключённых к Music Assistant.</string>
     <string name="search_none">Ничего не найдено по запросу «%s»</string>
@@ -183,6 +182,14 @@
     <string name="sort_played">Недавно прослушанные</string>
     <string name="empty">Здесь пока ничего нет</string>
     <string name="retry">Повторить</string>
+    <string name="play_on">Воспроизвести на</string>
+    <string name="this_phone">Этот телефон</string>
+    <string name="devices_none">Music Assistant не видит других колонок. Добавьте их в Music Assistant (Chromecast, AirPlay, Sonos, DLNA…), и они появятся здесь.</string>
+    <string name="device_playing">Играет</string>
+    <string name="notice_moved">Теперь играет на: %1$s</string>
+    <string name="notice_moved_phone">Теперь играет на этом телефоне</string>
+    <string name="remote_empty">Воспроизведение на %1$s: очередь пуста</string>
+    <string name="volume">Громкость</string>
     <string name="services_title">Сервисы Music Assistant</string>
     <string name="services_help">Добавьте или настройте источники музыки: Spotify, Tidal, Jellyfin, подкасты, радио…</string>
     <string name="services_add">Добавить сервис</string>

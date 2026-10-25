@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import it.xonos.ma.data.Device
 import it.xonos.ma.data.MaImage
 import it.xonos.ma.data.MaItem
 import kotlinx.coroutines.Job
@@ -181,4 +182,12 @@ class SettingsPage(home: String, remote: String, token: String, name: String, si
     /** Vero dopo il primo "Salva": da lì si dice se manca qualcosa. */
     var tried by mutableStateOf(false)
     var results by mutableStateOf<List<ConnectionCheck.Result>>(emptyList())
+}
+
+/** La scelta "Suona su": i lettori di Music Assistant e il telefono. */
+class DevicePicker {
+    var devices by mutableStateOf<Load<List<Device>>>(Load.Loading)
+
+    /** Il lettore verso cui si sta spostando la musica ([PhoneModel.PHONE] per il telefono). */
+    var moving by mutableStateOf<String?>(null)
 }

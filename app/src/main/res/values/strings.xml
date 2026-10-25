@@ -155,7 +155,6 @@
     <string name="lyrics_none">No lyrics for this track</string>
     <string name="queue">Up next</string>
     <string name="live">Live</string>
-    <string name="playing_on">Playing on %s</string>
     <string name="search_hint">Artists, tracks, podcasts…</string>
     <string name="search_start">Search your library and every service connected to Music Assistant.</string>
     <string name="search_none">Nothing found for “%s”</string>
@@ -166,6 +165,14 @@
     <string name="sort_played">Recently played</string>
     <string name="empty">Nothing here yet</string>
     <string name="retry">Try again</string>
+    <string name="play_on">Play on</string>
+    <string name="this_phone">This phone</string>
+    <string name="devices_none">Music Assistant doesn’t see any other speakers. Add them in Music Assistant (Chromecast, AirPlay, Sonos, DLNA…) and they show up here.</string>
+    <string name="device_playing">Playing</string>
+    <string name="notice_moved">Now playing on %1$s</string>
+    <string name="notice_moved_phone">Now playing on this phone</string>
+    <string name="remote_empty">Playing on %1$s: nothing queued</string>
+    <string name="volume">Volume</string>
     <string name="services_title">Music Assistant services</string>
     <string name="services_help">Add or set up where the music comes from: Spotify, Tidal, Jellyfin, podcasts, radio…</string>
     <string name="services_add">Add a service</string>

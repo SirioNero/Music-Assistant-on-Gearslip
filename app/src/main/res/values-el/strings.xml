@@ -152,7 +152,6 @@
     <string name="lyrics_none">Δεν υπάρχουν στίχοι για αυτό το τραγούδι</string>
     <string name="queue">Ακολουθούν</string>
     <string name="live">Ζωντανά</string>
-    <string name="playing_on">Αναπαραγωγή σε %s</string>
     <string name="search_hint">Καλλιτέχνες, τραγούδια, podcast…</string>
     <string name="search_start">Αναζητήστε στη βιβλιοθήκη σας και σε όλες τις υπηρεσίες που είναι συνδεδεμένες με το Music Assistant.</string>
     <string name="search_none">Δεν βρέθηκε τίποτα για «%s»</string>
@@ -163,6 +162,14 @@
     <string name="sort_played">Ακούσατε πρόσφατα</string>
     <string name="empty">Δεν υπάρχει τίποτα εδώ ακόμη</string>
     <string name="retry">Δοκιμάστε ξανά</string>
+    <string name="play_on">Αναπαραγωγή σε</string>
+    <string name="this_phone">Αυτό το τηλέφωνο</string>
+    <string name="devices_none">Το Music Assistant δεν βλέπει άλλα ηχεία. Προσθέστε τα στο Music Assistant (Chromecast, AirPlay, Sonos, DLNA…) και θα εμφανιστούν εδώ.</string>
+    <string name="device_playing">Αναπαράγει</string>
+    <string name="notice_moved">Τώρα παίζει σε: %1$s</string>
+    <string name="notice_moved_phone">Τώρα παίζει σε αυτό το τηλέφωνο</string>
+    <string name="remote_empty">Αναπαραγωγή σε %1$s: η ουρά είναι άδεια</string>
+    <string name="volume">Ένταση</string>
     <string name="services_title">Υπηρεσίες του Music Assistant</string>
     <string name="services_help">Προσθέστε ή ρυθμίστε από πού έρχεται η μουσική: Spotify, Tidal, Jellyfin, podcast, ραδιόφωνο…</string>
     <string name="services_add">Προσθήκη υπηρεσίας</string>

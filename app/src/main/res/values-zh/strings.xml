@@ -142,7 +142,6 @@
     <string name="lyrics_none">这首歌没有歌词</string>
     <string name="queue">接下来播放</string>
     <string name="live">直播</string>
-    <string name="playing_on">正在 %s 上播放</string>
     <string name="search_hint">艺人、歌曲、播客…</string>
     <string name="search_start">搜索你的音乐库以及连接到 Music Assistant 的所有服务。</string>
     <string name="search_none">没有找到“%s”的结果</string>
@@ -153,6 +152,14 @@
     <string name="sort_played">最近播放</string>
     <string name="empty">这里还没有内容</string>
     <string name="retry">重试</string>
+    <string name="play_on">播放到</string>
+    <string name="this_phone">这部手机</string>
+    <string name="devices_none">Music Assistant 没有发现其他音箱。在 Music Assistant 中添加（Chromecast、AirPlay、Sonos、DLNA……）后会显示在这里。</string>
+    <string name="device_playing">正在播放</string>
+    <string name="notice_moved">正在 %1$s 上播放</string>
+    <string name="notice_moved_phone">正在这部手机上播放</string>
+    <string name="remote_empty">在 %1$s 上播放：队列为空</string>
+    <string name="volume">音量</string>
     <string name="services_title">Music Assistant 服务</string>
     <string name="services_help">添加或设置音乐来源：Spotify、Tidal、Jellyfin、播客、电台……</string>
     <string name="services_add">添加服务</string>

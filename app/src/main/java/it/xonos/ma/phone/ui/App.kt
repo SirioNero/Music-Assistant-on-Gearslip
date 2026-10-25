@@ -79,7 +79,12 @@ interface Host {
 @Composable
 fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
     XonosTheme {
-        val nowPlaying by player.nowPlaying.collectAsState()
+        // Lo schermo comanda il telefono o, con "Suona su", un lettore di Music Assistant.
+        val link = model.remote ?: player
+        val nowPlaying by link.nowPlaying.collectAsState()
+        val phoneNow by player.nowPlaying.collectAsState()
+        val phonePlaying = phoneNow?.playing == true
+        LaunchedEffect(phonePlaying) { model.phonePlaying(phonePlaying) }
         // Finché non c'è un indirizzo e il token, si comincia dalle impostazioni.
         var configured by remember { mutableStateOf(model.configured) }
         // Anche il lettore e il benvenuto, che stanno fuori dallo Scaffold, scrivono con i colori del tema.
@@ -95,7 +100,12 @@ fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
                 snackbarHost = { SnackbarHost(snackbar) },
                 bottomBar = {
                     Column {
-                        nowPlaying?.let { MiniPlayer(it, player, model) }
+                        val now = nowPlaying
+                        val remote = model.remote
+                        when {
+                            now != null -> MiniPlayer(now, link, model)
+                            remote != null -> RemoteBar(remote.device, model)
+                        }
                         TabBar(model)
                     }
                 },
@@ -103,7 +113,7 @@ fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
                 val pages = rememberSaveableStateHolder()
                 val page = model.page
                 Box(Modifier.padding(padding).fillMaxSize()) {
-                    pages.SaveableStateProvider(page.id) { PageScreen(page, model, player, host) }
+                    pages.SaveableStateProvider(page.id) { PageScreen(page, model, link, host) }
                 }
             }
             Notices(model, host, snackbar)
@@ -116,8 +126,9 @@ fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
                 enter = slideInVertically(tween(320)) { it } + fadeIn(),
                 exit = slideOutVertically(tween(260)) { it } + fadeOut(),
             ) {
-                shown?.let { PlayerScreen(it, player, model, host) }
+                shown?.let { PlayerScreen(it, link, model, host) }
             }
+            model.picker?.let { DevicesSheet(it, model, host) }
         }
         PlatformBackHandler(enabled = configured && (model.playerOpen || model.depth > 0 || model.tab != Tab.HOME)) { model.back() }
     }
@@ -173,6 +184,7 @@ private fun Notices(model: PhoneModel, host: Host, snackbar: SnackbarHostState) 
         Notice.FavoriteRemoved -> stringResource(R.string.notice_favorite_removed)
         Notice.Saved -> stringResource(R.string.notice_saved)
         Notice.Removed -> stringResource(R.string.notice_removed)
+        is Notice.Moved -> notice.device?.let { stringResource(R.string.notice_moved, it) } ?: stringResource(R.string.notice_moved_phone)
         is Notice.Failed -> host.describe(notice.error)
     }
     // L'avviso si mostra fuori dall'effetto, che riparte appena lo si toglie dal modello.

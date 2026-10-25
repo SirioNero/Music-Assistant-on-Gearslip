@@ -152,7 +152,6 @@
     <string name="lyrics_none">Nessun testo per questo brano</string>
     <string name="queue">In coda</string>
     <string name="live">In diretta</string>
-    <string name="playing_on">In riproduzione su %s</string>
     <string name="search_hint">Artisti, brani, podcast…</string>
     <string name="search_start">Cerca nella tua libreria e in tutti i servizi collegati a Music Assistant.</string>
     <string name="search_none">Niente per “%s”</string>
@@ -163,6 +162,14 @@
     <string name="sort_played">Ascoltati di recente</string>
     <string name="empty">Qui non c’è ancora niente</string>
     <string name="retry">Riprova</string>
+    <string name="play_on">Suona su</string>
+    <string name="this_phone">Questo telefono</string>
+    <string name="devices_none">Music Assistant non vede altre casse. Aggiungile in Music Assistant (Chromecast, AirPlay, Sonos, DLNA…) e compaiono qui.</string>
+    <string name="device_playing">In riproduzione</string>
+    <string name="notice_moved">Ora suona su %1$s</string>
+    <string name="notice_moved_phone">Ora suona su questo telefono</string>
+    <string name="remote_empty">Si suona su %1$s: niente in coda</string>
+    <string name="volume">Volume</string>
     <string name="services_title">Servizi di Music Assistant</string>
     <string name="services_help">Aggiungi o configura da dove arriva la musica: Spotify, Tidal, Jellyfin, podcast, radio…</string>
     <string name="services_add">Aggiungi un servizio</string>

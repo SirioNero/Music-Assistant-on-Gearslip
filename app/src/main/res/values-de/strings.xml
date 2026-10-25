@@ -152,7 +152,6 @@
     <string name="lyrics_none">Kein Songtext für diesen Titel</string>
     <string name="queue">Als Nächstes</string>
     <string name="live">Live</string>
-    <string name="playing_on">Läuft auf %s</string>
     <string name="search_hint">Künstler, Titel, Podcasts…</string>
     <string name="search_start">Durchsuche deine Bibliothek und alle mit Music Assistant verbundenen Dienste.</string>
     <string name="search_none">Nichts gefunden für „%s“</string>
@@ -163,6 +162,14 @@
     <string name="sort_played">Zuletzt gehört</string>
     <string name="empty">Hier ist noch nichts</string>
     <string name="retry">Erneut versuchen</string>
+    <string name="play_on">Abspielen auf</string>
+    <string name="this_phone">Dieses Telefon</string>
+    <string name="devices_none">Music Assistant sieht keine anderen Lautsprecher. Füge sie in Music Assistant hinzu (Chromecast, AirPlay, Sonos, DLNA…), dann erscheinen sie hier.</string>
+    <string name="device_playing">Spielt gerade</string>
+    <string name="notice_moved">Spielt jetzt auf %1$s</string>
+    <string name="notice_moved_phone">Spielt jetzt auf diesem Telefon</string>
+    <string name="remote_empty">Wiedergabe auf %1$s: nichts in der Warteschlange</string>
+    <string name="volume">Lautstärke</string>
     <string name="services_title">Music-Assistant-Dienste</string>
     <string name="services_help">Lege fest, woher die Musik kommt: Spotify, Tidal, Jellyfin, Podcasts, Radio…</string>
     <string name="services_add">Dienst hinzufügen</string>

@@ -64,6 +64,7 @@ internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
             item(key = "header", contentType = "header") {
                 Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+                    IconButton(onClick = model::openDevices, modifier = Modifier.testTag("home_play_on")) { Icon(XIcons.Cast, stringResource(R.string.play_on)) }
                     IconButton(onClick = model::openSettings) { Icon(XIcons.Settings, stringResource(R.string.settings)) }
                 }
                 ConnectionBanner(model, host)

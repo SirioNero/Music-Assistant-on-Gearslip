@@ -27,6 +27,7 @@ MA_TOKEN=... LANG_XONOS=it QUERIES="vasco,podcast morning" build/install/harness
 | `AdjustCheckKt` | Controlla le correzioni di sincronia un campione alla volta |
 | `PerfCheckKt` | Tempi e blocchi del thread "principale" del `PhoneModel`: collegamento, Home, libreria, una playlist lunga (`PLAYLIST`) |
 | `AccountCheckKt` | Accesso con nome utente e password (`MA_USER`, `MA_PASSWORD`), il token che Xonos si fa dare, un ospite, il primo account di un MA vuoto (`NEW_URL`) |
+| `PlayersCheckKt` | "Suona su": il telefono e una cassa finta (Sendspin con un altro `product_name`, che MA mostra come Universal Player dopo ~15 s). La coda passa alla cassa e torna dallo stesso punto, comandi e volume della cassa, "suona" va al lettore scelto, lo schermo torna al telefono se questo suona da sé |
 | `ServicesCheckKt` | I servizi di MA con il servizio finto `xonos_test`: elenco, icone, flusso (modulo con errore, accesso "nel browser", fine), opzioni, pulsante, riconfigura, rimozione; poi lo stesso dal `PhoneModel` (anche la fine ricavata al ritorno nell'app) e la lingua dei moduli |
 
 `MA_URL` (predefinito `http://127.0.0.1:8095`) e `MA_TOKEN` indicano il server.
@@ -52,7 +53,8 @@ JAVA_OPTS="-Dxonos.out=/tmp/shots -Dxonos.lang=it -Dxonos.only=home,player" buil
 ```
 
 Le scene: `home`, `library`, `album`, `artist`, `search`, `player`, `lyrics`, `queue`, `podcast`,
-`settings`, `welcome`, `services`, `add-service`, `service-flow`, `service-login`, `service`
+`settings`, `welcome`, `services`, `add-service`, `service-flow`, `service-login`, `service`,
+`play-on`, `remote`, `remote-mini`
 (1080×2340, densità 2,625). Le scritte sono nella lingua di `-Dxonos.lang`.
 
 ## Il Music Assistant di prova (`ma-test/`)

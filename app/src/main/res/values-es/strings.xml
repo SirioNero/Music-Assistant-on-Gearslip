@@ -152,7 +152,6 @@
     <string name="lyrics_none">No hay letra para esta canción</string>
     <string name="queue">A continuación</string>
     <string name="live">En directo</string>
-    <string name="playing_on">Sonando en %s</string>
     <string name="search_hint">Artistas, canciones, pódcasts…</string>
     <string name="search_start">Busca en tu biblioteca y en todos los servicios conectados a Music Assistant.</string>
     <string name="search_none">No se encontró nada para «%s»</string>
@@ -163,6 +162,14 @@
     <string name="sort_played">Escuchados recientemente</string>
     <string name="empty">Aquí todavía no hay nada</string>
     <string name="retry">Reintentar</string>
+    <string name="play_on">Reproducir en</string>
+    <string name="this_phone">Este teléfono</string>
+    <string name="devices_none">Music Assistant no ve otros altavoces. Añádelos en Music Assistant (Chromecast, AirPlay, Sonos, DLNA…) y aparecerán aquí.</string>
+    <string name="device_playing">Reproduciendo</string>
+    <string name="notice_moved">Ahora suena en %1$s</string>
+    <string name="notice_moved_phone">Ahora suena en este teléfono</string>
+    <string name="remote_empty">Se reproduce en %1$s: nada en cola</string>
+    <string name="volume">Volumen</string>
     <string name="services_title">Servicios de Music Assistant</string>
     <string name="services_help">Añade o configura de dónde viene la música: Spotify, Tidal, Jellyfin, pódcasts, radio…</string>
     <string name="services_add">Añadir un servicio</string>

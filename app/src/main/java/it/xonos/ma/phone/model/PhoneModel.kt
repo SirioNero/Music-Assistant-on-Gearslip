@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import it.xonos.ma.data.Account
 import it.xonos.ma.data.Connection
+import it.xonos.ma.data.Device
+import it.xonos.ma.data.Devices
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.Lyrics
 import it.xonos.ma.data.MaException
@@ -51,6 +53,9 @@ sealed interface Notice {
     data object FavoriteRemoved : Notice
     data object Saved : Notice
     data object Removed : Notice
+
+    /** La musica ora suona su questo lettore (null: sul telefono). */
+    data class Moved(val device: String?) : Notice
     data class Failed(val error: Throwable) : Notice
 }
 
@@ -599,10 +604,12 @@ class PhoneModel(
     fun addToQueue(item: MaItem) = play(listOf(item.uri), option = "add")
 
     private fun play(media: List<String>, start: String? = null, option: String = "replace", shuffle: Boolean = false) {
+        // Suona dove si è scelto con "Suona su": il telefono, o un lettore di Music Assistant.
+        val target = remote?.device?.id
         scope.launch {
             try {
-                awaitReady()
-                library.playMedia(queueId(), media, start, option, shuffle)
+                if (target == null) awaitReady()
+                library.playMedia(target ?: queueId(), media, start, option, shuffle)
                 when (option) {
                     "next" -> notice = Notice.PlayNext
                     "add" -> notice = Notice.Added
@@ -619,6 +626,81 @@ class PhoneModel(
     private suspend fun awaitReady() {
         withTimeoutOrNull(READY_TIMEOUT_MS) { ready.first { it } }
             ?: throw MaException("Il lettore del telefono non è pronto", problem = Problem.NOT_CONNECTED)
+    }
+
+    // ---------- Suona su ----------
+
+    private val devices = Devices(repo)
+
+    /** Il lettore di Music Assistant comandato dallo schermo; null quando la musica esce dal telefono. */
+    var remote by mutableStateOf<RemoteLink?>(null)
+        private set
+
+    /** La scelta "Suona su", quando è aperta. */
+    var picker by mutableStateOf<DevicePicker?>(null)
+        private set
+
+    /** Quando si è cambiato lettore l'ultima volta (vedi [phonePlaying]). */
+    private var movedAt = 0L
+
+    /** Apre la scelta del lettore e cerca quelli che Music Assistant conosce. */
+    fun openDevices() {
+        val picker = DevicePicker()
+        this.picker = picker
+        loadDevices(picker)
+    }
+
+    fun loadDevices(picker: DevicePicker) {
+        picker.devices = Load.Loading
+        launchLoad({ picker.devices = Load.Failed(it) }) { picker.devices = Load.Ready(devices.targets(queueId())) }
+    }
+
+    fun closeDevices() {
+        picker = null
+    }
+
+    /**
+     * Fa suonare la musica su [device] (null: sul telefono). Se dove suona adesso c'è una coda, la
+     * coda passa al lettore nuovo e riparte dallo stesso punto; quello di prima si ferma.
+     */
+    fun playOn(device: Device?) {
+        val picker = picker
+        val old = remote
+        if (device?.id == old?.device?.id) return closeDevices()
+        picker?.moving = device?.id ?: PHONE
+        scope.launch {
+            try {
+                val from = old?.device?.id ?: queueId().takeIf { ready.value }
+                val to = device?.id ?: run {
+                    awaitReady()
+                    queueId()
+                }
+                if (from != null && (devices.queue(from)?.items ?: 0) > 0) devices.transfer(from, to)
+                old?.stop()
+                remote = device?.let { RemoteLink(it, repo, devices, library, ::image, scope).also(RemoteLink::start) }
+                movedAt = System.currentTimeMillis()
+                this@PhoneModel.picker = null
+                notice = Notice.Moved(device?.name)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notice = Notice.Failed(e)
+            } finally {
+                picker?.moving = null
+            }
+        }
+    }
+
+    /**
+     * Il telefono ha cominciato a suonare per conto suo (per esempio dall'auto): lo schermo torna a
+     * mostrare il telefono, senza toccare l'altro lettore. Appena dopo un cambio non vale: la coda
+     * del telefono sta ancora finendo.
+     */
+    fun phonePlaying(playing: Boolean) {
+        val old = remote ?: return
+        if (!playing || System.currentTimeMillis() - movedAt < MOVE_SETTLE_MS) return
+        old.stop()
+        remote = null
     }
 
     // ---------- Preferiti ----------
@@ -811,6 +893,10 @@ class PhoneModel(
         const val SHELVES_CACHE = "shelves"
 
         val TRACK_LIKE = setOf("track", "podcast_episode", "audiobook")
+
+        /** Nella scelta "Suona su", il telefono stesso. */
+        const val PHONE = "phone"
+        const val MOVE_SETTLE_MS = 5_000L
 
         /** La password più corta che Music Assistant accetta per un account nuovo. */
         const val MIN_PASSWORD = 8

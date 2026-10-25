@@ -16,6 +16,7 @@ import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.Problem
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
+import it.xonos.ma.data.Device
 import it.xonos.ma.data.FlowStep
 import it.xonos.ma.data.ServiceConfig
 import it.xonos.ma.data.ServiceKind
@@ -185,6 +186,10 @@ private fun answer(command: String, args: JSONObject): Any? = when (command) {
         if (n != null && album in Catalog.ALBUMS) Catalog.trackJson(album, n) else null
     }
     "metadata/get_track_lyrics" -> JSONArray().put(JSONObject.NULL).put(Catalog.LYRICS)
+    // "Suona su": le casse di casa; nel salotto suona Emozioni.
+    "players/all" -> JSONArray(PLAYERS.map { JSONObject(it) })
+    "player_queues/get" -> if (args.optString("queue_id") == "salotto") salottoQueue() else null
+    "player_queues/items" -> if (args.optString("queue_id") == "salotto") JSONArray((1..Catalog.tracks("emozioni").size).map { queueItem(it) }) else null
     // Le icone dei servizi, come le manda Music Assistant: SVG in un data URI.
     "providers/icon" -> ICONS[args.optString("provider")]?.let { (color, letter) ->
         val svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="$color"/>""" +
@@ -369,6 +374,20 @@ private val SCENES = listOf(
         push(settings)
     },
     "welcome" to Scene(now = null, configured = false) {},
+    "play-on" to Scene {
+        (page as HomePage).started = true
+        playerOpen = true
+        openDevices()
+    },
+    "remote" to Scene {
+        (page as HomePage).started = true
+        playOn(Device.from(JSONObject(PLAYERS[0])))
+        playerOpen = true
+    },
+    "remote-mini" to Scene(now = null) {
+        (page as HomePage).started = true
+        playOn(Device.from(JSONObject(PLAYERS[0])))
+    },
     "services" to Scene {
         (page as HomePage).started = true
         push(ServicesPage().apply { services = ready(SERVICES.mapNotNull { ServiceConfig.from(JSONObject(it)) }); started = true })
@@ -400,6 +419,29 @@ private val SCENES = listOf(
         )
     },
 )
+
+private val PLAYERS = listOf(
+    """{"player_id":"salotto","name":"Salotto","type":"player","available":true,"enabled":true,"hide_in_ui":false,"private":false,"playback_state":"playing","volume_level":35}""",
+    """{"player_id":"cucina","name":"Cucina","type":"player","available":true,"enabled":true,"hide_in_ui":false,"private":false,"playback_state":"idle","volume_level":20}""",
+    """{"player_id":"casa","name":"Tutta la casa","type":"group","available":true,"enabled":true,"hide_in_ui":false,"private":false,"playback_state":"idle","volume_level":30}""",
+    """{"player_id":"studio","name":"Studio (spento)","type":"player","available":false,"enabled":true,"hide_in_ui":false,"private":false,"playback_state":"idle"}""",
+    """{"player_id":"xonos-screens","name":"Xonos","type":"player","available":true,"enabled":true,"hide_in_ui":true,"private":true,"playback_state":"idle"}""",
+)
+
+private fun queueItem(n: Int): JSONObject {
+    val track = Catalog.trackJson("emozioni", n)
+    return JSONObject().put("queue_item_id", "q$n").put("name", track.optString("name")).put("duration", track.optInt("duration")).put("media_item", track)
+}
+
+private fun salottoQueue(): JSONObject = JSONObject()
+    .put("queue_id", "salotto")
+    .put("state", "playing")
+    .put("items", Catalog.tracks("emozioni").size)
+    .put("current_index", 1)
+    .put("elapsed_time", 25.5)
+    .put("shuffle_enabled", false)
+    .put("repeat_mode", "all")
+    .put("current_item", queueItem(2))
 
 /** Colore e lettera delle icone finte dei servizi. */
 private val ICONS = mapOf(

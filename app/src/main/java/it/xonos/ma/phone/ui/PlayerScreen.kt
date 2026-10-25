@@ -66,7 +66,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -77,6 +76,7 @@ import it.xonos.ma.phone.model.NowPlaying
 import it.xonos.ma.phone.model.PhoneModel
 import it.xonos.ma.phone.model.PlayerLink
 import it.xonos.ma.phone.model.PlayerPanel
+import it.xonos.ma.phone.model.RemoteLink
 import it.xonos.ma.phone.model.Repeat
 import kotlin.math.max
 import kotlin.math.min
@@ -116,8 +116,18 @@ internal fun MiniPlayer(now: NowPlaying, player: PlayerLink, model: PhoneModel) 
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(now.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    now.artist?.let {
-                        Text(it, style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.7f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    val remote = model.remote
+                    if (remote != null) {
+                        // Su un altro lettore: al posto dell'artista, dove suona.
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(XIcons.Speaker, null, Modifier.size(14.dp), tint = MaterialTheme.colorScheme.primary)
+                            Spacer(Modifier.width(4.dp))
+                            Text(remote.device.name, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    } else {
+                        now.artist?.let {
+                            Text(it, style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.7f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
                     }
                 }
                 PlayPauseButton(now, player, Modifier.size(48.dp), 28.dp)
@@ -169,15 +179,8 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(horizontal = 24.dp)) {
             Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { model.playerOpen = false }) { Icon(XIcons.Down, stringResource(R.string.close_player), Modifier.size(30.dp)) }
-                Text(
-                    stringResource(R.string.playing_on, model.playerName),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                )
+                // Dove suona: toccandolo si sceglie un altro lettore ("Suona su").
+                Box(Modifier.weight(1f).padding(horizontal = 8.dp), contentAlignment = Alignment.Center) { PlayOnButton(model) }
                 NowPlayingMenu(now, model)
             }
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -227,6 +230,7 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
             }
             Spacer(Modifier.height(8.dp))
             Controls(now, player)
+            (player as? RemoteLink)?.let { RemoteVolume(it) }
             Spacer(Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 PanelButton(XIcons.Lyrics, R.string.lyrics, model, PlayerPanel.LYRICS)

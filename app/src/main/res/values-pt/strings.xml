@@ -152,7 +152,6 @@
     <string name="lyrics_none">Sem letra para esta música</string>
     <string name="queue">A seguir</string>
     <string name="live">Ao vivo</string>
-    <string name="playing_on">Tocando em %s</string>
     <string name="search_hint">Artistas, músicas, podcasts…</string>
     <string name="search_start">Busque na sua biblioteca e em todos os serviços conectados ao Music Assistant.</string>
     <string name="search_none">Nada encontrado para “%s”</string>
@@ -163,6 +162,14 @@
     <string name="sort_played">Ouvidos recentemente</string>
     <string name="empty">Ainda não há nada aqui</string>
     <string name="retry">Tentar de novo</string>
+    <string name="play_on">Tocar em</string>
+    <string name="this_phone">Este telefone</string>
+    <string name="devices_none">O Music Assistant não vê outros alto-falantes. Adicione-os no Music Assistant (Chromecast, AirPlay, Sonos, DLNA…) e eles aparecem aqui.</string>
+    <string name="device_playing">Tocando</string>
+    <string name="notice_moved">Agora tocando em %1$s</string>
+    <string name="notice_moved_phone">Agora tocando neste telefone</string>
+    <string name="remote_empty">Tocando em %1$s: fila vazia</string>
+    <string name="volume">Volume</string>
     <string name="services_title">Serviços do Music Assistant</string>
     <string name="services_help">Adicione ou configure de onde vem a música: Spotify, Tidal, Jellyfin, podcasts, rádio…</string>
     <string name="services_add">Adicionar um serviço</string>
@@ -170,7 +177,7 @@
     <string name="services_old_server">Para adicionar e configurar serviços daqui é preciso o Music Assistant 2.10 ou mais recente. Mesmo assim você pode vê-los e removê-los.</string>
     <string name="services_filter">Pesquisar serviços</string>
     <string name="service_type_music">Música</string>
-    <string name="service_type_player">Players e caixas de som</string>
+    <string name="service_type_player">Reprodutores e alto-falantes</string>
     <string name="service_type_plugin">Plugins</string>
     <string name="service_type_metadata">Metadados</string>
     <string name="service_type_other">Outros</string>
