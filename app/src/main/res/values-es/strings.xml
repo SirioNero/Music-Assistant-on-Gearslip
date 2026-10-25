@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Music Assistant en el coche, a través de Gearslip: la música sale del teléfono y llega a los altavoces del coche.</string>
+    <string name="label_language">Idioma</string>
+    <string name="label_home">Dirección de casa</string>
+    <string name="label_remote">Dirección fuera de casa (opcional)</string>
+    <string name="label_token">Token de acceso de larga duración</string>
+    <string name="label_name">Nombre del reproductor</string>
+    <string name="hint_remote">https://… o la dirección de la VPN</string>
+    <string name="hint_token">Pega aquí el token</string>
+    <string name="help_home">La dirección de la interfaz de Music Assistant, normalmente en el puerto 8095.</string>
+    <string name="help_remote">En el coche el teléfono está fuera de la red de casa: Xonos prueba primero la dirección de casa y luego esta.</string>
+    <string name="help_token">Créalo en Music Assistant: Ajustes, Perfil, Tokens de acceso de larga duración.</string>
+    <string name="help_name">Cómo aparece el teléfono entre los reproductores de Music Assistant.</string>
+    <string name="save">Guardar y probar la conexión</string>
+    <string name="battery_needed">Android puede detener la música con la pantalla apagada para ahorrar batería. Permite que Xonos funcione en segundo plano.</string>
+    <string name="battery_ok">✓ Android deja que Xonos suene también con la pantalla apagada.</string>
+    <string name="battery_button">Permitir en segundo plano</string>
+    <string name="help_car">En el coche, abre Gearslip: Xonos aparece entre las apps de música.</string>
+
+    <!-- La prova della connessione -->
+    <string name="test_incomplete">Hacen falta al menos una dirección y el token.</string>
+    <string name="test_running">Probando la conexión…</string>
+    <string name="test_home">Casa</string>
+    <string name="test_remote">Fuera de casa</string>
+    <string name="test_ok">✓ %1$s: Music Assistant %2$s</string>
+    <string name="test_failed">✗ %1$s: %2$s</string>
+    <plurals name="test_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="other">%d playlists</item>
+    </plurals>
+    <string name="audio_ready">audio listo</string>
+    <string name="audio_unexpected">audio: respuesta inesperada</string>
+    <string name="audio_closed">audio: conexión cerrada</string>
+    <string name="audio_denied">audio: acceso denegado</string>
+    <string name="audio_too_old">audio: se necesita Music Assistant 2.7.5 o posterior</string>
+    <string name="audio_error">audio: %s</string>
+    <string name="audio_unreachable">audio: no se puede conectar</string>
+    <string name="audio_no_answer">audio: sin respuesta</string>
+
+    <!-- Cosa non va con Music Assistant -->
+    <string name="problem_bad_address">Dirección no válida: %s</string>
+    <string name="problem_no_answer_from">Sin respuesta de %s</string>
+    <string name="problem_no_answer">Music Assistant no responde</string>
+    <string name="problem_not_ma">En esta dirección no responde Music Assistant</string>
+    <string name="problem_too_old">Music Assistant %s es demasiado antiguo: se necesita la versión 2.7 o posterior</string>
+    <string name="problem_bad_token">Token no aceptado: crea uno nuevo en Music Assistant</string>
+    <string name="problem_denied">Acceso denegado</string>
+    <string name="problem_http">Error HTTP %s</string>
+    <string name="problem_network">Error de red: %s</string>
+    <string name="problem_unreachable">No se puede conectar con Music Assistant</string>
+    <string name="problem_lost">Conexión perdida, reconectando</string>
+    <string name="problem_not_connected">Sin conexión con Music Assistant</string>
+    <string name="problem_refused">Music Assistant: %s</string>
+    <string name="problem_not_configured">Configura Xonos en el teléfono</string>
+    <string name="error_unknown">error desconocido</string>
+
+    <!-- Il menu in auto -->
+    <string name="cat_recent">Escuchado recientemente</string>
+    <string name="cat_foryou">Para ti</string>
+    <string name="cat_playlists">Playlists</string>
+    <string name="cat_albums">Álbumes</string>
+    <string name="cat_artists">Artistas</string>
+    <string name="cat_tracks">Canciones</string>
+    <string name="cat_favorites">Canciones favoritas</string>
+    <string name="cat_genres">Géneros</string>
+    <string name="cat_radios">Radio</string>
+    <string name="cat_podcasts">Pódcasts</string>
+    <string name="cat_audiobooks">Audiolibros</string>
+    <string name="cat_browse">Explorar servicios</string>
+    <string name="top_tracks">Más escuchadas</string>
+    <string name="all_tracks">Todas las canciones</string>
+    <plurals name="results">
+        <item quantity="one">%d resultado</item>
+        <item quantity="other">%d resultados</item>
+    </plurals>
+    <plurals name="count_tracks">
+        <item quantity="one">%d canción</item>
+        <item quantity="other">%d canciones</item>
+    </plurals>
+    <plurals name="count_albums">
+        <item quantity="one">%d álbum</item>
+        <item quantity="other">%d álbumes</item>
+    </plurals>
+    <plurals name="count_artists">
+        <item quantity="one">%d artista</item>
+        <item quantity="other">%d artistas</item>
+    </plurals>
+    <plurals name="count_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="other">%d playlists</item>
+    </plurals>
+    <plurals name="count_radio">
+        <item quantity="one">%d emisora</item>
+        <item quantity="other">%d emisoras</item>
+    </plurals>
+    <plurals name="count_podcasts">
+        <item quantity="one">%d pódcast</item>
+        <item quantity="other">%d pódcasts</item>
+    </plurals>
+    <plurals name="count_audiobooks">
+        <item quantity="one">%d audiolibro</item>
+        <item quantity="other">%d audiolibros</item>
+    </plurals>
+    <plurals name="count_genres">
+        <item quantity="one">%d género</item>
+        <item quantity="other">%d géneros</item>
+    </plurals>
+</resources>

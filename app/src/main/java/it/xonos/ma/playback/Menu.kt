@@ -23,6 +23,24 @@ data class MenuNode(
     val playable: Boolean,
 )
 
+/** Le scritte del menu, nella lingua scelta sul telefono. */
+interface MenuLabels {
+    /** Una voce del menu principale: "recent", "foryou", "playlists", "albums", "tracks", "favorites", ... */
+    fun category(id: String): String
+
+    /** Un tipo di elemento, con le chiavi della ricerca di Music Assistant: "tracks", "albums", "podcasts", "radio", ... */
+    fun kind(type: String): String
+
+    /** Quanti risultati di un tipo ha trovato una ricerca. */
+    fun results(count: Int): String
+
+    /** Quanti elementi di un tipo ("tracks", "albums", "artists", ...) ci sono. */
+    fun count(type: String, count: Int): String
+
+    val topTracks: String
+    val allTracks: String
+}
+
 /**
  * Il menu musicale che Gearslip mostra: le voci della libreria di Music Assistant, la ricerca,
  * e cosa succede quando se ne sceglie una. Non usa Media3, così si prova anche fuori dal telefono.
@@ -38,30 +56,30 @@ data class MenuNode(
  */
 class Menu(
     private val library: Library,
+    private val labels: MenuLabels,
     private val queueId: () -> String,
 ) {
 
     private enum class Category(
         val id: String,
-        val title: String,
         val icon: String,
         val kind: String?,
         val favoriteOnly: Boolean = false,
-        /** Cosa contiene, per dividerla per iniziale quando è lunga; null se non è in ordine alfabetico. */
-        val noun: String? = null,
+        /** Il tipo che contiene, per dividerla per iniziale quando è lunga; null se non è in ordine alfabetico. */
+        val counted: String? = null,
     ) {
-        RECENT("recent", "Ascoltati di recente", "recent", null),
-        FOR_YOU("foryou", "Per te", "foryou", null),
-        PLAYLISTS("playlists", "Playlist", "playlist", "playlists", noun = "playlist"),
-        ALBUMS("albums", "Album", "album", "albums", noun = "album"),
-        ARTISTS("artists", "Artisti", "artist", "artists", noun = "artisti"),
-        TRACKS("tracks", "Brani", "track", "tracks", noun = "brani"),
-        FAVORITES("favorites", "Brani preferiti", "favorite", "tracks", favoriteOnly = true),
-        GENRES("genres", "Generi", "genre", "genres", noun = "generi"),
-        RADIOS("radios", "Radio", "radio", "radios", noun = "radio"),
-        PODCASTS("podcasts", "Podcast", "podcast", "podcasts", noun = "podcast"),
-        AUDIOBOOKS("audiobooks", "Audiolibri", "audiobook", "audiobooks", noun = "audiolibri"),
-        BROWSE("browse", "Sfoglia i servizi", "browse", null),
+        RECENT("recent", "recent", null),
+        FOR_YOU("foryou", "foryou", null),
+        PLAYLISTS("playlists", "playlist", "playlists", counted = "playlists"),
+        ALBUMS("albums", "album", "albums", counted = "albums"),
+        ARTISTS("artists", "artist", "artists", counted = "artists"),
+        TRACKS("tracks", "track", "tracks", counted = "tracks"),
+        FAVORITES("favorites", "favorite", "tracks", favoriteOnly = true),
+        GENRES("genres", "genre", "genres", counted = "genres"),
+        RADIOS("radios", "radio", "radios", counted = "radio"),
+        PODCASTS("podcasts", "podcast", "podcasts", counted = "podcasts"),
+        AUDIOBOOKS("audiobooks", "audiobook", "audiobooks", counted = "audiobooks"),
+        BROWSE("browse", "browse", null),
     }
 
     /** Gli elenchi già chiesti, per aprire le iniziali e suonare "da qui in poi" senza richiederli. */
@@ -112,7 +130,7 @@ class Menu(
             val list = found[type] ?: return@mapNotNull null
             // Una cartella che ripeterebbe solo ciò che è già in cima non serve.
             if (list.all { it.uri in shown }) return@mapNotNull null
-            folder("find|$type|$text", TYPE_TITLES.getValue(type), results(list.size), TYPE_ICONS.getValue(type), playable = type == "tracks")
+            folder("find|$type|$text", labels.kind(type), labels.results(list.size), TYPE_ICONS.getValue(type), playable = type == "tracks")
         }
         return (nodes + folders).onEach { known.put(it.id, it) }
     }
@@ -216,7 +234,7 @@ class Menu(
         }
         Category.entries.mapNotNull { category ->
             val count = counts[category]?.await() ?: -1
-            if (count == 0) null else folder("cat|${category.id}", category.title, null, category.icon)
+            if (count == 0) null else folder("cat|${category.id}", labels.category(category.id), null, category.icon)
         }.onEach { known.put(it.id, it) }
     }
 
@@ -239,18 +257,18 @@ class Menu(
             Category.BROWSE -> library.browse(null)
             else -> library.libraryItems(category.kind ?: return emptyList())
         }
-        val noun = category.noun
-        return if (noun != null && items.size > INITIALS_FROM) initials(id, items, noun, category.icon) else entries(id, items)
+        val counted = category.counted
+        return if (counted != null && items.size > INITIALS_FROM) initials(id, items, counted, category.icon) else entries(id, items)
     }
 
     /** Un elenco troppo lungo da scorrere in auto: una cartella per iniziale, nell'ordine dell'elenco. */
-    private fun initials(parentId: String, items: List<MaItem>, noun: String, icon: String): List<MenuNode> {
+    private fun initials(parentId: String, items: List<MaItem>, counted: String, icon: String): List<MenuNode> {
         val groups = items.groupBy(::initialOf)
         // Se cominciano tutti con la stessa lettera, dividerli non aiuta.
         if (groups.size < 2) return entries(parentId, items)
         lists.put(parentId, items)
         return groups.map { (initial, group) ->
-            folder("abc|$initial|$parentId", initial, "${group.size} $noun", icon)
+            folder("abc|$initial|$parentId", initial, labels.count(counted, group.size), icon)
         }.onEach { known.put(it.id, it) }
     }
 
@@ -297,18 +315,18 @@ class Menu(
         lists.put("tracks|${artist.uri}", allTracks)
         buildList {
             if (topTracks.isNotEmpty()) {
-                add(folder("top|${artist.uri}", "Brani più ascoltati", tracksCount(topTracks.size), "track", artist.image, playable = true))
+                add(folder("top|${artist.uri}", labels.topTracks, labels.count("tracks", topTracks.size), "track", artist.image, playable = true))
             }
             addAll(entries(id, albums.await().sortedByDescending { it.year }))
             if (allTracks.isNotEmpty()) {
-                add(folder("tracks|${artist.uri}", "Tutti i brani", tracksCount(allTracks.size), "track", playable = true))
+                add(folder("tracks|${artist.uri}", labels.allTracks, labels.count("tracks", allTracks.size), "track", playable = true))
             }
         }.onEach { known.put(it.id, it) }
     }
 
     /** Un genere: tutti i suoi brani, poi i suoi album. */
     private suspend fun genre(id: String, genre: MaItem): List<MenuNode> {
-        val tracks = folder("tracks|${genre.uri}", "Tutti i brani", null, "track", genre.image, playable = true)
+        val tracks = folder("tracks|${genre.uri}", labels.allTracks, null, "track", genre.image, playable = true)
         known.put(tracks.id, tracks)
         return listOf(tracks) + entries(id, library.genreAlbums(genre))
     }
@@ -382,17 +400,6 @@ class Menu(
         /** Le cartelle di brani, che si possono anche suonare intere. */
         private val TRACK_FOLDERS = listOf("find|tracks|", "top|", "tracks|")
 
-        private val TYPE_TITLES = mapOf(
-            "artists" to "Artisti",
-            "tracks" to "Brani",
-            "albums" to "Album",
-            "playlists" to "Playlist",
-            "podcasts" to "Podcast",
-            "audiobooks" to "Audiolibri",
-            "radio" to "Radio",
-            "genres" to "Generi",
-        )
-
         private val TYPE_ICONS = mapOf(
             "artists" to "artist",
             "tracks" to "track",
@@ -404,22 +411,28 @@ class Menu(
             "genres" to "genre",
         )
 
-        /** Le parole con cui si chiede un tipo, all'inizio o in fondo alla ricerca ("canzone" no: è in troppi titoli). */
+        /**
+         * Le parole con cui si chiede un tipo, all'inizio o in fondo alla ricerca, nelle lingue di Xonos
+         * e già senza accenti come le lascia [fold]. Niente "canzone" o "song": sono in troppi titoli.
+         */
         private val TYPE_WORDS = mapOf(
-            "artista" to "artists", "artist" to "artists",
-            "album" to "albums",
-            "playlist" to "playlists",
-            "podcast" to "podcasts",
-            "audiolibro" to "audiobooks", "audiobook" to "audiobooks",
-            "radio" to "radio",
-            "genere" to "genres", "genre" to "genres",
+            "artista" to "artists", "artist" to "artists", "artiste" to "artists", "kunstler" to "artists",
+            "καλλιτεχνης" to "artists", "исполнитель" to "artists", "артист" to "artists", "艺人" to "artists", "歌手" to "artists",
+            "album" to "albums", "αλμπουμ" to "albums", "альбом" to "albums", "专辑" to "albums",
+            "playlist" to "playlists", "плеилист" to "playlists", "播放列表" to "playlists",
+            "podcast" to "podcasts", "подкаст" to "podcasts", "播客" to "podcasts",
+            "audiolibro" to "audiobooks", "audiobook" to "audiobooks", "horbuch" to "audiobooks", "audiolivro" to "audiobooks",
+            "аудиокнига" to "audiobooks", "有声书" to "audiobooks",
+            "radio" to "radio", "ραδιοφωνο" to "radio", "радио" to "radio", "电台" to "radio",
+            "genere" to "genres", "genre" to "genres", "genero" to "genres", "жанр" to "genres", "流派" to "genres",
         )
 
-        private val ARTICLES = setOf("il", "lo", "la", "l", "i", "gli", "le", "un", "uno", "una", "the", "a")
-
-        private fun results(n: Int) = if (n == 1) "1 risultato" else "$n risultati"
-
-        private fun tracksCount(n: Int) = if (n == 1) "1 brano" else "$n brani"
+        /** Gli articoli che possono precedere il tipo: "il podcast ...", "der Podcast ...", "o podcast ...". */
+        private val ARTICLES = setOf(
+            "il", "lo", "la", "l", "i", "gli", "le", "un", "uno", "una",
+            "the", "a", "el", "los", "las", "der", "die", "das", "ein", "eine", "les", "une",
+            "o", "os", "as", "um", "uma", "ο", "η", "το", "ενα",
+        )
 
         private val MARKS = Regex("\\p{M}+")
         private val SEPARATORS = Regex("[^\\p{L}\\p{N}]+")

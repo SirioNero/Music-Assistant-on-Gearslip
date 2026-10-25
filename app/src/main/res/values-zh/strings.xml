@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">通过 Gearslip 在车上使用 Music Assistant：音乐从手机播放，经车载扬声器输出。</string>
+    <string name="label_language">语言</string>
+    <string name="label_home">家中地址</string>
+    <string name="label_remote">外出时的地址（可选）</string>
+    <string name="label_token">长期访问令牌</string>
+    <string name="label_name">播放器名称</string>
+    <string name="hint_remote">https://… 或 VPN 地址</string>
+    <string name="hint_token">在此粘贴令牌</string>
+    <string name="help_home">Music Assistant 界面的地址，通常使用 8095 端口。</string>
+    <string name="help_remote">在车上时手机不在家庭网络中：Xonos 会先尝试家中地址，再尝试这个地址。</string>
+    <string name="help_token">在 Music Assistant 中创建：设置 › 个人资料 › 长期访问令牌。</string>
+    <string name="help_name">手机在 Music Assistant 播放器列表中显示的名称。</string>
+    <string name="save">保存并测试连接</string>
+    <string name="battery_needed">为了省电，Android 可能会在熄屏时停止播放音乐。请允许 Xonos 在后台运行。</string>
+    <string name="battery_ok">✓ Android 允许 Xonos 在熄屏时继续播放。</string>
+    <string name="battery_button">允许后台运行</string>
+    <string name="help_car">在车上打开 Gearslip：Xonos 会出现在音乐应用中。</string>
+
+    <!-- La prova della connessione -->
+    <string name="test_incomplete">至少需要一个地址和令牌。</string>
+    <string name="test_running">正在测试连接…</string>
+    <string name="test_home">家中</string>
+    <string name="test_remote">外出</string>
+    <string name="test_ok">✓ %1$s：Music Assistant %2$s</string>
+    <string name="test_failed">✗ %1$s：%2$s</string>
+    <plurals name="test_playlists">
+        <item quantity="other">%d 个播放列表</item>
+    </plurals>
+    <string name="audio_ready">音频就绪</string>
+    <string name="audio_unexpected">音频：意外的响应</string>
+    <string name="audio_closed">音频：连接已关闭</string>
+    <string name="audio_denied">音频：访问被拒绝</string>
+    <string name="audio_too_old">音频：需要 Music Assistant 2.7.5 或更高版本</string>
+    <string name="audio_error">音频：%s</string>
+    <string name="audio_unreachable">音频：无法访问</string>
+    <string name="audio_no_answer">音频：无响应</string>
+
+    <!-- Cosa non va con Music Assistant -->
+    <string name="problem_bad_address">地址无效：%s</string>
+    <string name="problem_no_answer_from">%s 没有响应</string>
+    <string name="problem_no_answer">Music Assistant 没有响应</string>
+    <string name="problem_not_ma">此地址上没有 Music Assistant</string>
+    <string name="problem_too_old">Music Assistant %s 版本过旧：需要 2.7 或更高版本</string>
+    <string name="problem_bad_token">令牌未被接受：请在 Music Assistant 中新建一个</string>
+    <string name="problem_denied">访问被拒绝</string>
+    <string name="problem_http">HTTP 错误 %s</string>
+    <string name="problem_network">网络错误：%s</string>
+    <string name="problem_unreachable">无法访问 Music Assistant</string>
+    <string name="problem_lost">连接已断开，正在重新连接</string>
+    <string name="problem_not_connected">未连接到 Music Assistant</string>
+    <string name="problem_refused">Music Assistant：%s</string>
+    <string name="problem_not_configured">请在手机上设置 Xonos</string>
+    <string name="error_unknown">未知错误</string>
+
+    <!-- Il menu in auto -->
+    <string name="cat_recent">最近播放</string>
+    <string name="cat_foryou">为你推荐</string>
+    <string name="cat_playlists">播放列表</string>
+    <string name="cat_albums">专辑</string>
+    <string name="cat_artists">艺人</string>
+    <string name="cat_tracks">歌曲</string>
+    <string name="cat_favorites">收藏的歌曲</string>
+    <string name="cat_genres">流派</string>
+    <string name="cat_radios">电台</string>
+    <string name="cat_podcasts">播客</string>
+    <string name="cat_audiobooks">有声书</string>
+    <string name="cat_browse">浏览服务</string>
+    <string name="top_tracks">热门歌曲</string>
+    <string name="all_tracks">全部歌曲</string>
+    <plurals name="results">
+        <item quantity="other">%d 个结果</item>
+    </plurals>
+    <plurals name="count_tracks">
+        <item quantity="other">%d 首歌曲</item>
+    </plurals>
+    <plurals name="count_albums">
+        <item quantity="other">%d 张专辑</item>
+    </plurals>
+    <plurals name="count_artists">
+        <item quantity="other">%d 位艺人</item>
+    </plurals>
+    <plurals name="count_playlists">
+        <item quantity="other">%d 个播放列表</item>
+    </plurals>
+    <plurals name="count_radio">
+        <item quantity="other">%d 个电台</item>
+    </plurals>
+    <plurals name="count_podcasts">
+        <item quantity="other">%d 个播客</item>
+    </plurals>
+    <plurals name="count_audiobooks">
+        <item quantity="other">%d 本有声书</item>
+    </plurals>
+    <plurals name="count_genres">
+        <item quantity="other">%d 个流派</item>
+    </plurals>
+</resources>

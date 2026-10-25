@@ -1,0 +1,71 @@
+package it.xonos.ma.playback
+
+import android.content.Context
+import android.content.res.Resources
+import it.xonos.ma.Language
+import it.xonos.ma.R
+
+/** Le scritte del menu dalle risorse dell'app, nella lingua scelta sul telefono, anche se cambia con l'auto collegata. */
+class ResourceLabels(private val context: Context, private val language: () -> Language) : MenuLabels {
+
+    private var cached: Pair<Language, Resources>? = null
+
+    private val resources: Resources
+        @Synchronized get() {
+            val current = language()
+            cached?.let { (chosen, res) -> if (chosen == current) return res }
+            return current.wrap(context).resources.also { cached = current to it }
+        }
+
+    override fun category(id: String) = resources.getString(CATEGORIES.getValue(id))
+
+    override fun kind(type: String) = resources.getString(KINDS.getValue(type))
+
+    override fun results(count: Int) = resources.getQuantityString(R.plurals.results, count, count)
+
+    override fun count(type: String, count: Int) = resources.getQuantityString(COUNTS.getValue(type), count, count)
+
+    override val topTracks: String get() = resources.getString(R.string.top_tracks)
+
+    override val allTracks: String get() = resources.getString(R.string.all_tracks)
+
+    private companion object {
+        val CATEGORIES = mapOf(
+            "recent" to R.string.cat_recent,
+            "foryou" to R.string.cat_foryou,
+            "playlists" to R.string.cat_playlists,
+            "albums" to R.string.cat_albums,
+            "artists" to R.string.cat_artists,
+            "tracks" to R.string.cat_tracks,
+            "favorites" to R.string.cat_favorites,
+            "genres" to R.string.cat_genres,
+            "radios" to R.string.cat_radios,
+            "podcasts" to R.string.cat_podcasts,
+            "audiobooks" to R.string.cat_audiobooks,
+            "browse" to R.string.cat_browse,
+        )
+
+        /** I tipi della ricerca si chiamano come le voci del menu. */
+        val KINDS = mapOf(
+            "artists" to R.string.cat_artists,
+            "tracks" to R.string.cat_tracks,
+            "albums" to R.string.cat_albums,
+            "playlists" to R.string.cat_playlists,
+            "podcasts" to R.string.cat_podcasts,
+            "audiobooks" to R.string.cat_audiobooks,
+            "radio" to R.string.cat_radios,
+            "genres" to R.string.cat_genres,
+        )
+
+        val COUNTS = mapOf(
+            "tracks" to R.plurals.count_tracks,
+            "albums" to R.plurals.count_albums,
+            "artists" to R.plurals.count_artists,
+            "playlists" to R.plurals.count_playlists,
+            "radio" to R.plurals.count_radio,
+            "podcasts" to R.plurals.count_podcasts,
+            "audiobooks" to R.plurals.count_audiobooks,
+            "genres" to R.plurals.count_genres,
+        )
+    }
+}

@@ -8,7 +8,48 @@ sealed interface Connection {
     data object NotConfigured : Connection
     data class Connecting(val url: String) : Connection
     data class Connected(val url: String, val server: ServerInfo) : Connection
-    data class Failed(val message: String) : Connection
+
+    /** [message] va nei log; a chi usa l'app si dice [problem], nella sua lingua. */
+    data class Failed(val message: String, val problem: Problem = Problem.NETWORK, val detail: String? = null) : Connection
+}
+
+/**
+ * Cosa è andato storto con Music Assistant. L'app lo spiega con parole sue, nella lingua scelta
+ * sul telefono; il dettaglio (un indirizzo, una versione, un codice HTTP) va dentro la frase.
+ */
+enum class Problem {
+    /** L'indirizzo scritto non è un indirizzo. */
+    BAD_ADDRESS,
+
+    /** Nessuna risposta in tempo (dettaglio: l'indirizzo, se si sa). */
+    NO_ANSWER,
+
+    /** A quell'indirizzo risponde qualcos'altro. */
+    NOT_MUSIC_ASSISTANT,
+
+    /** Music Assistant più vecchio della 2.7 (dettaglio: la versione). */
+    TOO_OLD,
+
+    /** Il token non è valido o è scaduto. */
+    BAD_TOKEN,
+
+    /** L'accesso è negato. */
+    DENIED,
+
+    /** Un altro errore HTTP (dettaglio: il codice). */
+    HTTP,
+
+    /** La rete: niente connessione, nome sconosciuto, server spento (dettaglio: cosa dice il sistema). */
+    NETWORK,
+
+    /** La connessione c'era ed è caduta. */
+    LOST,
+
+    /** Non c'è una connessione aperta. */
+    NOT_CONNECTED,
+
+    /** Music Assistant ha rifiutato la richiesta (dettaglio: il suo messaggio). */
+    REFUSED,
 }
 
 /** Cosa dice di sé il server appena collegato. */

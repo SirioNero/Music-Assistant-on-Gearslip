@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Music Assistant en voiture, via Gearslip : la musique part du téléphone et arrive aux haut-parleurs de la voiture.</string>
+    <string name="label_language">Langue</string>
+    <string name="label_home">Adresse à la maison</string>
+    <string name="label_remote">Adresse hors de la maison (facultatif)</string>
+    <string name="label_token">Jeton d’accès longue durée</string>
+    <string name="label_name">Nom du lecteur</string>
+    <string name="hint_remote">https://… ou l’adresse du VPN</string>
+    <string name="hint_token">Collez le jeton ici</string>
+    <string name="help_home">L’adresse de l’interface de Music Assistant, généralement sur le port 8095.</string>
+    <string name="help_remote">En voiture, le téléphone est hors du réseau de la maison : Xonos essaie d’abord l’adresse de la maison, puis celle-ci.</string>
+    <string name="help_token">Créez-le dans Music Assistant : Paramètres, Profil, Jetons d’accès longue durée.</string>
+    <string name="help_name">Le nom du téléphone parmi les lecteurs de Music Assistant.</string>
+    <string name="save">Enregistrer et tester la connexion</string>
+    <string name="battery_needed">Android peut arrêter la musique écran éteint pour économiser la batterie. Autorisez Xonos à fonctionner en arrière-plan.</string>
+    <string name="battery_ok">✓ Android laisse Xonos jouer même écran éteint.</string>
+    <string name="battery_button">Autoriser en arrière-plan</string>
+    <string name="help_car">En voiture, ouvrez Gearslip : Xonos figure parmi les apps de musique.</string>
+
+    <!-- La prova della connessione -->
+    <string name="test_incomplete">Il faut au moins une adresse et le jeton.</string>
+    <string name="test_running">Test de la connexion…</string>
+    <string name="test_home">Maison</string>
+    <string name="test_remote">Hors de la maison</string>
+    <string name="test_ok">✓ %1$s : Music Assistant %2$s</string>
+    <string name="test_failed">✗ %1$s : %2$s</string>
+    <plurals name="test_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="other">%d playlists</item>
+    </plurals>
+    <string name="audio_ready">audio prêt</string>
+    <string name="audio_unexpected">audio : réponse inattendue</string>
+    <string name="audio_closed">audio : connexion fermée</string>
+    <string name="audio_denied">audio : accès refusé</string>
+    <string name="audio_too_old">audio : Music Assistant 2.7.5 ou plus récent est nécessaire</string>
+    <string name="audio_error">audio : %s</string>
+    <string name="audio_unreachable">audio : injoignable</string>
+    <string name="audio_no_answer">audio : pas de réponse</string>
+
+    <!-- Cosa non va con Music Assistant -->
+    <string name="problem_bad_address">Adresse non valide : %s</string>
+    <string name="problem_no_answer_from">Pas de réponse de %s</string>
+    <string name="problem_no_answer">Music Assistant ne répond pas</string>
+    <string name="problem_not_ma">Music Assistant ne répond pas à cette adresse</string>
+    <string name="problem_too_old">Music Assistant %s est trop ancien : la version 2.7 ou plus récente est nécessaire</string>
+    <string name="problem_bad_token">Jeton refusé : créez-en un nouveau dans Music Assistant</string>
+    <string name="problem_denied">Accès refusé</string>
+    <string name="problem_http">Erreur HTTP %s</string>
+    <string name="problem_network">Erreur réseau : %s</string>
+    <string name="problem_unreachable">Music Assistant est injoignable</string>
+    <string name="problem_lost">Connexion perdue, reconnexion en cours</string>
+    <string name="problem_not_connected">Pas de connexion à Music Assistant</string>
+    <string name="problem_refused">Music Assistant : %s</string>
+    <string name="problem_not_configured">Configurez Xonos sur le téléphone</string>
+    <string name="error_unknown">erreur inconnue</string>
+
+    <!-- Il menu in auto -->
+    <string name="cat_recent">Écoutés récemment</string>
+    <string name="cat_foryou">Pour vous</string>
+    <string name="cat_playlists">Playlists</string>
+    <string name="cat_albums">Albums</string>
+    <string name="cat_artists">Artistes</string>
+    <string name="cat_tracks">Titres</string>
+    <string name="cat_favorites">Titres favoris</string>
+    <string name="cat_genres">Genres</string>
+    <string name="cat_radios">Radio</string>
+    <string name="cat_podcasts">Podcasts</string>
+    <string name="cat_audiobooks">Livres audio</string>
+    <string name="cat_browse">Parcourir les services</string>
+    <string name="top_tracks">Les plus écoutés</string>
+    <string name="all_tracks">Tous les titres</string>
+    <plurals name="results">
+        <item quantity="one">%d résultat</item>
+        <item quantity="other">%d résultats</item>
+    </plurals>
+    <plurals name="count_tracks">
+        <item quantity="one">%d titre</item>
+        <item quantity="other">%d titres</item>
+    </plurals>
+    <plurals name="count_albums">
+        <item quantity="one">%d album</item>
+        <item quantity="other">%d albums</item>
+    </plurals>
+    <plurals name="count_artists">
+        <item quantity="one">%d artiste</item>
+        <item quantity="other">%d artistes</item>
+    </plurals>
+    <plurals name="count_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="other">%d playlists</item>
+    </plurals>
+    <plurals name="count_radio">
+        <item quantity="one">%d station</item>
+        <item quantity="other">%d stations</item>
+    </plurals>
+    <plurals name="count_podcasts">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcasts</item>
+    </plurals>
+    <plurals name="count_audiobooks">
+        <item quantity="one">%d livre audio</item>
+        <item quantity="other">%d livres audio</item>
+    </plurals>
+    <plurals name="count_genres">
+        <item quantity="one">%d genre</item>
+        <item quantity="other">%d genres</item>
+    </plurals>
+</resources>

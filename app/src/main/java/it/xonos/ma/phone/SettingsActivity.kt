@@ -2,6 +2,7 @@ package it.xonos.ma.phone
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,13 +10,18 @@ import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
-import it.xonos.ma.XonosApp
+import it.xonos.ma.Language
 import it.xonos.ma.R
+import it.xonos.ma.XonosApp
 import it.xonos.ma.data.MaClient
 import it.xonos.ma.data.Settings
+import it.xonos.ma.describe
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.MainScope
@@ -28,13 +34,18 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
 
-/** La sola schermata sul telefono: indirizzi, token, nome del lettore e una prova di connessione. */
+/** La sola schermata sul telefono: lingua, indirizzi, token, nome del lettore e una prova di connessione. */
 class SettingsActivity : Activity() {
 
     private val scope = MainScope()
     private lateinit var status: TextView
     private lateinit var battery: TextView
     private lateinit var batteryButton: Button
+
+    // Le scritte nella lingua scelta qui, non in quella del telefono.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(Settings(newBase).language.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +60,7 @@ class SettingsActivity : Activity() {
         battery = findViewById(R.id.battery)
         batteryButton = findViewById(R.id.battery_button)
 
+        setUpLanguage(app.settings)
         app.settings.load().let {
             home.setText(it.homeUrl)
             remote.setText(it.remoteUrl)
@@ -80,15 +92,37 @@ class SettingsActivity : Activity() {
         updateBattery()
     }
 
+    /** L'elenco delle lingue, ciascuna col suo nome: scelta una, la schermata si ridisegna in quella lingua. */
+    private fun setUpLanguage(settings: Settings) {
+        val languages = Language.entries
+        val picker = findViewById<Spinner>(R.id.language)
+        picker.adapter = ArrayAdapter(this, R.layout.item_language, languages.map { it.label }).apply {
+            setDropDownViewResource(R.layout.item_language_dropdown)
+        }
+        picker.setSelection(languages.indexOf(settings.language), false)
+        picker.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val chosen = languages[position]
+                if (chosen == settings.language) return
+                settings.language = chosen
+                // Ciò che è già scritto nei campi resta: Android lo ricorda nel ridisegnare la schermata.
+                recreate()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+    }
+
     private fun test(app: XonosApp, config: Settings.Config) {
         if (!config.isComplete) {
-            status.text = "Servono almeno un indirizzo e il token."
+            status.text = getString(R.string.test_incomplete)
             return
         }
-        status.text = "Provo la connessione…"
+        status.text = getString(R.string.test_running)
         scope.launch {
             val lines = mutableListOf<String>()
-            for ((label, url) in listOf("Casa" to config.homeUrl, "Fuori casa" to config.remoteUrl)) {
+            val places = listOf(getString(R.string.test_home) to config.homeUrl, getString(R.string.test_remote) to config.remoteUrl)
+            for ((label, url) in places) {
                 if (url.isBlank()) continue
                 val client = app.repo.newClient()
                 val line = try {
@@ -96,14 +130,14 @@ class SettingsActivity : Activity() {
                     val playlists = (client.command("music/playlists/count") as? Number)?.toInt()
                     val audio = testAudio(app, url, config.token)
                     listOfNotNull(
-                        "✓ $label: Music Assistant ${server.version}",
-                        playlists?.let { "$it playlist" },
+                        getString(R.string.test_ok, label, server.version),
+                        playlists?.let { resources.getQuantityString(R.plurals.test_playlists, it, it) },
                         audio,
                     ).joinToString(" · ")
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    "✗ $label: ${e.message ?: "errore sconosciuto"}"
+                    getString(R.string.test_failed, label, describe(this@SettingsActivity, e))
                 } finally {
                     client.close()
                 }
@@ -124,22 +158,26 @@ class SettingsActivity : Activity() {
 
             override fun onMessage(webSocket: WebSocket, text: String) {
                 val ok = runCatching { JSONObject(text).optString("type") == "auth_ok" }.getOrDefault(false)
-                answer.complete(if (ok) "audio pronto" else "audio: risposta inattesa")
+                answer.complete(getString(if (ok) R.string.audio_ready else R.string.audio_unexpected))
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                answer.complete("audio: ${reason.ifBlank { "connessione chiusa" }}")
+                answer.complete(if (reason.isBlank()) getString(R.string.audio_closed) else getString(R.string.audio_error, reason))
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 answer.complete(
-                    if (response?.code == 404) "audio: serve Music Assistant 2.7.5 o successivo"
-                    else "audio: ${t.message ?: "non raggiungibile"}",
+                    when {
+                        response?.code == 404 -> getString(R.string.audio_too_old)
+                        response?.code == 401 || response?.code == 403 -> getString(R.string.audio_denied)
+                        t.message != null -> getString(R.string.audio_error, t.message)
+                        else -> getString(R.string.audio_unreachable)
+                    },
                 )
             }
         })
         return try {
-            withTimeoutOrNull(8_000) { answer.await() } ?: "audio: nessuna risposta"
+            withTimeoutOrNull(8_000) { answer.await() } ?: getString(R.string.audio_no_answer)
         } finally {
             socket.close(1000, null)
         }

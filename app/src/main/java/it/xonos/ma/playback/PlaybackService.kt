@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import it.xonos.ma.XonosApp
+import it.xonos.ma.describe
 import it.xonos.ma.BuildConfig
 import it.xonos.ma.R
 import it.xonos.ma.data.Connection
@@ -100,8 +101,10 @@ class PlaybackService : MediaLibraryService() {
             settings.volume = volume
             settings.muted = muted
         }
-        player = MaPlayer(mainLooper, app.repo, settings.playerId, ready, engine.outputting, artwork::uriFor)
-        tree = BrowseTree(Menu(app.library) { settings.playerId }, artwork)
+        player = MaPlayer(mainLooper, app.repo, settings.playerId, ready, engine.outputting, artwork::uriFor) { connection ->
+            describe(settings.language.wrap(this), connection)
+        }
+        tree = BrowseTree(Menu(app.library, ResourceLabels(this) { settings.language }) { settings.playerId }, artwork)
         player.onPlayRequest = { item -> tree.play(item) }
 
         val openSettings = PendingIntent.getActivity(

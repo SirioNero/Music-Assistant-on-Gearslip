@@ -20,7 +20,7 @@ The app’s interface is in Italian for now.
 
 ### Getting around
 
-- **The menu** lists Ascoltati di recente (recently played), Per te (recommendations from your library and services), Playlist, Album, Artisti (artists), Brani (every track in the library), Brani preferiti (favorite tracks), Generi (genres), Radio, Podcast, Audiolibri (audiobooks) and Sfoglia i servizi (browse each service’s own folders). Empty ones are hidden. Lists are complete, however long: past 150 items they split by initial, A to Z.
+- **The menu** lists Recently played, For you (recommendations from your library and services), Playlists, Albums, Artists, Tracks (every track in the library), Favorite tracks, Genres, Radio, Podcasts, Audiobooks and Browse services (each service’s own folders), in the language chosen on the phone. Empty ones are hidden. Lists are complete, however long: past 150 items they split by initial, A to Z.
 - **Albums and playlists** open with a tap; the play button next to them plays them whole. A track inside an album or playlist plays the album or playlist from that track on, so next and previous stay inside it.
 - **An artist** shows the most played tracks, every album (those in the library and the whole discography on the services where the artist is), and all the tracks.
 - **Search** with Gearslip’s search key: Xonos searches the library and every service connected to Music Assistant, for every kind of item. The best matches come first, one per kind, then a folder per kind with all its results: Brani, Artisti, Album, Playlist, Podcast, Audiolibri, Radio, Generi. Starting or ending with a kind (“podcast morning”, “morning podcast”, “radio deejay”) puts that kind first.
@@ -31,13 +31,13 @@ The app’s interface is in Italian for now.
 ### Installation
 
 1. From the [Releases](../../releases) page, download `Xonos.apk` to your phone and install it. Android asks you to allow installing unknown apps; Play Protect may warn that the app is unknown.
-2. Open Xonos on your phone and enter:
+2. Open Xonos on your phone, pick your language at the top (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: English until you choose), and enter:
    - your Music Assistant address at home, for example `http://homeassistant.local:8095` (the Home Assistant add-on) or `http://192.168.1.10:8095`;
    - the address to use away from home (see below);
    - a long-lived access token (in Music Assistant: Settings, Profile, Long-lived access tokens);
    - optionally, the name the phone gets among Music Assistant’s players.
-   Tap “Salva e prova la connessione” (Save and test connection): it checks both the API and the audio.
-3. Tap “Consenti in background” (Allow in background), so Android doesn’t stop the music with the screen off.
+   Tap “Save and test the connection”: it checks both the API and the audio.
+3. Tap “Allow in background”, so Android doesn’t stop the music with the screen off.
 4. In the car, open Gearslip: Xonos appears among the music apps.
 
 To get updates automatically, add `https://github.com/SirioNero/Music-Assistant-on-Gearslip` to [Obtainium](https://github.com/ImranR98/Obtainium). Each release is named after the app version (`v0.1.N`), so Obtainium can tell when an update is out.
@@ -60,7 +60,7 @@ Home Assistant Cloud (Nabu Casa) only reaches Home Assistant, not Music Assistan
 
 - **The test says “audio: …”.** The API answers but the audio doesn’t: with a reverse proxy, allow WebSockets on `/sendspin` too; Music Assistant before 2.7.5 has no audio for phones.
 - **The menu works but there’s no sound.** Check that the phone is connected to the car over Bluetooth, or that Gearslip’s USB audio is on.
-- **The music stops with the screen off.** Tap “Consenti in background” on the phone, and on some brands (Xiaomi, Huawei, Samsung) also allow Xonos to run in the background in the battery settings.
+- **The music stops with the screen off.** Tap “Allow in background” on the phone, and on some brands (Xiaomi, Huawei, Samsung) also allow Xonos to run in the background in the battery settings.
 - **Useful logs**: `adb logcat -s Xonos`.
 
 ### Limitations
@@ -91,8 +91,11 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `playback/MaPlayer.kt` | The player Gearslip sees, mirroring the Music Assistant queue |
 | `playback/Menu.kt` | The menu in the car, the search, and what each item plays |
 | `playback/BrowseTree.kt` | The menu as Media3 items for Gearslip |
+| `playback/ResourceLabels.kt` | The menu’s labels, in the language chosen on the phone |
 | `playback/Artwork.kt` | Cover art served to Gearslip |
 | `phone/SettingsActivity.kt` | The settings screen on the phone |
+| `Language.kt` | The app’s languages, and problems told in the chosen one |
+| `res/values*/strings.xml` | Every text, in English (`values`) and in each language (`values-it`, `values-es`…) |
 
 ## Italiano
 
@@ -110,7 +113,7 @@ Xonos trasforma il telefono in un lettore di [Music Assistant](https://music-ass
 
 ### Come si naviga
 
-- **Il menu** elenca Ascoltati di recente, Per te (i consigli della libreria e dei servizi), Playlist, Album, Artisti, Brani (tutti quelli della libreria), Brani preferiti, Generi, Radio, Podcast, Audiolibri e Sfoglia i servizi (le cartelle di ciascun servizio). Le voci vuote non compaiono. Gli elenchi sono completi, anche lunghissimi: oltre i 150 elementi si dividono per iniziale, dalla A alla Z.
+- **Il menu** elenca Ascoltati di recente, Per te (i consigli della libreria e dei servizi), Playlist, Album, Artisti, Brani (tutti quelli della libreria), Brani preferiti, Generi, Radio, Podcast, Audiolibri e Sfoglia i servizi (le cartelle di ciascun servizio), nella lingua scelta sul telefono. Le voci vuote non compaiono. Gli elenchi sono completi, anche lunghissimi: oltre i 150 elementi si dividono per iniziale, dalla A alla Z.
 - **Album e playlist** si aprono con un tocco; il tasto play accanto li suona interi. Un brano dentro un album o una playlist li fa partire da quel brano, così avanti e indietro restano lì dentro.
 - **Un artista** mostra i brani più ascoltati, tutti gli album (quelli in libreria e la discografia intera dei servizi dove l’artista c’è) e tutti i brani.
 - **La ricerca** è il tasto cerca di Gearslip: Xonos cerca nella libreria e in tutti i servizi collegati a Music Assistant, ogni tipo di elemento. In cima ci sono i risultati migliori, uno per tipo, poi una cartella per tipo con tutti i suoi risultati: Brani, Artisti, Album, Playlist, Podcast, Audiolibri, Radio, Generi. Se cominci o finisci con un tipo (“podcast morning”, “morning podcast”, “radio deejay”) quel tipo va per primo.
@@ -121,7 +124,7 @@ Xonos trasforma il telefono in un lettore di [Music Assistant](https://music-ass
 ### Installazione
 
 1. Dalla pagina [Releases](../../releases) scarica `Xonos.apk` sul telefono e installalo. Android chiede di consentire l’installazione di app sconosciute; Play Protect può avvisare che l’app non è nota.
-2. Apri Xonos sul telefono e inserisci:
+2. Apri Xonos sul telefono, scegli in cima la lingua (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: finché non la scegli è l’inglese) e inserisci:
    - l’indirizzo di casa di Music Assistant, per esempio `http://homeassistant.local:8095` (il componente aggiuntivo di Home Assistant) oppure `http://192.168.1.10:8095`;
    - l’indirizzo da fuori casa (vedi sotto);
    - un token di accesso a lungo termine (in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine);
@@ -181,5 +184,8 @@ Segnalazioni e pull request sono benvenute, soprattutto da chi prova Xonos in au
 | `playback/MaPlayer.kt` | Il lettore che vede Gearslip, specchio della coda di Music Assistant |
 | `playback/Menu.kt` | Il menu in auto, la ricerca e cosa suona ogni voce |
 | `playback/BrowseTree.kt` | Il menu come voci di Media3 per Gearslip |
+| `playback/ResourceLabels.kt` | Le scritte del menu, nella lingua scelta sul telefono |
 | `playback/Artwork.kt` | Le copertine passate a Gearslip |
 | `phone/SettingsActivity.kt` | La schermata di configurazione sul telefono |
+| `Language.kt` | Le lingue dell’app, e i problemi detti in quella scelta |
+| `res/values*/strings.xml` | Tutti i testi, in inglese (`values`) e in ogni lingua (`values-it`, `values-es`…) |

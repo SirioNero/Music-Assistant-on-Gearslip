@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Music Assistant в машине через Gearslip: музыка играет с телефона и звучит из динамиков машины.</string>
+    <string name="label_language">Язык</string>
+    <string name="label_home">Адрес дома</string>
+    <string name="label_remote">Адрес вне дома (необязательно)</string>
+    <string name="label_token">Долгосрочный токен доступа</string>
+    <string name="label_name">Имя проигрывателя</string>
+    <string name="hint_remote">https://… или адрес VPN</string>
+    <string name="hint_token">Вставьте токен сюда</string>
+    <string name="help_home">Адрес интерфейса Music Assistant, обычно на порту 8095.</string>
+    <string name="help_remote">В машине телефон вне домашней сети: Xonos сначала пробует домашний адрес, потом этот.</string>
+    <string name="help_token">Создайте его в Music Assistant: Настройки, Профиль, Долгосрочные токены доступа.</string>
+    <string name="help_name">Под каким именем телефон будет виден среди проигрывателей Music Assistant.</string>
+    <string name="save">Сохранить и проверить подключение</string>
+    <string name="battery_needed">Чтобы экономить заряд, Android может остановить музыку при выключенном экране. Разрешите Xonos работать в фоне.</string>
+    <string name="battery_ok">✓ Android позволяет Xonos играть и при выключенном экране.</string>
+    <string name="battery_button">Разрешить работу в фоне</string>
+    <string name="help_car">В машине откройте Gearslip: Xonos есть среди музыкальных приложений.</string>
+
+    <!-- La prova della connessione -->
+    <string name="test_incomplete">Нужны хотя бы один адрес и токен.</string>
+    <string name="test_running">Проверка подключения…</string>
+    <string name="test_home">Дом</string>
+    <string name="test_remote">Вне дома</string>
+    <string name="test_ok">✓ %1$s: Music Assistant %2$s</string>
+    <string name="test_failed">✗ %1$s: %2$s</string>
+    <plurals name="test_playlists">
+        <item quantity="one">%d плейлист</item>
+        <item quantity="few">%d плейлиста</item>
+        <item quantity="many">%d плейлистов</item>
+        <item quantity="other">%d плейлиста</item>
+    </plurals>
+    <string name="audio_ready">звук готов</string>
+    <string name="audio_unexpected">звук: неожиданный ответ</string>
+    <string name="audio_closed">звук: соединение закрыто</string>
+    <string name="audio_denied">звук: доступ запрещён</string>
+    <string name="audio_too_old">звук: нужен Music Assistant 2.7.5 или новее</string>
+    <string name="audio_error">звук: %s</string>
+    <string name="audio_unreachable">звук: недоступен</string>
+    <string name="audio_no_answer">звук: нет ответа</string>
+
+    <!-- Cosa non va con Music Assistant -->
+    <string name="problem_bad_address">Неверный адрес: %s</string>
+    <string name="problem_no_answer_from">Нет ответа от %s</string>
+    <string name="problem_no_answer">Music Assistant не отвечает</string>
+    <string name="problem_not_ma">По этому адресу не отвечает Music Assistant</string>
+    <string name="problem_too_old">Music Assistant %s слишком старый: нужна версия 2.7 или новее</string>
+    <string name="problem_bad_token">Токен не принят: создайте новый в Music Assistant</string>
+    <string name="problem_denied">Доступ запрещён</string>
+    <string name="problem_http">Ошибка HTTP %s</string>
+    <string name="problem_network">Ошибка сети: %s</string>
+    <string name="problem_unreachable">Music Assistant недоступен</string>
+    <string name="problem_lost">Соединение потеряно, переподключение</string>
+    <string name="problem_not_connected">Нет подключения к Music Assistant</string>
+    <string name="problem_refused">Music Assistant: %s</string>
+    <string name="problem_not_configured">Настройте Xonos на телефоне</string>
+    <string name="error_unknown">неизвестная ошибка</string>
+
+    <!-- Il menu in auto -->
+    <string name="cat_recent">Недавно прослушанное</string>
+    <string name="cat_foryou">Для вас</string>
+    <string name="cat_playlists">Плейлисты</string>
+    <string name="cat_albums">Альбомы</string>
+    <string name="cat_artists">Исполнители</string>
+    <string name="cat_tracks">Треки</string>
+    <string name="cat_favorites">Избранные треки</string>
+    <string name="cat_genres">Жанры</string>
+    <string name="cat_radios">Радио</string>
+    <string name="cat_podcasts">Подкасты</string>
+    <string name="cat_audiobooks">Аудиокниги</string>
+    <string name="cat_browse">Обзор сервисов</string>
+    <string name="top_tracks">Популярные треки</string>
+    <string name="all_tracks">Все треки</string>
+    <plurals name="results">
+        <item quantity="one">%d результат</item>
+        <item quantity="few">%d результата</item>
+        <item quantity="many">%d результатов</item>
+        <item quantity="other">%d результата</item>
+    </plurals>
+    <plurals name="count_tracks">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d трека</item>
+    </plurals>
+    <plurals name="count_albums">
+        <item quantity="one">%d альбом</item>
+        <item quantity="few">%d альбома</item>
+        <item quantity="many">%d альбомов</item>
+        <item quantity="other">%d альбома</item>
+    </plurals>
+    <plurals name="count_artists">
+        <item quantity="one">%d исполнитель</item>
+        <item quantity="few">%d исполнителя</item>
+        <item quantity="many">%d исполнителей</item>
+        <item quantity="other">%d исполнителя</item>
+    </plurals>
+    <plurals name="count_playlists">
+        <item quantity="one">%d плейлист</item>
+        <item quantity="few">%d плейлиста</item>
+        <item quantity="many">%d плейлистов</item>
+        <item quantity="other">%d плейлиста</item>
+    </plurals>
+    <plurals name="count_radio">
+        <item quantity="one">%d радиостанция</item>
+        <item quantity="few">%d радиостанции</item>
+        <item quantity="many">%d радиостанций</item>
+        <item quantity="other">%d радиостанции</item>
+    </plurals>
+    <plurals name="count_podcasts">
+        <item quantity="one">%d подкаст</item>
+        <item quantity="few">%d подкаста</item>
+        <item quantity="many">%d подкастов</item>
+        <item quantity="other">%d подкаста</item>
+    </plurals>
+    <plurals name="count_audiobooks">
+        <item quantity="one">%d аудиокнига</item>
+        <item quantity="few">%d аудиокниги</item>
+        <item quantity="many">%d аудиокниг</item>
+        <item quantity="other">%d аудиокниги</item>
+    </plurals>
+    <plurals name="count_genres">
+        <item quantity="one">%d жанр</item>
+        <item quantity="few">%d жанра</item>
+        <item quantity="many">%d жанров</item>
+        <item quantity="other">%d жанра</item>
+    </plurals>
+</resources>

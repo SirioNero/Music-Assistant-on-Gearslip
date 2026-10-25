@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Το Music Assistant στο αυτοκίνητο, μέσω του Gearslip: η μουσική παίζει από το τηλέφωνο και φτάνει στα ηχεία του αυτοκινήτου.</string>
+    <string name="label_language">Γλώσσα</string>
+    <string name="label_home">Διεύθυνση στο σπίτι</string>
+    <string name="label_remote">Διεύθυνση εκτός σπιτιού (προαιρετικά)</string>
+    <string name="label_token">Διακριτικό πρόσβασης μακράς διαρκείας (token)</string>
+    <string name="label_name">Όνομα συσκευής αναπαραγωγής</string>
+    <string name="hint_remote">https://… ή η διεύθυνση του VPN</string>
+    <string name="hint_token">Επικολλήστε εδώ το διακριτικό</string>
+    <string name="help_home">Η διεύθυνση του περιβάλλοντος του Music Assistant, συνήθως στη θύρα 8095.</string>
+    <string name="help_remote">Στο αυτοκίνητο το τηλέφωνο είναι εκτός του δικτύου του σπιτιού: το Xonos δοκιμάζει πρώτα τη διεύθυνση του σπιτιού και μετά αυτή.</string>
+    <string name="help_token">Δημιουργήστε το στο Music Assistant: Ρυθμίσεις, Προφίλ, Διακριτικά πρόσβασης μακράς διαρκείας.</string>
+    <string name="help_name">Πώς εμφανίζεται το τηλέφωνο ανάμεσα στις συσκευές αναπαραγωγής του Music Assistant.</string>
+    <string name="save">Αποθήκευση και δοκιμή σύνδεσης</string>
+    <string name="battery_needed">Το Android μπορεί να σταματήσει τη μουσική με σβηστή οθόνη, για εξοικονόμηση μπαταρίας. Επιτρέψτε στο Xonos να λειτουργεί στο παρασκήνιο.</string>
+    <string name="battery_ok">✓ Το Android αφήνει το Xonos να παίζει και με σβηστή οθόνη.</string>
+    <string name="battery_button">Να επιτρέπεται στο παρασκήνιο</string>
+    <string name="help_car">Στο αυτοκίνητο ανοίξτε το Gearslip: το Xonos είναι στις εφαρμογές μουσικής.</string>
+
+    <!-- La prova della connessione -->
+    <string name="test_incomplete">Χρειάζονται τουλάχιστον μία διεύθυνση και το διακριτικό.</string>
+    <string name="test_running">Δοκιμή σύνδεσης…</string>
+    <string name="test_home">Σπίτι</string>
+    <string name="test_remote">Εκτός σπιτιού</string>
+    <string name="test_ok">✓ %1$s: Music Assistant %2$s</string>
+    <string name="test_failed">✗ %1$s: %2$s</string>
+    <plurals name="test_playlists">
+        <item quantity="one">%d λίστα</item>
+        <item quantity="other">%d λίστες</item>
+    </plurals>
+    <string name="audio_ready">ήχος έτοιμος</string>
+    <string name="audio_unexpected">ήχος: απροσδόκητη απάντηση</string>
+    <string name="audio_closed">ήχος: η σύνδεση έκλεισε</string>
+    <string name="audio_denied">ήχος: δεν επιτρέπεται η πρόσβαση</string>
+    <string name="audio_too_old">ήχος: χρειάζεται Music Assistant 2.7.5 ή νεότερο</string>
+    <string name="audio_error">ήχος: %s</string>
+    <string name="audio_unreachable">ήχος: μη προσβάσιμος</string>
+    <string name="audio_no_answer">ήχος: καμία απάντηση</string>
+
+    <!-- Cosa non va con Music Assistant -->
+    <string name="problem_bad_address">Μη έγκυρη διεύθυνση: %s</string>
+    <string name="problem_no_answer_from">Καμία απάντηση από %s</string>
+    <string name="problem_no_answer">Το Music Assistant δεν απαντά</string>
+    <string name="problem_not_ma">Σε αυτή τη διεύθυνση δεν απαντά το Music Assistant</string>
+    <string name="problem_too_old">Το Music Assistant %s είναι πολύ παλιό: χρειάζεται η έκδοση 2.7 ή νεότερη</string>
+    <string name="problem_bad_token">Το διακριτικό δεν έγινε δεκτό: δημιουργήστε νέο στο Music Assistant</string>
+    <string name="problem_denied">Δεν επιτρέπεται η πρόσβαση</string>
+    <string name="problem_http">Σφάλμα HTTP %s</string>
+    <string name="problem_network">Σφάλμα δικτύου: %s</string>
+    <string name="problem_unreachable">Το Music Assistant δεν είναι προσβάσιμο</string>
+    <string name="problem_lost">Η σύνδεση χάθηκε, επανασύνδεση</string>
+    <string name="problem_not_connected">Δεν υπάρχει σύνδεση με το Music Assistant</string>
+    <string name="problem_refused">Music Assistant: %s</string>
+    <string name="problem_not_configured">Ρυθμίστε το Xonos στο τηλέφωνο</string>
+    <string name="error_unknown">άγνωστο σφάλμα</string>
+
+    <!-- Il menu in auto -->
+    <string name="cat_recent">Ακούσατε πρόσφατα</string>
+    <string name="cat_foryou">Για εσάς</string>
+    <string name="cat_playlists">Λίστες αναπαραγωγής</string>
+    <string name="cat_albums">Άλμπουμ</string>
+    <string name="cat_artists">Καλλιτέχνες</string>
+    <string name="cat_tracks">Τραγούδια</string>
+    <string name="cat_favorites">Αγαπημένα τραγούδια</string>
+    <string name="cat_genres">Είδη</string>
+    <string name="cat_radios">Ραδιόφωνο</string>
+    <string name="cat_podcasts">Podcast</string>
+    <string name="cat_audiobooks">Ηχητικά βιβλία</string>
+    <string name="cat_browse">Περιήγηση στις υπηρεσίες</string>
+    <string name="top_tracks">Τα πιο δημοφιλή</string>
+    <string name="all_tracks">Όλα τα τραγούδια</string>
+    <plurals name="results">
+        <item quantity="one">%d αποτέλεσμα</item>
+        <item quantity="other">%d αποτελέσματα</item>
+    </plurals>
+    <plurals name="count_tracks">
+        <item quantity="one">%d τραγούδι</item>
+        <item quantity="other">%d τραγούδια</item>
+    </plurals>
+    <plurals name="count_albums">
+        <item quantity="one">%d άλμπουμ</item>
+        <item quantity="other">%d άλμπουμ</item>
+    </plurals>
+    <plurals name="count_artists">
+        <item quantity="one">%d καλλιτέχνης</item>
+        <item quantity="other">%d καλλιτέχνες</item>
+    </plurals>
+    <plurals name="count_playlists">
+        <item quantity="one">%d λίστα</item>
+        <item quantity="other">%d λίστες</item>
+    </plurals>
+    <plurals name="count_radio">
+        <item quantity="one">%d σταθμός</item>
+        <item quantity="other">%d σταθμοί</item>
+    </plurals>
+    <plurals name="count_podcasts">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcast</item>
+    </plurals>
+    <plurals name="count_audiobooks">
+        <item quantity="one">%d ηχητικό βιβλίο</item>
+        <item quantity="other">%d ηχητικά βιβλία</item>
+    </plurals>
+    <plurals name="count_genres">
+        <item quantity="one">%d είδος</item>
+        <item quantity="other">%d είδη</item>
+    </plurals>
+</resources>

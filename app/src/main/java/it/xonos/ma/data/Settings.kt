@@ -2,6 +2,7 @@ package it.xonos.ma.data
 
 import android.content.Context
 import android.util.Base64
+import it.xonos.ma.Language
 import java.net.URI
 import java.security.SecureRandom
 
@@ -29,6 +30,13 @@ class Settings(context: Context) {
             .putString(KEY_TOKEN, config.token)
             .apply()
     }
+
+    /** La lingua scelta sul telefono, per lo schermo e per il menu in auto; l'inglese finché non se ne sceglie una. */
+    var language: Language
+        get() = Language.of(prefs.getString(KEY_LANGUAGE, null))
+        set(value) {
+            prefs.edit().putString(KEY_LANGUAGE, value.tag).apply()
+        }
 
     /** Il nome con cui il telefono compare in Music Assistant. */
     var playerName: String
@@ -80,6 +88,7 @@ class Settings(context: Context) {
         private const val KEY_VOLUME = "volume"
         private const val KEY_MUTED = "muted"
         private const val KEY_ART = "art_key"
+        private const val KEY_LANGUAGE = "language"
 
         const val DEFAULT_NAME = "Xonos"
 

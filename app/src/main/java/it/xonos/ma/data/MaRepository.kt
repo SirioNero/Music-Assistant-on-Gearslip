@@ -85,7 +85,7 @@ class MaRepository(private val settings: Settings) {
 
     /** Un comando all'API; fallisce subito se Music Assistant non è collegato. */
     suspend fun command(name: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): Any? {
-        val c = client ?: throw MaException("Music Assistant non è collegato")
+        val c = client ?: throw MaException("Music Assistant non è collegato", problem = Problem.NOT_CONNECTED)
         return c.command(name, timeoutMs, fill)
     }
 
@@ -102,7 +102,7 @@ class MaRepository(private val settings: Settings) {
             var session: MaClient? = null
             var server: ServerInfo? = null
             var usedUrl = ""
-            var lastError = "Music Assistant non raggiungibile"
+            var lastError = MaException("Music Assistant non raggiungibile", problem = Problem.NETWORK)
             for (url in config.urls) {
                 _connection.value = Connection.Connecting(url)
                 val candidate = MaClient(http)
@@ -116,12 +116,12 @@ class MaRepository(private val settings: Settings) {
                     throw e
                 } catch (e: Exception) {
                     candidate.close()
-                    lastError = e.message ?: lastError
+                    lastError = e as? MaException ?: MaException(e.message ?: lastError.message.orEmpty(), problem = Problem.NETWORK, detail = e.message)
                 }
             }
 
             if (session == null || server == null) {
-                _connection.value = Connection.Failed(lastError)
+                _connection.value = Connection.Failed(lastError.message.orEmpty(), lastError.problem, lastError.detail)
                 failures++
                 delay((2_000L * failures).coerceAtMost(20_000L))
                 continue
@@ -135,11 +135,15 @@ class MaRepository(private val settings: Settings) {
                 Log.i(TAG, "Collegato a ${server.name} (${server.version}) su $usedUrl")
                 _connection.value = Connection.Connected(usedUrl, server)
                 val reason = active.closed.await()
-                _connection.value = Connection.Failed("Connessione persa ($reason), riprovo")
+                _connection.value = Connection.Failed("Connessione persa ($reason), riprovo", Problem.LOST, reason)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _connection.value = Connection.Failed(e.message ?: "Errore di connessione")
+                _connection.value = Connection.Failed(
+                    e.message ?: "Errore di connessione",
+                    (e as? MaException)?.problem ?: Problem.NETWORK,
+                    (e as? MaException)?.detail ?: e.message,
+                )
             } finally {
                 if (client === active) client = null
                 active.onEvent = null

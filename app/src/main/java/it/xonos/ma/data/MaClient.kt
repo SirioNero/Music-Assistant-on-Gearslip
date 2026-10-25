@@ -13,7 +13,13 @@ import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
-class MaException(message: String, val code: Int? = null) : Exception(message)
+/** Un errore di Music Assistant: [message] per i log, [problem] e [detail] per dirlo a chi usa l'app. */
+class MaException(
+    message: String,
+    val code: Int? = null,
+    val problem: Problem = Problem.REFUSED,
+    val detail: String? = null,
+) : Exception(message)
 
 /**
  * Una singola connessione WebSocket all'API di Music Assistant (/ws).
@@ -41,21 +47,29 @@ class MaClient(private val http: OkHttpClient) {
         val request = try {
             Request.Builder().url(websocketUrl(baseUrl)).build()
         } catch (e: IllegalArgumentException) {
-            throw MaException("Indirizzo non valido: $baseUrl")
+            throw MaException("Indirizzo non valido: $baseUrl", problem = Problem.BAD_ADDRESS, detail = baseUrl)
         }
         socket = http.newWebSocket(request, listener)
         try {
             val info = withTimeoutOrNull(timeoutMs) { serverInfo.await() }
-                ?: throw MaException("Nessuna risposta da $baseUrl")
-            val server = ServerInfo.from(info) ?: throw MaException("A questo indirizzo non risponde Music Assistant")
+                ?: throw MaException("Nessuna risposta da $baseUrl", problem = Problem.NO_ANSWER, detail = baseUrl)
+            val server = ServerInfo.from(info)
+                ?: throw MaException("A questo indirizzo non risponde Music Assistant", problem = Problem.NOT_MUSIC_ASSISTANT)
             val auth = try {
                 command("auth", timeoutMs) { put("token", token) } as? JSONObject
             } catch (e: MaException) {
-                // Prima della 2.7 Music Assistant non aveva accessi né token, e nemmeno l'audio per i telefoni.
-                if (e.message.orEmpty().contains("Invalid command")) {
-                    throw MaException("Music Assistant ${server.version} è troppo vecchio: serve la 2.7 o successiva")
+                when {
+                    // Prima della 2.7 Music Assistant non aveva accessi né token, e nemmeno l'audio per i telefoni.
+                    e.code == INVALID_COMMAND || e.message.orEmpty().contains("Invalid command") -> throw MaException(
+                        "Music Assistant ${server.version} è troppo vecchio: serve la 2.7 o successiva",
+                        e.code,
+                        Problem.TOO_OLD,
+                        server.version,
+                    )
+                    e.code in TOKEN_ERRORS -> throw MaException(e.message ?: "Token non valido", e.code, Problem.BAD_TOKEN)
+                    e.code == NOT_ALLOWED -> throw MaException(e.message ?: "Accesso negato", e.code, Problem.DENIED)
+                    else -> throw e
                 }
-                throw e
             }
             val filter = auth?.optJSONObject("user")?.optJSONArray("player_filter")
             return server.copy(limitedPlayers = filter != null && filter.length() > 0)
@@ -71,7 +85,7 @@ class MaClient(private val http: OkHttpClient) {
      */
     suspend fun command(name: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): Any? {
         val ws = socket
-        if (ws == null || closed.isCompleted) throw MaException("Non collegato a Music Assistant")
+        if (ws == null || closed.isCompleted) throw MaException("Non collegato a Music Assistant", problem = Problem.NOT_CONNECTED)
         val id = ids.getAndIncrement().toString()
         val message = JSONObject()
             .put("message_id", id)
@@ -81,20 +95,20 @@ class MaClient(private val http: OkHttpClient) {
         pending[id] = deferred
         if (!ws.send(message.toString())) {
             pending.remove(id)
-            throw MaException("Invio a Music Assistant non riuscito")
+            throw MaException("Invio a Music Assistant non riuscito", problem = Problem.LOST)
         }
         val box = withTimeoutOrNull(timeoutMs) { deferred.await() }
         if (box == null) {
             pending.remove(id)
             partials.remove(id)
-            throw MaException("Music Assistant non risponde")
+            throw MaException("Music Assistant non risponde", problem = Problem.NO_ANSWER)
         }
         return box.value
     }
 
     fun close() {
         socket?.close(1000, null)
-        shutdown("Connessione chiusa")
+        shutdown("Connessione chiusa", Problem.LOST)
     }
 
     private val listener = object : WebSocketListener() {
@@ -111,17 +125,16 @@ class MaClient(private val http: OkHttpClient) {
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            shutdown(reason.ifBlank { "Connessione chiusa" })
+            shutdown(reason.ifBlank { "Connessione chiusa" }, Problem.LOST, reason.ifBlank { null })
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            val reason = when {
-                response?.code == 401 || response?.code == 403 -> "Accesso negato"
-                response?.code == 404 -> "A questo indirizzo non risponde Music Assistant"
-                response != null -> "Errore HTTP ${response.code}"
-                else -> t.message ?: "Errore di rete"
+            when {
+                response?.code == 401 || response?.code == 403 -> shutdown("Accesso negato", Problem.DENIED)
+                response?.code == 404 -> shutdown("A questo indirizzo non risponde Music Assistant", Problem.NOT_MUSIC_ASSISTANT)
+                response != null -> shutdown("Errore HTTP ${response.code}", Problem.HTTP, response.code.toString())
+                else -> shutdown(t.message ?: "Errore di rete", Problem.NETWORK, t.message)
             }
-            shutdown(reason)
         }
     }
 
@@ -142,10 +155,11 @@ class MaClient(private val http: OkHttpClient) {
             return
         }
         if (msg.has("error_code")) {
-            val error = MaException(msg.str("details") ?: "Comando rifiutato", msg.optInt("error_code"))
+            val details = msg.str("details")
+            val error = MaException(details ?: "Comando rifiutato", msg.optInt("error_code"), Problem.REFUSED, details)
             if (id == "connection") {
                 // Per esempio "Setup required": il server chiude subito dopo.
-                shutdown(error.message ?: "Connessione rifiutata")
+                shutdown(details ?: "Connessione rifiutata", Problem.REFUSED, details)
                 return
             }
             partials.remove(id)
@@ -169,8 +183,8 @@ class MaClient(private val http: OkHttpClient) {
         }
     }
 
-    private fun shutdown(reason: String) {
-        val error = MaException(reason)
+    private fun shutdown(reason: String, problem: Problem, detail: String? = null) {
+        val error = MaException(reason, problem = problem, detail = detail)
         serverInfo.completeExceptionally(error)
         pending.values.forEach { it.completeExceptionally(error) }
         pending.clear()
@@ -180,6 +194,11 @@ class MaClient(private val http: OkHttpClient) {
 
     companion object {
         private const val TAG = "Xonos"
+
+        // I codici d'errore di Music Assistant che contano all'accesso.
+        private const val INVALID_COMMAND = 12
+        private const val NOT_ALLOWED = 22
+        private val TOKEN_ERRORS = setOf(20, 21, 23)
 
         /** L'indirizzo WebSocket di un percorso del server: http diventa ws, https diventa wss. */
         fun websocketUrl(base: String, path: String = "/ws"): String {

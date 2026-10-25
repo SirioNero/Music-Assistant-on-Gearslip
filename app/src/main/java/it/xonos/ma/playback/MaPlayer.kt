@@ -59,6 +59,8 @@ class MaPlayer(
     /** Vero mentre la musica esce davvero dal telefono. */
     private val outputting: StateFlow<Boolean>,
     private val artwork: (MaImage?, Int) -> Uri?,
+    /** Cosa dire in auto di una connessione che non va, nella lingua scelta sul telefono. */
+    private val describe: (Connection) -> String?,
 ) : SimpleBasePlayer(looper) {
 
     /** Suona un elemento scelto dall'auto (vedi [BrowseTree.play]). */
@@ -100,12 +102,8 @@ class MaPlayer(
         repo.addEventListener(listener)
         scope.launch {
             repo.connection.collect { connection ->
-                problem = when (connection) {
-                    is Connection.Connected -> null
-                    Connection.NotConfigured -> "Configura Xonos sul telefono"
-                    is Connection.Failed -> connection.message
-                    is Connection.Connecting -> problem
-                }
+                // Mentre si ricollega resta il problema di prima, se c'era.
+                problem = if (connection is Connection.Connecting) problem else describe(connection)
                 invalidateState()
             }
         }

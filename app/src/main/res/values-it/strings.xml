@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tagline">Music Assistant in auto, tramite Gearslip: la musica parte dal telefono e arriva alle casse dell’auto.</string>
+    <string name="label_language">Lingua</string>
+    <string name="label_home">Indirizzo di casa</string>
+    <string name="label_remote">Indirizzo da fuori casa (facoltativo)</string>
+    <string name="label_token">Token di accesso a lungo termine</string>
+    <string name="label_name">Nome del lettore</string>
+    <string name="hint_remote">https://… oppure l’indirizzo VPN</string>
+    <string name="hint_token">Incolla qui il token</string>
+    <string name="help_home">L’indirizzo dell’interfaccia di Music Assistant, di solito sulla porta 8095.</string>
+    <string name="help_remote">In auto il telefono è fuori dalla rete di casa: Xonos prova prima l’indirizzo di casa, poi questo.</string>
+    <string name="help_token">Crealo in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine.</string>
+    <string name="help_name">Come compare il telefono tra i lettori di Music Assistant.</string>
+    <string name="save">Salva e prova la connessione</string>
+    <string name="battery_needed">Android può fermare la musica a schermo spento per risparmiare batteria. Consenti a Xonos di funzionare in background.</string>
+    <string name="battery_ok">✓ Android lascia suonare Xonos anche a schermo spento.</string>
+    <string name="battery_button">Consenti in background</string>
+    <string name="help_car">In auto apri Gearslip: Xonos compare tra le app musicali.</string>
+
+    <!-- La prova della connessione -->
+    <string name="test_incomplete">Servono almeno un indirizzo e il token.</string>
+    <string name="test_running">Provo la connessione…</string>
+    <string name="test_home">Casa</string>
+    <string name="test_remote">Fuori casa</string>
+    <string name="test_ok">✓ %1$s: Music Assistant %2$s</string>
+    <string name="test_failed">✗ %1$s: %2$s</string>
+    <plurals name="test_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="other">%d playlist</item>
+    </plurals>
+    <string name="audio_ready">audio pronto</string>
+    <string name="audio_unexpected">audio: risposta inattesa</string>
+    <string name="audio_closed">audio: connessione chiusa</string>
+    <string name="audio_denied">audio: accesso negato</string>
+    <string name="audio_too_old">audio: serve Music Assistant 2.7.5 o successivo</string>
+    <string name="audio_error">audio: %s</string>
+    <string name="audio_unreachable">audio: non raggiungibile</string>
+    <string name="audio_no_answer">audio: nessuna risposta</string>
+
+    <!-- Cosa non va con Music Assistant -->
+    <string name="problem_bad_address">Indirizzo non valido: %s</string>
+    <string name="problem_no_answer_from">Nessuna risposta da %s</string>
+    <string name="problem_no_answer">Music Assistant non risponde</string>
+    <string name="problem_not_ma">A questo indirizzo non risponde Music Assistant</string>
+    <string name="problem_too_old">Music Assistant %s è troppo vecchio: serve la 2.7 o successiva</string>
+    <string name="problem_bad_token">Token non accettato: creane uno nuovo in Music Assistant</string>
+    <string name="problem_denied">Accesso negato</string>
+    <string name="problem_http">Errore HTTP %s</string>
+    <string name="problem_network">Errore di rete: %s</string>
+    <string name="problem_unreachable">Music Assistant non raggiungibile</string>
+    <string name="problem_lost">Connessione persa, mi ricollego</string>
+    <string name="problem_not_connected">Non collegato a Music Assistant</string>
+    <string name="problem_refused">Music Assistant: %s</string>
+    <string name="problem_not_configured">Configura Xonos sul telefono</string>
+    <string name="error_unknown">errore sconosciuto</string>
+
+    <!-- Il menu in auto -->
+    <string name="cat_recent">Ascoltati di recente</string>
+    <string name="cat_foryou">Per te</string>
+    <string name="cat_playlists">Playlist</string>
+    <string name="cat_albums">Album</string>
+    <string name="cat_artists">Artisti</string>
+    <string name="cat_tracks">Brani</string>
+    <string name="cat_favorites">Brani preferiti</string>
+    <string name="cat_genres">Generi</string>
+    <string name="cat_radios">Radio</string>
+    <string name="cat_podcasts">Podcast</string>
+    <string name="cat_audiobooks">Audiolibri</string>
+    <string name="cat_browse">Sfoglia i servizi</string>
+    <string name="top_tracks">Brani più ascoltati</string>
+    <string name="all_tracks">Tutti i brani</string>
+    <plurals name="results">
+        <item quantity="one">%d risultato</item>
+        <item quantity="other">%d risultati</item>
+    </plurals>
+    <plurals name="count_tracks">
+        <item quantity="one">%d brano</item>
+        <item quantity="other">%d brani</item>
+    </plurals>
+    <plurals name="count_albums">
+        <item quantity="one">%d album</item>
+        <item quantity="other">%d album</item>
+    </plurals>
+    <plurals name="count_artists">
+        <item quantity="one">%d artista</item>
+        <item quantity="other">%d artisti</item>
+    </plurals>
+    <plurals name="count_playlists">
+        <item quantity="one">%d playlist</item>
+        <item quantity="other">%d playlist</item>
+    </plurals>
+    <plurals name="count_radio">
+        <item quantity="one">%d radio</item>
+        <item quantity="other">%d radio</item>
+    </plurals>
+    <plurals name="count_podcasts">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcast</item>
+    </plurals>
+    <plurals name="count_audiobooks">
+        <item quantity="one">%d audiolibro</item>
+        <item quantity="other">%d audiolibri</item>
+    </plurals>
+    <plurals name="count_genres">
+        <item quantity="one">%d genere</item>
+        <item quantity="other">%d generi</item>
+    </plurals>
+</resources>
