@@ -25,15 +25,16 @@ class BaselineProfileGenerator {
     fun generate() = rule.collect(packageName = Xonos.packageName, includeInStartupProfile = true) {
         openHome()
         ensurePlaying()
-        flingList(waitFor("home"), 2)
+        flingList("home", 2)
 
         openShelf("Albums")
         waitFor("card", 30_000).click()
         waitFor("item_row", 30_000)
-        flingList(waitFor("item_list"), 1)
+        flingList("item_list", 1)
         device.pressBack()
-        flingList(waitFor("library_list"), 2)
-        flingList(openShelf("Tracks"), 2)
+        flingList("library_list", 2)
+        openShelf("Tracks")
+        flingList("library_list", 2)
 
         waitFor("mini_player").click()
         waitFor("player")

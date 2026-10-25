@@ -80,11 +80,13 @@ class HomeScrollBenchmark(mode: String) : XonosBenchmark(mode) {
         iterations = 5,
         setupBlock = { openHome() },
     ) {
-        flingList(waitFor("home"), 3)
+        flingList("home", 3)
         device.findObject(By.res("row"))?.let { row ->
             row.setGestureMargin(device.displayWidth / 10)
-            row.fling(Direction.RIGHT)
-            row.fling(Direction.LEFT)
+            runCatching {
+                row.fling(Direction.RIGHT)
+                row.fling(Direction.LEFT)
+            }
         }
     }
 }
@@ -100,12 +102,12 @@ class LibraryScrollBenchmark(mode: String) : XonosBenchmark(mode) {
         iterations = 5,
         setupBlock = { openHome() },
     ) {
-        val albums = openShelf("Albums")
+        openShelf("Albums")
         waitFor("card", 30_000)
-        flingList(albums, 4)
-        val tracks = openShelf("Tracks")
+        flingList("library_list", 4)
+        openShelf("Tracks")
         waitFor("item_row", 30_000)
-        flingList(tracks, 4)
+        flingList("library_list", 4)
     }
 }
 
@@ -145,9 +147,10 @@ class PlaylistBenchmark(mode: String) : XonosBenchmark(mode) {
         setupBlock = { openHome() },
     ) {
         openShelf("Playlists")
-        waitForText(Xonos.PLAYLIST, 30_000).click()
-        val list = waitFor("item_list")
+        waitFor("card", 30_000)
+        scrollToText("library_list", Xonos.PLAYLIST).click()
+        waitFor("item_list")
         waitFor("item_row", 120_000)
-        flingList(list, 3)
+        flingList("item_list", 3)
     }
 }
