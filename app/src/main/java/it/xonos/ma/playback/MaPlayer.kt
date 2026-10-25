@@ -61,6 +61,8 @@ class MaPlayer(
     /** Vero mentre la musica esce davvero dal telefono. */
     private val outputting: StateFlow<Boolean>,
     private val artwork: (MaImage?, Int) -> Uri?,
+    /** Di quanto ciò che si sente è indietro rispetto alla posizione di Music Assistant (vedi AudioEngine.lateMs). */
+    private val lateMs: () -> Long = { 0L },
     /** Cosa dire in auto di una connessione che non va, nella lingua scelta sul telefono. */
     private val describe: (Connection) -> String?,
 ) : SimpleBasePlayer(looper) {
@@ -248,7 +250,8 @@ class MaPlayer(
         val moving = q.playing && audible
         val duration = current.durationSec * 1000L
         return PositionSupplier {
-            val now = if (moving) base + (SystemClock.elapsedRealtime() - at) else base
+            // Si mostra ciò che si sente: dopo un avvio lento, un po' indietro rispetto al server.
+            val now = ((if (moving) base + (SystemClock.elapsedRealtime() - at) else base) - lateMs()).coerceAtLeast(0)
             if (duration > 0) min(now, duration) else now
         }
     }

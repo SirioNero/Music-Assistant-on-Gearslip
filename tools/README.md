@@ -24,6 +24,7 @@ MA_TOKEN=... LANG_XONOS=it QUERIES="vasco,podcast morning" build/install/harness
 | `PhoneCheckKt` | L'app del telefono senza schermo: il `PhoneModel` contro MA (Home, libreria a pagine, album, artista, podcast, ricerca, suona/dopo/in coda, casuale, preferiti, testi, indietro, impostazioni). Finisce con "Tutto bene" |
 | `ProblemCheckKt` | Token sbagliato, indirizzo sbagliato, porta chiusa...: il `Problem` di ciascuno |
 | `CaptureCheckKt` | Salva i pacchetti audio (`CODEC=opus|pcm`, `OUT=file`) per `ma-test/analyze_audio.py` |
+| `StartCheckKt` | L'inizio di un brano senza server: un'uscita come un AudioTrack (parte con il buffer pieno o, da Android 12, con 40 ms; dice i suoi tempi dopo un po'; ritardo di altoparlante o Bluetooth). Controlla che l'inizio non si salti mai e che la posizione mostrata sia quella che si sente |
 | `AdjustCheckKt` | Controlla le correzioni di sincronia un campione alla volta |
 | `PerfCheckKt` | Tempi e blocchi del thread "principale" del `PhoneModel`: collegamento, Home, libreria, una playlist lunga (`PLAYLIST`) |
 | `AccountCheckKt` | Accesso con nome utente e password (`MA_USER`, `MA_PASSWORD`), il token che Xonos si fa dare, un ospite, il primo account di un MA vuoto (`NEW_URL`) |

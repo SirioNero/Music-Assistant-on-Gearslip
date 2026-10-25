@@ -63,6 +63,12 @@ interface PcmOutput {
     /** Quando si sentirà il fotogramma numero [frame] (contando dall'inizio), sul nostro orologio; null se non lo sa. */
     fun presentationTimeUs(frame: Long): Long?
 
+    /** Quanti fotogrammi ha già suonato (o almeno preso per suonarli); null se non lo sa. */
+    fun playedFrames(): Long? = null
+
+    /** Quanti fotogrammi vuole prima di cominciare a suonare. */
+    val startFrames: Int get() = 0
+
     fun setGain(gain: Float)
 
     /** Smette subito di suonare e butta ciò che ha in coda; si può chiamare da qualsiasi thread. */
@@ -111,6 +117,9 @@ class PcmDecoder(private val channels: Int, private val bitDepth: Int) : AudioDe
  * se è in anticipo aspetta con un po' di silenzio, e i piccoli scarti (gli orologi non vanno mai
  * proprio alla stessa velocità) li recupera togliendo o ripetendo pochi campioni, senza che si senta.
  *
+ * All'avvio invece non si salta niente: se l'uscita ci ha messo più del margine chiesto al server,
+ * l'inizio del brano si suona lo stesso, un po' dopo ([lateMs]), e il ritardo si recupera piano.
+ *
  * I metodi pubblici si chiamano dal thread della rete, in ordine di arrivo dei messaggi.
  */
 class AudioEngine(
@@ -148,6 +157,9 @@ class AudioEngine(
     private var framesWritten = 0L
     private var smoothedErrorUs = 0.0
     private var lastAudioAt = 0L
+
+    // Quanto si suona dopo il momento del server, dall'ultimo avvio: si recupera piano.
+    @Volatile private var lateUs = 0L
     private var silence = ShortArray(0)
     private var statSince = 0L
     private var statBlocks = 0
@@ -158,6 +170,12 @@ class AudioEngine(
 
     /** Vero mentre esce davvero musica: falso in attesa del primo audio, in pausa o se la rete si è fermata. */
     val outputting: StateFlow<Boolean> = _outputting.asStateFlow()
+
+    /**
+     * Di quanto la musica che si sente è indietro rispetto al momento del server (e alla posizione
+     * che dice Music Assistant): succede dopo un avvio lento, e torna a zero piano piano.
+     */
+    val lateMs: Long get() = lateUs / 1000
 
     /** Inizia uno stream, o ne cambia il formato senza interromperlo. */
     fun startStream(format: StreamFormat) {
@@ -304,6 +322,7 @@ class AudioEngine(
         }
         framesWritten = 0
         smoothedErrorUs = 0.0
+        lateUs = 0
     }
 
     private fun checkStarved() {
@@ -326,6 +345,7 @@ class AudioEngine(
         }
         framesWritten = 0
         smoothedErrorUs = 0.0
+        lateUs = 0
         created.play()
         return created
     }
@@ -337,14 +357,25 @@ class AudioEngine(
         val fresh = framesWritten == 0L
         if (fresh && !prime(out, gen)) return
 
-        val target = filter.toClient(timestampUs)
-        val error = heardAt(out) - target // positivo: siamo in ritardo
+        // Il ritardo dell'avvio si recupera piano, meno della correzione dolce più sotto.
+        if (!fresh && lateUs > 0) lateUs = max(0L, lateUs - (frames * 1_000_000L / out.sampleRate * CATCH_UP).toLong())
+        var target = filter.toClient(timestampUs) + lateUs
+        var error = heardAt(out) - target // positivo: siamo in ritardo
         report(error, fresh)
         var start = 0
         var count = frames
         if (fresh || abs(error) > HARD_US) {
             // All'avvio, o dopo un buco della rete: ci si allinea in un colpo solo.
             smoothedErrorUs = 0.0
+            if (fresh && error > 0) {
+                // L'uscita ci ha messo più del margine chiesto al server: l'inizio del brano non si
+                // salta, lo si suona un po' dopo (fino a [MAX_LATE_US]) e si recupera piano.
+                val late = min(error, MAX_LATE_US)
+                Log.d(TAG, "Inizio ${late / 1000} ms dopo il momento giusto: non si salta, si recupera piano")
+                lateUs = late
+                target += late
+                error -= late
+            }
             if (error > 0) {
                 // Audio già passato: lo si salta.
                 val drop = framesFor(error, out.sampleRate).coerceAtMost(count.toLong()).toInt()
@@ -414,14 +445,23 @@ class AudioEngine(
         statMax = 0
     }
 
-    /** Apre l'uscita con un po' di silenzio, finché non sa dire quando suona davvero. */
+    /**
+     * Apre l'uscita con un po' di silenzio, finché non sa dire quando suona davvero. Il silenzio in
+     * coda resta poco ([PRIME_AHEAD_US]) se l'uscita dice quanto ha già suonato: tutto quello che c'è
+     * in coda quando arriva la musica, la musica lo deve aspettare.
+     */
     private fun prime(out: PcmOutput, gen: Int): Boolean {
         val step = framesFor(PRIME_STEP_US, out.sampleRate).toInt()
-        val limit = framesFor(PRIME_MAX_US, out.sampleRate)
-        var primed = 0L
-        while (out.presentationTimeUs(framesWritten) == null && primed < limit) {
+        val ahead = framesFor(PRIME_AHEAD_US, out.sampleRate)
+        val until = clock() + PRIME_MAX_US
+        while (out.presentationTimeUs(framesWritten) == null && clock() < until) {
+            val played = out.playedFrames()
+            if (played != null && framesWritten >= out.startFrames && framesWritten - played >= ahead) {
+                Thread.sleep(PRIME_SLEEP_MS)
+                if (gen != generation || released) return false
+                continue
+            }
             if (!writeSilence(out, step, gen)) return false
-            primed += step
         }
         return true
     }
@@ -479,8 +519,16 @@ class AudioEngine(
         const val SOFT_US = 30_000.0
         const val MIN_LATENCY_US = 20_000L
         const val STATS_US = 30_000_000L
-        const val PRIME_STEP_US = 20_000L
+        const val PRIME_STEP_US = 10_000L
+        const val PRIME_AHEAD_US = 50_000L
+        const val PRIME_SLEEP_MS = 5L
         const val PRIME_MAX_US = 600_000L
+
+        /** Il ritardo più grande che si tiene all'avvio invece di saltare l'audio. */
+        const val MAX_LATE_US = 2_000_000L
+
+        /** Quanto in fretta si recupera il ritardo dell'avvio: 0,4% (la correzione dolce arriva allo 0,5%). */
+        const val CATCH_UP = 0.004
         const val MAX_SILENCE_US = 3_000_000L
         const val STARVED_US = 1_500_000L
         const val SLEEP_STEP_MS = 50L

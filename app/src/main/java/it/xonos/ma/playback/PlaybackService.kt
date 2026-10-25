@@ -100,7 +100,7 @@ class PlaybackService : MediaLibraryService() {
             settings.volume = volume
             settings.muted = muted
         }
-        player = MaPlayer(mainLooper, app.repo, settings.playerId, app.playerReady, engine.outputting, artwork::uriFor) { connection ->
+        player = MaPlayer(mainLooper, app.repo, settings.playerId, app.playerReady, engine.outputting, artwork::uriFor, { engine.lateMs }) { connection ->
             describe(settings.language.wrap(this), connection)
         }
         tree = BrowseTree(Menu(app.library, ResourceLabels(this) { settings.language }) { settings.playerId }, artwork)

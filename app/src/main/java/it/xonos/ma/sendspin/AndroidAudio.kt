@@ -7,6 +7,7 @@ import android.media.AudioTrack
 import android.media.MediaCodec
 import android.media.MediaCodecList
 import android.media.MediaFormat
+import android.os.Build
 import android.util.Log
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -51,6 +52,7 @@ private class AudioTrackOutput(override val sampleRate: Int, override val channe
     private val track: AudioTrack
     private val timestamp = AudioTimestamp()
     private val bufferFrames: Int
+    private val threshold: Int
 
     init {
         val mask = if (channels == 1) AudioFormat.CHANNEL_OUT_MONO else AudioFormat.CHANNEL_OUT_STEREO
@@ -75,7 +77,21 @@ private class AudioTrackOutput(override val sampleRate: Int, override val channe
             .setBufferSizeInBytes(bytes)
             .build()
         bufferFrames = track.bufferSizeInFrames
+        // Di suo l'AudioTrack comincia a suonare solo con il buffer pieno: un quarto di secondo di
+        // silenzio prima della musica a ogni avvio. Da Android 12 gli bastano pochi millesimi.
+        threshold = if (Build.VERSION.SDK_INT >= 31) {
+            try {
+                track.setStartThresholdInFrames(minOf(bufferFrames, sampleRate * START_MS / 1000))
+            } catch (e: Exception) {
+                bufferFrames
+            }
+        } else {
+            bufferFrames
+        }
     }
+
+    override val startFrames: Int
+        get() = threshold
 
     override val latencyUs: Long
         get() = bufferFrames * 1_000_000L / sampleRate + EXTRA_LATENCY_US
@@ -87,6 +103,13 @@ private class AudioTrackOutput(override val sampleRate: Int, override val channe
     override fun write(data: ShortArray, offsetFrames: Int, frames: Int): Int {
         val written = track.write(data, offsetFrames * channels, frames * channels, AudioTrack.WRITE_BLOCKING)
         return if (written < 0) written else written / channels
+    }
+
+    override fun playedFrames(): Long? = try {
+        // La posizione è un intero senza segno a 32 bit.
+        track.playbackHeadPosition.toLong() and 0xFFFFFFFFL
+    } catch (e: IllegalStateException) {
+        null
     }
 
     override fun presentationTimeUs(frame: Long): Long? {
@@ -134,6 +157,9 @@ private class AudioTrackOutput(override val sampleRate: Int, override val channe
     private companion object {
         /** Quello che c'è dopo il buffer (mixer, Bluetooth), finché l'uscita non dà i suoi tempi veri. */
         const val EXTRA_LATENCY_US = 50_000L
+
+        /** Quanto audio vuole l'uscita prima di partire, da Android 12 (prima: il buffer intero). */
+        const val START_MS = 40
     }
 }
 
