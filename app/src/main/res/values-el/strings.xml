@@ -51,6 +51,8 @@
     <string name="problem_unreachable">Το Music Assistant δεν είναι προσβάσιμο</string>
     <string name="problem_lost">Η σύνδεση χάθηκε, επανασύνδεση</string>
     <string name="problem_not_connected">Δεν υπάρχει σύνδεση με το Music Assistant</string>
+    <string name="problem_bad_login">Λάθος όνομα χρήστη ή κωδικός</string>
+    <string name="problem_setup_required">Αυτό το Music Assistant δεν έχει ακόμη λογαριασμό: δημιουργήστε τον πρώτο</string>
     <string name="problem_refused">Music Assistant: %s</string>
     <string name="problem_not_configured">Ρυθμίστε το Xonos στο τηλέφωνο</string>
     <string name="error_unknown">άγνωστο σφάλμα</string>

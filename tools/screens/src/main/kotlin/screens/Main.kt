@@ -13,6 +13,7 @@ import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaException
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.Problem
+import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.phone.model.ArtistPage
 import it.xonos.ma.phone.model.ConnectionCheck
@@ -123,7 +124,7 @@ private fun shoot(file: File, lang: String, scene: Scene) {
     val repo = MaRepository(settings)
     repo.acquire()
     if (scene.configured) runBlocking { withTimeout(10_000) { repo.connection.first { it is Connection.Connected } } }
-    val model = PhoneModel(repo, Library(repo), settings, { "xonos-screens" }, MutableStateFlow(true), CoroutineScope(SupervisorJob() + Dispatchers.Default))
+    val model = PhoneModel(repo, Library(repo), settings, ScreenCache(null), { "xonos-screens" }, MutableStateFlow(true), CoroutineScope(SupervisorJob() + Dispatchers.Default))
     scene.setUp(model)
     val host = FakeHost(Language.of(if (lang == "zh") "zh-CN" else lang))
     val composeScene = ImageComposeScene(WIDTH, HEIGHT, Density(DENSITY)) { XonosScreen(model, FakeLink(scene.now), host) }

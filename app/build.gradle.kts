@@ -46,7 +46,11 @@ android {
             if (hasXonosKey) signingConfig = signingConfigs.getByName("xonos")
         }
         getByName("release") {
-            isMinifyEnabled = false
+            // R8 toglie il codice che non serve e ottimizza quello che resta (Compose ne ha bisogno per
+            // essere fluido). Senza offuscare i nomi: gli errori nei log restano leggibili. Vedi proguard-rules.pro.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // Senza la chiave di Xonos (le misure su GitHub, chi compila per sé) l'APK si firma con
             // quella di debug, così si installa lo stesso; le release si pubblicano solo con la chiave.
             signingConfig = signingConfigs.getByName(if (hasXonosKey) "xonos" else "debug")

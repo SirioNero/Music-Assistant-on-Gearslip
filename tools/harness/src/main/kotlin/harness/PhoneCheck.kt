@@ -4,6 +4,7 @@ import it.xonos.ma.data.Connection
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.QueueState
+import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.phone.model.ArtistPage
 import it.xonos.ma.phone.model.HomePage
@@ -33,6 +34,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
+import java.nio.file.Files
 import java.util.concurrent.Executors
 
 /**
@@ -62,7 +64,9 @@ fun main(): Unit = runBlocking {
 
     // Un solo thread per il modello, come il thread principale del telefono.
     val main = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-    val model = PhoneModel(repo, library, settings, { playerId }, ready, CoroutineScope(SupervisorJob() + main))
+    // Le schermate salvate vanno in una cartella temporanea: alla fine le legge una seconda app senza server.
+    val cache = ScreenCache(Files.createTempDirectory("xonos-cache").toFile())
+    val model = PhoneModel(repo, library, settings, cache, { playerId }, ready, CoroutineScope(SupervisorJob() + main))
     var failures = 0
 
     fun check(label: String, ok: Boolean, detail: String = "") {
@@ -263,6 +267,35 @@ fun main(): Unit = runBlocking {
     model.back()
     check("Dalla prima schermata di una scheda torna alla Home", model.tab == Tab.HOME)
     check("Dalla Home indietro esce", !model.back())
+
+    // ---------- Schermate salvate ----------
+    // Un'altra app con le stesse schermate salvate, ma un server che non risponde: Home e album arrivano dal disco.
+    val offlineSettings = Settings().also { it.save(Settings.Config("http://127.0.0.1:1", "", "x")) }
+    val offlineRepo = MaRepository(offlineSettings)
+    offlineRepo.acquire()
+    val offline = PhoneModel(offlineRepo, Library(offlineRepo), offlineSettings, cache, { playerId }, MutableStateFlow(false), CoroutineScope(SupervisorJob() + main))
+    val offlineHome = offline.page as HomePage
+    val shownAt = System.nanoTime()
+    offline.start(offlineHome)
+    withTimeoutOrNull(3_000) { while (offlineHome.rows !is Load.Ready) delay(10) }
+    val savedRows = offlineHome.rows.value.orEmpty()
+    check(
+        "Cache: la Home senza server",
+        offlineHome.recent is Load.Ready && savedRows.isNotEmpty() && savedRows.all { it.items is Load.Ready },
+        "${savedRows.size} righe in ${(System.nanoTime() - shownAt) / 1_000_000} ms",
+    )
+    val savedCover = savedRows.flatMap { it.items.value.orEmpty() }.firstOrNull { it.image != null }
+    check("Cache: copertine dall'indirizzo salvato", offline.image(savedCover?.image, 256)?.startsWith(url) == true, "${offline.image(savedCover?.image, 256)}")
+    offline.select(Tab.LIBRARY)
+    val offlineLibrary = offline.page as LibraryPage
+    offline.start(offlineLibrary)
+    withTimeoutOrNull(3_000) { while (offlineLibrary.shelves == null) delay(10) }
+    check("Cache: voci della libreria", offlineLibrary.shelves?.contains(Shelf.ALBUMS) == true, "${offlineLibrary.shelves}")
+    val offlineAlbums = offline.shelf(offlineLibrary, Shelf.ALBUMS)
+    offline.show(offlineAlbums)
+    withTimeoutOrNull(3_000) { while (offlineAlbums.items.isEmpty()) delay(10) }
+    check("Cache: prima pagina degli album", offlineAlbums.items.size == 100 && offlineAlbums.loading, "${offlineAlbums.items.size}")
+    offlineRepo.release()
 
     // ---------- Impostazioni ----------
     model.openSettings()

@@ -53,6 +53,8 @@
     <string name="problem_unreachable">Music Assistant недоступен</string>
     <string name="problem_lost">Соединение потеряно, переподключение</string>
     <string name="problem_not_connected">Нет подключения к Music Assistant</string>
+    <string name="problem_bad_login">Неверное имя пользователя или пароль</string>
+    <string name="problem_setup_required">В этом Music Assistant ещё нет учётных записей: создайте первую</string>
     <string name="problem_refused">Music Assistant: %s</string>
     <string name="problem_not_configured">Настройте Xonos на телефоне</string>
     <string name="error_unknown">неизвестная ошибка</string>

@@ -1,6 +1,9 @@
 package it.xonos.ma.data
 
 import android.util.Log
+import java.net.URLEncoder
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.json.JSONObject
-import java.net.URLEncoder
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
 
 /**
  * Tiene viva una connessione all'API di Music Assistant mentre l'app serve: dice quale indirizzo
@@ -87,6 +87,17 @@ class MaRepository(private val settings: Settings) {
     suspend fun command(name: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): Any? {
         val c = client ?: throw MaException("Music Assistant non è collegato", problem = Problem.NOT_CONNECTED)
         return c.command(name, timeoutMs, fill)
+    }
+
+    /** Un comando che risponde con un elenco, trasformato elemento per elemento mentre arriva (vedi [MaClient.items]). */
+    suspend fun <T : Any> items(
+        name: String,
+        timeoutMs: Long = 30_000,
+        transform: (JSONObject) -> T?,
+        fill: JSONObject.() -> Unit = {},
+    ): List<T> {
+        val c = client ?: throw MaException("Music Assistant non è collegato", problem = Problem.NOT_CONNECTED)
+        return c.items(name, timeoutMs, transform, fill)
     }
 
     private suspend fun connectLoop() {

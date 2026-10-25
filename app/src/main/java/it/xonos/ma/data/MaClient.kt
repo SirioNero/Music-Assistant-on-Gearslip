@@ -1,6 +1,8 @@
 package it.xonos.ma.data
 
 import android.util.Log
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.OkHttpClient
@@ -10,8 +12,6 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
 
 /** Un errore di Music Assistant: [message] per i log, [problem] e [detail] per dirlo a chi usa l'app. */
 class MaException(
@@ -32,10 +32,17 @@ class MaClient(private val http: OkHttpClient) {
     private val ids = AtomicInteger(1)
     private val pending = ConcurrentHashMap<String, CompletableDeferred<Box>>()
     private val partials = ConcurrentHashMap<String, JSONArray>()
+
+    // Per gli elenchi chiesti con [items]: come trasformare ogni elemento, e quelli già trasformati.
+    private val transforms = ConcurrentHashMap<String, (JSONObject) -> Any?>()
+    private val converted = ConcurrentHashMap<String, ArrayList<Any?>>()
     private val serverInfo = CompletableDeferred<JSONObject>()
 
     /** Si completa (con il motivo) quando la connessione si chiude. */
     val closed = CompletableDeferred<String>()
+
+    /** Perché la connessione si è chiusa: lo si dice anche a chi prova a mandare un comando dopo. */
+    @Volatile private var closeError: MaException? = null
 
     /** Gli eventi del server (nome, object_id, dati). Arrivano sul thread di OkHttp. */
     @Volatile var onEvent: ((String, String?, Any?) -> Unit)? = null
@@ -44,6 +51,20 @@ class MaClient(private val http: OkHttpClient) {
 
     /** Si collega e accede con il token. */
     suspend fun connect(baseUrl: String, token: String, timeoutMs: Long = 10_000): ServerInfo {
+        val server = open(baseUrl, timeoutMs)
+        try {
+            return authenticate(server, token, timeoutMs)
+        } catch (e: Exception) {
+            close()
+            throw e
+        }
+    }
+
+    /**
+     * Si collega senza accedere e dice chi è il server: serve per accedere con nome utente e
+     * password, o per creare il primo account (vedi [Account]).
+     */
+    suspend fun open(baseUrl: String, timeoutMs: Long = 10_000): ServerInfo {
         val request = try {
             Request.Builder().url(websocketUrl(baseUrl)).build()
         } catch (e: IllegalArgumentException) {
@@ -53,57 +74,91 @@ class MaClient(private val http: OkHttpClient) {
         try {
             val info = withTimeoutOrNull(timeoutMs) { serverInfo.await() }
                 ?: throw MaException("Nessuna risposta da $baseUrl", problem = Problem.NO_ANSWER, detail = baseUrl)
-            val server = ServerInfo.from(info)
+            return ServerInfo.from(info)
                 ?: throw MaException("A questo indirizzo non risponde Music Assistant", problem = Problem.NOT_MUSIC_ASSISTANT)
-            val auth = try {
-                command("auth", timeoutMs) { put("token", token) } as? JSONObject
-            } catch (e: MaException) {
-                when {
-                    // Prima della 2.7 Music Assistant non aveva accessi né token, e nemmeno l'audio per i telefoni.
-                    e.code == INVALID_COMMAND || e.message.orEmpty().contains("Invalid command") -> throw MaException(
-                        "Music Assistant ${server.version} è troppo vecchio: serve la 2.7 o successiva",
-                        e.code,
-                        Problem.TOO_OLD,
-                        server.version,
-                    )
-                    e.code in TOKEN_ERRORS -> throw MaException(e.message ?: "Token non valido", e.code, Problem.BAD_TOKEN)
-                    e.code == NOT_ALLOWED -> throw MaException(e.message ?: "Accesso negato", e.code, Problem.DENIED)
-                    else -> throw e
-                }
-            }
-            val filter = auth?.optJSONObject("user")?.optJSONArray("player_filter")
-            return server.copy(limitedPlayers = filter != null && filter.length() > 0)
         } catch (e: Exception) {
             close()
             throw e
         }
     }
 
+    /** L'accesso con il token, su una connessione aperta con [open]; dice anche chi ha fatto l'accesso. */
+    suspend fun authenticate(server: ServerInfo, token: String, timeoutMs: Long = 10_000): ServerInfo {
+        val auth = try {
+            command("auth", timeoutMs) { put("token", token) } as? JSONObject
+        } catch (e: MaException) {
+            when {
+                // Prima della 2.7 Music Assistant non aveva accessi né token, e nemmeno l'audio per i telefoni.
+                e.code == INVALID_COMMAND || e.message.orEmpty().contains("Invalid command") -> throw MaException(
+                    "Music Assistant ${server.version} è troppo vecchio: serve la 2.7 o successiva",
+                    e.code,
+                    Problem.TOO_OLD,
+                    server.version,
+                )
+                e.code in TOKEN_ERRORS -> throw MaException(e.message ?: "Token non valido", e.code, Problem.BAD_TOKEN)
+                e.code == NOT_ALLOWED -> throw MaException(e.message ?: "Accesso negato", e.code, Problem.DENIED)
+                else -> throw e
+            }
+        }
+        val user = auth?.optJSONObject("user")
+        val filter = user?.optJSONArray("player_filter")
+        return server.copy(
+            limitedPlayers = filter != null && filter.length() > 0,
+            user = user?.str("display_name") ?: user?.str("username"),
+            role = user?.str("role"),
+        )
+    }
+
     /**
      * Esegue un comando e ne restituisce il risultato (JSONObject, JSONArray, numero, stringa o null).
      * Gli elenchi lunghi arrivano a pezzi: qui si ricompongono.
      */
-    suspend fun command(name: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): Any? {
+    suspend fun command(name: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): Any? =
+        send(name, timeoutMs, null, fill)
+
+    /**
+     * Un comando che risponde con un elenco: ogni elemento diventa subito un [T] con [transform],
+     * pezzo per pezzo man mano che arriva, sul thread della rete. Così un elenco di migliaia di
+     * elementi non resta mai tutto in memoria come JSON, e il thread principale non lo tocca.
+     */
+    @Suppress("UNCHECKED_CAST")
+    suspend fun <T : Any> items(
+        name: String,
+        timeoutMs: Long = 30_000,
+        transform: (JSONObject) -> T?,
+        fill: JSONObject.() -> Unit = {},
+    ): List<T> = send(name, timeoutMs, transform, fill) as? List<T> ?: emptyList()
+
+    private suspend fun send(name: String, timeoutMs: Long, transform: ((JSONObject) -> Any?)?, fill: JSONObject.() -> Unit): Any? {
         val ws = socket
-        if (ws == null || closed.isCompleted) throw MaException("Non collegato a Music Assistant", problem = Problem.NOT_CONNECTED)
+        if (ws == null || closed.isCompleted) throw closeError ?: MaException("Non collegato a Music Assistant", problem = Problem.NOT_CONNECTED)
         val id = ids.getAndIncrement().toString()
         val message = JSONObject()
             .put("message_id", id)
             .put("command", name)
             .put("args", JSONObject().apply(fill))
         val deferred = CompletableDeferred<Box>()
+        if (transform != null) transforms[id] = transform
         pending[id] = deferred
         if (!ws.send(message.toString())) {
-            pending.remove(id)
-            throw MaException("Invio a Music Assistant non riuscito", problem = Problem.LOST)
+            forget(id)
+            // Il server ha appena chiuso (per esempio "Setup required"): il motivo arriva un attimo dopo.
+            withTimeoutOrNull(2_000) { closed.await() }
+            throw closeError ?: MaException("Invio a Music Assistant non riuscito", problem = Problem.LOST)
         }
         val box = withTimeoutOrNull(timeoutMs) { deferred.await() }
         if (box == null) {
-            pending.remove(id)
-            partials.remove(id)
+            forget(id)
             throw MaException("Music Assistant non risponde", problem = Problem.NO_ANSWER)
         }
         return box.value
+    }
+
+    private fun forget(id: String) {
+        pending.remove(id)
+        partials.remove(id)
+        transforms.remove(id)
+        converted.remove(id)
     }
 
     fun close() {
@@ -158,15 +213,28 @@ class MaClient(private val http: OkHttpClient) {
             val details = msg.str("details")
             val error = MaException(details ?: "Comando rifiutato", msg.optInt("error_code"), Problem.REFUSED, details)
             if (id == "connection") {
-                // Per esempio "Setup required": il server chiude subito dopo.
-                shutdown(details ?: "Connessione rifiutata", Problem.REFUSED, details)
+                // Per esempio "Setup required" (un Music Assistant appena installato, senza account): il server chiude subito dopo.
+                val setup = msg.optInt("error_code") == SETUP_REQUIRED || msg.str("translation_key") == "setup_required"
+                shutdown(details ?: "Connessione rifiutata", if (setup) Problem.SETUP_REQUIRED else Problem.REFUSED, details)
                 return
             }
-            partials.remove(id)
-            pending.remove(id)?.completeExceptionally(error)
+            val deferred = pending[id]
+            forget(id)
+            deferred?.completeExceptionally(error)
             return
         }
         val result = msg.opt("result")?.takeIf { it != JSONObject.NULL }
+        val transform = transforms[id]
+        if (transform != null) {
+            // Un elenco da trasformare: questo pezzo diventa subito elementi, il JSON si butta.
+            val list = converted.getOrPut(id) { ArrayList() }
+            (result as? JSONArray)?.let { chunk -> traced("Xonos.items") { chunk.objects().mapNotNullTo(list, transform) } }
+            if (msg.optBoolean("partial")) return
+            val deferred = pending[id]
+            forget(id)
+            deferred?.complete(Box(list))
+            return
+        }
         if (msg.optBoolean("partial")) {
             val chunk = result as? JSONArray ?: return
             val all = partials.getOrPut(id) { JSONArray() }
@@ -185,10 +253,14 @@ class MaClient(private val http: OkHttpClient) {
 
     private fun shutdown(reason: String, problem: Problem, detail: String? = null) {
         val error = MaException(reason, problem = problem, detail = detail)
+        // Il primo motivo è quello vero: dopo "Setup required" arriva anche la chiusura del socket.
+        if (closeError == null) closeError = error
         serverInfo.completeExceptionally(error)
         pending.values.forEach { it.completeExceptionally(error) }
         pending.clear()
         partials.clear()
+        transforms.clear()
+        converted.clear()
         closed.complete(reason)
     }
 
@@ -199,6 +271,7 @@ class MaClient(private val http: OkHttpClient) {
         private const val INVALID_COMMAND = 12
         private const val NOT_ALLOWED = 22
         private val TOKEN_ERRORS = setOf(20, 21, 23)
+        private const val SETUP_REQUIRED = 503
 
         /** L'indirizzo WebSocket di un percorso del server: http diventa ws, https diventa wss. */
         fun websocketUrl(base: String, path: String = "/ws"): String {

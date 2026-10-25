@@ -51,20 +51,24 @@ import it.xonos.ma.phone.model.Load
 import it.xonos.ma.phone.model.PhoneModel
 import it.xonos.ma.phone.model.PlayerLink
 import it.xonos.ma.phone.model.value
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 /** Album, playlist, podcast o genere: copertina grande, pulsanti e l'elenco dei brani (o episodi). */
 @Composable
 internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, host: Host) {
     val item = page.item
     val cover = model.image(item.image, LARGE_ART)
-    val playing by player.nowPlaying.collectAsState()
+    // Solo quale brano suona: il resto del lettore (posizione, coda...) non deve ridisegnare l'elenco.
+    val playingUri by remember(player) { player.nowPlaying.map { it?.uri }.distinctUntilChanged() }
+        .collectAsState(player.nowPlaying.value?.uri)
     val state = rememberLazyListState()
     val tracks = page.tracks.value.orEmpty()
     // Nei podcast l'ordine è quello delle puntate, non un "da qui in poi".
     val numbered = item.mediaType == "album"
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
-            item(key = "header") {
+            item(key = "header", contentType = "header") {
                 Header(
                     title = item.name,
                     cover = cover,
@@ -90,14 +94,14 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
                 )
             }
             loaded(page.tracks, host, { model.reload(page) }) { list ->
-                itemsIndexed(list, key = { i, it -> "$i|${it.uri}" }) { i, track ->
+                itemsIndexed(list, key = { i, it -> "$i|${it.uri}" }, contentType = { _, _ -> "track" }) { i, track ->
                     ItemRow(
                         track,
                         model,
                         { model.play(list, i, page.context) },
                         number = if (numbered) track.trackNumber.takeIf { it > 0 } ?: (i + 1) else null,
                         subtitle = if (numbered) track.artists.joinToString(", ") { it.name }.ifEmpty { null } else track.subtitle,
-                        current = playing?.uri == track.uri,
+                        current = playingUri == track.uri,
                         showAlbum = item.mediaType != "album",
                     )
                 }
@@ -105,7 +109,7 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
             if (item.mediaType == "genre") {
                 loaded(page.albums, host, { model.reload(page) }) { albums ->
                     if (albums.isNotEmpty()) {
-                        item(key = "albums") {
+                        item(key = "albums", contentType = "row") {
                             CardRow(stringResource(R.string.cat_albums), albums, model) { _, album -> model.open(album) }
                         }
                     }
@@ -125,7 +129,7 @@ internal fun ArtistScreen(page: ArtistPage, model: PhoneModel, host: Host) {
     val allTitle = stringResource(R.string.all_tracks)
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
-            item(key = "header") {
+            item(key = "header", contentType = "header") {
                 Header(artist.name, model.image(artist.image, LARGE_ART), "artist", listOf(kindName("artist")), coverSize = 196.dp)
                 PlayBar(
                     onPlay = { model.play(artist) },
@@ -136,23 +140,23 @@ internal fun ArtistScreen(page: ArtistPage, model: PhoneModel, host: Host) {
             }
             val top = page.top.value.orEmpty()
             if (top.isNotEmpty()) {
-                item(key = "top") {
+                item(key = "top", contentType = "title") {
                     SectionTitle(topTitle, onSeeAll = if (top.size > SHOWN_TOP) ({ model.openArtistTracks(page, topTitle, top = true) }) else null)
                 }
-                itemsIndexed(top.take(SHOWN_TOP), key = { i, it -> "top$i|${it.uri}" }) { i, track ->
+                itemsIndexed(top.take(SHOWN_TOP), key = { i, it -> "top$i|${it.uri}" }, contentType = { _, _ -> "track" }) { i, track ->
                     ItemRow(track, model, { model.play(top, i, null) }, number = i + 1)
                 }
             }
             loaded(page.albums, host, { model.reload(page) }) { albums ->
                 if (albums.isNotEmpty()) {
-                    item(key = "albums") {
+                    item(key = "albums", contentType = "row") {
                         CardRow(stringResource(R.string.cat_albums), albums, model) { _, album -> model.open(album) }
                     }
                 }
             }
             val tracks = page.tracks.value.orEmpty()
             if (tracks.isNotEmpty()) {
-                item(key = "all") {
+                item(key = "all", contentType = "all") {
                     SectionTitle(allTitle)
                     Row(
                         Modifier.fillMaxWidth().clickable { model.openArtistTracks(page, allTitle, top = false) }.padding(horizontal = 16.dp, vertical = 12.dp),
@@ -176,7 +180,7 @@ internal fun ListScreen(page: ListPage, model: PhoneModel, host: Host) {
     val state = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
-            item(key = "header") {
+            item(key = "header", contentType = "header") {
                 Column(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 16.dp, end = 16.dp, top = 64.dp, bottom = 4.dp)) {
                     Text(page.title, style = MaterialTheme.typography.headlineMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     page.subtitle?.let {
@@ -192,7 +196,7 @@ internal fun ListScreen(page: ListPage, model: PhoneModel, host: Host) {
                 if (items.isEmpty()) {
                     item { Empty() }
                 }
-                itemsIndexed(items, key = { i, it -> "$i|${it.uri}" }) { i, item ->
+                itemsIndexed(items, key = { i, it -> "$i|${it.uri}" }, contentType = { _, _ -> "track" }) { i, item ->
                     ItemRow(item, model, { model.play(items, i, null) })
                 }
             }
@@ -285,7 +289,7 @@ private fun <T> LazyListScope.loaded(
 ) {
     when (load) {
         is Load.Ready -> content(load.value)
-        else -> item { Loaded(load, host::describe, onRetry) {} }
+        else -> item(contentType = "loading") { Loaded(load, host::describe, onRetry) {} }
     }
 }
 

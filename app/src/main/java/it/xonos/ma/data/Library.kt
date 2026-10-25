@@ -1,18 +1,19 @@
 package it.xonos.ma.data
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
 /** Le domande che il menu dell'auto fa alla libreria di Music Assistant, e i comandi della coda. */
 class Library(private val repo: MaRepository) {
 
-    private suspend fun items(command: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): List<MaItem> {
-        val result = repo.command(command, timeoutMs, fill) as? JSONArray ?: return emptyList()
-        return traced("Xonos.items") { result.objects().mapNotNull(MaItem::from) }
-    }
+    /** Un elenco di elementi: diventano MaItem man mano che arrivano, lontano dal thread principale. */
+    private suspend fun items(command: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): List<MaItem> =
+        repo.items(command, timeoutMs, MaItem::from, fill)
 
     /**
      * Un elenco intero, a pagine di [PAGE] come le chiede Music Assistant stesso: dopo la prima
@@ -157,9 +158,11 @@ class Library(private val repo: MaRepository) {
             put("limit", limit)
         } as? JSONObject ?: return emptyMap()
         // Lo stesso podcast o brano può arrivare da più servizi: resta il primo, che è il più pertinente.
-        return traced("Xonos.items") {
-            SEARCH_TYPES.associateWith { key -> dedupe(result.optJSONArray(key).objects().mapNotNull(MaItem::from)) }
-                .filterValues { it.isNotEmpty() }
+        return withContext(Dispatchers.Default) {
+            traced("Xonos.items") {
+                SEARCH_TYPES.associateWith { key -> dedupe(result.optJSONArray(key).objects().mapNotNull(MaItem::from)) }
+                    .filterValues { it.isNotEmpty() }
+            }
         }
     }
 

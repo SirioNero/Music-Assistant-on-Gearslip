@@ -89,7 +89,7 @@ internal fun LibraryScreen(page: LibraryPage, model: PhoneModel, host: Host) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShelfContent(list: ShelfList, model: PhoneModel, host: Host) {
-    LaunchedEffect(list) { if (list.items.isEmpty()) model.loadMore(list) }
+    LaunchedEffect(list) { model.show(list) }
     PullToRefreshBox(isRefreshing = list.refreshing, onRefresh = { model.refresh(list) }) { ShelfItems(list, model, host) }
 }
 
@@ -111,19 +111,19 @@ private fun ShelfItems(list: ShelfList, model: PhoneModel, host: Host) {
             contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 16.dp),
             modifier = Modifier.fillMaxSize().testTag("library_list"),
         ) {
-            itemsIndexed(list.items, key = { i, item -> "$i|${item.uri}" }) { _, item ->
+            itemsIndexed(list.items, key = { i, item -> "$i|${item.uri}" }, contentType = { _, _ -> "card" }) { _, item ->
                 ItemCard(item, model, { model.open(item) })
             }
-            item(span = { GridItemSpan(maxLineSpan) }) { footer() }
+            item(span = { GridItemSpan(maxLineSpan) }, contentType = "footer") { footer() }
         }
     } else {
         val state = rememberLazyListState()
         LoadMoreWhenNear(state, list, model)
         LazyColumn(state = state, contentPadding = PaddingValues(bottom = 16.dp), modifier = Modifier.fillMaxSize().testTag("library_list")) {
-            itemsIndexed(list.items, key = { i, item -> "$i|${item.uri}" }) { i, item ->
+            itemsIndexed(list.items, key = { i, item -> "$i|${item.uri}" }, contentType = { _, _ -> "row" }) { i, item ->
                 ItemRow(item, model, { model.play(list.items, i, null) })
             }
-            item { footer() }
+            item(contentType = "footer") { footer() }
         }
     }
 }

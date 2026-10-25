@@ -12,10 +12,17 @@ import it.xonos.ma.data.MaImage
 import it.xonos.ma.data.MaItem
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.Problem
+import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
+import it.xonos.ma.data.cachedItem
+import it.xonos.ma.data.cachedItems
+import it.xonos.ma.data.objects
+import it.xonos.ma.data.str
+import it.xonos.ma.data.toCache
 import it.xonos.ma.playback.Menu
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -24,7 +31,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONArray
+import org.json.JSONObject
 
 /** Le schede in fondo allo schermo. */
 enum class Tab { HOME, SEARCH, LIBRARY }
@@ -52,6 +62,8 @@ class PhoneModel(
     private val repo: MaRepository,
     private val library: Library,
     private val settings: Settings,
+    /** Le ultime schermate caricate, da mostrare subito alla prossima apertura. */
+    private val cache: ScreenCache,
     /** La coda del telefono in Music Assistant (l'id del lettore). */
     private val queueId: () -> String,
     /** Vero quando il telefono è un lettore di Music Assistant: solo allora si può suonare. */
@@ -180,41 +192,74 @@ class PhoneModel(
 
     /**
      * La Home. Aggiornandola ([refresh]) resta quello che c'era finché non arriva il nuovo, e una
-     * riga che non si carica non toglie quella di prima.
+     * riga che non si carica non toglie quella di prima. La prima volta si mostra subito la Home
+     * salvata l'ultima volta (se c'è), e intanto si aggiorna allo stesso modo.
      */
     private fun loadHome(page: HomePage, refresh: Boolean = false) {
-        if (!refresh) {
-            page.recent = Load.Loading
-            page.rows = Load.Loading
-        }
         page.loadedAt = System.currentTimeMillis()
-        val recent = scope.launch {
-            try {
-                awaitConnected()
-                page.recent = Load.Ready(library.recent(RECENT))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                if (!refresh || page.recent !is Load.Ready) page.recent = Load.Failed(e)
+        if (refresh) page.refreshing = true
+        page.job = scope.launch {
+            val keep = refresh || showSavedHome(page)
+            if (!keep) {
+                page.recent = Load.Loading
+                page.rows = Load.Loading
             }
+            coroutineScope {
+                launch {
+                    try {
+                        awaitConnected()
+                        page.recent = Load.Ready(library.recent(RECENT))
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        if (!keep || page.recent !is Load.Ready) page.recent = Load.Failed(e)
+                    }
+                }
+                launch {
+                    try {
+                        awaitConnected()
+                        loadRows(page, keep)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        if (!keep || page.rows !is Load.Ready) page.rows = Load.Failed(e)
+                    }
+                }
+            }
+            page.refreshing = false
+            page.fresh = page.recent is Load.Ready && page.rows is Load.Ready && (page.rows as Load.Ready).value.none { it.items is Load.Loading }
+            saveHome(page)
         }
-        val rows = scope.launch {
-            try {
-                awaitConnected()
-                loadRows(page, refresh)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                if (!refresh || page.rows !is Load.Ready) page.rows = Load.Failed(e)
+    }
+
+    /** La Home dell'ultima volta, dal disco; falso se non c'è. */
+    private suspend fun showSavedHome(page: HomePage): Boolean {
+        val saved = withContext(Dispatchers.IO) {
+            val o = cache.read(HOME_CACHE) ?: return@withContext null
+            val rows = o.optJSONArray("rows").objects().mapNotNull { row ->
+                val item = row.optJSONObject("row")?.let(::cachedItem) ?: return@mapNotNull null
+                HomePage.Row(item, Load.Ready(cachedItems(row.optJSONArray("items"))))
             }
-        }
-        if (refresh) {
-            page.refreshing = true
-            scope.launch {
-                recent.join()
-                rows.join()
-                page.refreshing = false
-            }
+            Triple(o.str("base"), cachedItems(o.optJSONArray("recent")), rows)
+        } ?: return false
+        val (base, recent, rows) = saved
+        if (recent.isEmpty() && rows.isEmpty()) return false
+        savedBase = base
+        page.recent = Load.Ready(recent)
+        page.rows = Load.Ready(rows)
+        return true
+    }
+
+    private suspend fun saveHome(page: HomePage) {
+        val base = repo.baseUrl ?: return
+        val recent = page.recent.value ?: return
+        val rows = page.rows.value?.mapNotNull { row -> row.items.value?.let { row.row to it } } ?: return
+        withContext(Dispatchers.IO) {
+            val saved = JSONObject()
+                .put("base", base)
+                .put("recent", recent.toCache())
+                .put("rows", JSONArray(rows.map { (row, items) -> JSONObject().put("row", row.toCache()).put("items", items.toCache()) }))
+            cache.write(HOME_CACHE, saved)
         }
     }
 
@@ -246,11 +291,15 @@ class PhoneModel(
         if (!page.refreshing) loadHome(page, refresh = true)
     }
 
-    fun refresh(list: ShelfList) {
-        if (list.refreshing) return
+    /**
+     * Ricarica la prima pagina di un elenco. [quiet]: senza la rotella in alto, per aggiornare
+     * l'elenco salvato l'ultima volta (intanto la rotella è in fondo, come quando si carica altro).
+     */
+    fun refresh(list: ShelfList, quiet: Boolean = false) {
+        if (list.refreshing || (quiet && list.loading)) return
         list.job?.cancel()
-        list.refreshing = true
-        list.loading = false
+        if (quiet) list.loading = true else list.refreshing = true
+        if (!quiet) list.loading = false
         list.job = scope.launch {
             try {
                 awaitConnected()
@@ -263,14 +312,43 @@ class PhoneModel(
                 list.items.addAll(first)
                 list.end = shelf == Shelf.BROWSE || first.size < Library.PHONE_PAGE
                 list.error = null
+                list.stale = false
+                saveFirstPage(list, first)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 list.error = e
             } finally {
                 list.refreshing = false
+                list.loading = false
             }
         }
+    }
+
+    /** Mostra un elenco della libreria: la prima pagina salvata l'ultima volta e intanto quella nuova, o la si carica. */
+    fun show(list: ShelfList) {
+        if (list.shown) return
+        list.shown = true
+        if (list.items.isNotEmpty()) return
+        scope.launch {
+            val saved = withContext(Dispatchers.IO) {
+                cache.read(list.cacheName)?.let { it.str("base") to cachedItems(it.optJSONArray("items")) }
+            }
+            if (saved != null && saved.second.isNotEmpty() && list.items.isEmpty()) {
+                savedBase = savedBase ?: saved.first
+                list.items.addAll(saved.second)
+                list.stale = true
+                refresh(list, quiet = true)
+            } else {
+                loadMore(list)
+            }
+        }
+    }
+
+    private fun saveFirstPage(list: ShelfList, first: List<MaItem>) {
+        val base = repo.baseUrl ?: return
+        val name = list.cacheName
+        scope.launch(Dispatchers.IO) { cache.write(name, JSONObject().put("base", base).put("items", first.toCache())) }
     }
 
     /** Tornando nell'app: una Home vecchia di più di dieci minuti si aggiorna da sola. */
@@ -280,13 +358,26 @@ class PhoneModel(
     }
 
     private fun loadShelves(page: LibraryPage) {
-        launchLoad({ page.shelves = Shelf.entries }) {
+        scope.launch {
+            // Le voci dell'ultima volta subito, poi quelle vere.
+            val saved = withContext(Dispatchers.IO) {
+                cache.read(SHELVES_CACHE)?.optJSONArray("shelves")?.let { names ->
+                    (0 until names.length()).mapNotNull { i -> Shelf.entries.firstOrNull { it.name == names.optString(i) } }
+                }
+            }
+            if (page.shelves == null && !saved.isNullOrEmpty()) {
+                page.shelves = saved
+                if (page.shelf !in saved) page.shelf = saved.first()
+            }
+        }
+        launchLoad({ if (page.shelves == null) page.shelves = Shelf.entries }) {
             // Si mostrano solo le voci con qualcosa dentro, come in auto.
             val shelves = coroutineScope {
                 Shelf.entries.map { shelf -> async { shelf to has(shelf) } }.awaitAll()
             }.filter { it.second }.map { it.first }
             page.shelves = shelves
             if (page.shelf !in shelves) shelves.firstOrNull()?.let { page.shelf = it }
+            withContext(Dispatchers.IO) { cache.write(SHELVES_CACHE, JSONObject().put("shelves", JSONArray(shelves.map { it.name }))) }
         }
     }
 
@@ -306,6 +397,8 @@ class PhoneModel(
 
     /** Chiede la pagina successiva di un elenco della libreria, se non la sta già chiedendo. */
     fun loadMore(list: ShelfList) {
+        // Un elenco ancora quello salvato: prima va rifatta la sua prima pagina.
+        if (list.stale) return refresh(list, quiet = true)
         if (list.loading || list.end) return
         list.loading = true
         list.error = null
@@ -319,6 +412,7 @@ class PhoneModel(
                 }
                 list.items.addAll(page)
                 if (shelf != Shelf.BROWSE && page.size < Library.PHONE_PAGE) list.end = true
+                if (list.items.size == page.size) saveFirstPage(list, page)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -557,6 +651,8 @@ class PhoneModel(
         page.home = config.homeUrl
         page.remote = config.remoteUrl
         page.token = config.token
+        // Un altro server: le schermate salvate sono dell'altro.
+        if (config != settings.load()) scope.launch(Dispatchers.IO) { cache.clear() }
         settings.save(config)
         settings.playerName = page.name
         page.name = settings.playerName
@@ -590,7 +686,8 @@ class PhoneModel(
     }
 
     private fun failed(page: Page): Boolean = when (page) {
-        is HomePage -> page.recent is Load.Failed || page.rows is Load.Failed
+        // Anche una Home mostrata dal disco e mai aggiornata, se non ci sta già provando.
+        is HomePage -> page.job?.isActive != true && (page.recent is Load.Failed || page.rows is Load.Failed || !page.fresh)
         is LibraryPage -> page.lists.values.any { it.error != null }
         is ItemPage -> page.tracks is Load.Failed || page.albums is Load.Failed
         is ArtistPage -> page.top is Load.Failed || page.albums is Load.Failed || page.tracks is Load.Failed
@@ -600,10 +697,16 @@ class PhoneModel(
 
     // ---------- Immagini ----------
 
-    /** L'indirizzo di un'immagine di Music Assistant alla misura chiesta (256 o 512), se si è collegati. */
+    /** L'indirizzo con cui sono state salvate le schermate mostrate prima di collegarsi. */
+    private var savedBase: String? = null
+
+    /**
+     * L'indirizzo di un'immagine di Music Assistant alla misura chiesta (256 o 512). Prima di
+     * collegarsi vale quello delle schermate salvate: Coil le ha già sul disco.
+     */
     fun image(image: MaImage?, size: Int): String? {
         image ?: return null
-        val base = repo.baseUrl ?: return null
+        val base = repo.baseUrl ?: savedBase ?: return null
         return MaRepository.imageUrl(base, image, size)
     }
 
@@ -616,6 +719,8 @@ class PhoneModel(
         const val READY_TIMEOUT_MS = 20_000L
         const val LYRICS_KEPT = 20
         const val STALE_MS = 10 * 60_000L
+        const val HOME_CACHE = "home"
+        const val SHELVES_CACHE = "shelves"
 
         val TRACK_LIKE = setOf("track", "podcast_episode", "audiobook")
     }

@@ -63,8 +63,10 @@ fun main(): Unit = runBlocking {
     check("podcast intero", podcast.id)
     check("cartella Brani di una ricerca", vasco.first { it.id.startsWith("find|tracks|") }.id)
     check("brano dai risultati", vasco.first { it.id.startsWith("play|") }.id)
-    val inLetter = menu.children(letters.first().id)
-    check("brano 6 della lettera ${letters.first().title}, da lì in poi", inLetter[5].id)
+    // Una lettera con almeno sei brani (nella libreria di prova la "A" ne ha uno solo).
+    val letter = letters.first { menu.children(it.id).size >= 6 }
+    val inLetter = menu.children(letter.id)
+    check("brano 6 della lettera ${letter.title}, da lì in poi", inLetter[5].id)
     check("tutti i brani di un artista", menu.children(vasco.first { it.type == "artist" }.id).first { it.id.startsWith("tracks|") }.id)
     genre?.let { check("genere ${it.title}", it.id) }
     check("ricerca a voce: podcast tienimi bordone", "", "il podcast tienimi bordone")

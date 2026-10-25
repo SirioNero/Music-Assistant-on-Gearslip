@@ -2,9 +2,9 @@ name: Misure
 
 # Misura Xonos su un emulatore Android, con il Music Assistant di prova in Docker sullo stesso runner
 # (l'emulatore lo vede a 10.0.2.2): avvio, scorrimento, lettore, playlist lunga (baselineprofile/).
-# Volendo genera anche il Baseline Profile. I risultati (tabella, JSON, log, profilo) finiscono nel
-# riferimento nascosto refs/xonos/measure, come le schermate:
-#   git fetch origin refs/xonos/measure && git archive FETCH_HEAD | tar -x -C <cartella>
+# Volendo genera anche il Baseline Profile. I risultati (tabella, JSON, log, tracce, profilo) finiscono
+# nel riferimento nascosto refs/xonos/measures/<ramo> (con - al posto di /), come le schermate:
+#   git fetch origin refs/xonos/measures/claude-xyz && git archive FETCH_HEAD | tar -x -C <cartella>
 # Parte a mano, o con un push su un ramo claude/** il cui messaggio contiene [misure]
 # ([profilo] per generare anche il Baseline Profile).
 
@@ -106,9 +106,9 @@ jobs:
           [ -f "$OUT/check.txt" ] && { echo; echo '```'; cat "$OUT/check.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           docker logs ma > "$OUT/ma.log" 2>&1 || true
           # Le tracce Perfetto sono grandi: restano solo le prime due di ogni misura.
-          find "$OUT" -name '*.perfetto-trace' | sort | awk -F'_iter' '{ n[$1]++; if (n[$1] > 2) print }' | xargs -r rm -f
+          find "$OUT" -name '*.perfetto-trace' | sort | awk -F'_iter' '{ n[$1]++; if (n[$1] > 2) print }' | xargs -r -d '\n' rm -f
 
-      - name: Pubblica in refs/xonos/measure
+      - name: Pubblica in refs/xonos/measures
         if: always()
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -118,4 +118,5 @@ jobs:
           git add -A
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "Misure di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
-          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/xonos/measure
+          # Uno per ramo, così due misure in parallelo non si sovrascrivono: refs/xonos/measures/<ramo con - al posto di />.
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/xonos/measures/${GITHUB_REF_NAME//\//-}"

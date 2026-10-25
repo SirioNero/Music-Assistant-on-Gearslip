@@ -45,6 +45,10 @@ class HomePage : Page() {
     /** Quando si è caricata l'ultima volta (System.currentTimeMillis). */
     internal var loadedAt = 0L
 
+    /** Vero quando ciò che si vede è arrivato da Music Assistant, non dalla Home salvata sul disco. */
+    internal var fresh = false
+    internal var job: Job? = null
+
     /** Una riga di consigli: il suo titolo e cosa c'è dentro. */
     class Row(val row: MaItem, items: Load<List<MaItem>>) {
         var items by mutableStateOf(items)
@@ -85,6 +89,15 @@ class ShelfList(val shelf: Shelf) {
     var error by mutableStateOf<Throwable?>(null)
     var refreshing by mutableStateOf(false)
     internal var job: Job? = null
+
+    /** Vero dopo la prima volta che lo schermo l'ha mostrato (vedi PhoneModel.show). */
+    internal var shown = false
+
+    /** Vero mentre gli elementi sono quelli salvati sul disco, finché non arriva la prima pagina nuova. */
+    internal var stale = false
+
+    /** Il file della cache con la prima pagina, per voce e ordine. */
+    internal val cacheName: String get() = "shelf-${shelf.name.lowercase()}-$order"
 }
 
 /** La scheda Libreria: le voci che hanno qualcosa (null finché non si sa) e quella scelta. */

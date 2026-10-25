@@ -26,6 +26,8 @@ fun describe(context: Context, problem: Problem, detail: String?): String = when
     Problem.NETWORK -> if (detail != null) context.getString(R.string.problem_network, detail) else context.getString(R.string.problem_unreachable)
     Problem.LOST -> context.getString(R.string.problem_lost)
     Problem.NOT_CONNECTED -> context.getString(R.string.problem_not_connected)
+    Problem.BAD_LOGIN -> context.getString(R.string.problem_bad_login)
+    Problem.SETUP_REQUIRED -> context.getString(R.string.problem_setup_required)
     Problem.REFUSED -> if (detail != null) context.getString(R.string.problem_refused, detail) else context.getString(R.string.error_unknown)
 }
 

@@ -56,14 +56,14 @@ internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
         },
     ) {
         LazyColumn(Modifier.fillMaxSize().testTag("home"), contentPadding = PaddingValues(top = top, bottom = 24.dp)) {
-            item(key = "header") {
+            item(key = "header", contentType = "header") {
                 Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
                     IconButton(onClick = model::openSettings) { Icon(XIcons.Settings, stringResource(R.string.settings)) }
                 }
                 ConnectionBanner(model, host)
             }
-            item(key = "recent") {
+            item(key = "recent", contentType = "row") {
                 when (val recent = page.recent) {
                     Load.Loading -> Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                     is Load.Failed -> Problem(host.describe(recent.error), { model.reload(page) })
@@ -74,7 +74,7 @@ internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
             }
             // Le righe vuote (o non riuscite) non si mostrano: sono solo consigli.
             val rows = page.rows.value.orEmpty()
-            items(rows, key = { "${it.row.provider}|${it.row.itemId}" }) { row ->
+            items(rows, key = { "${it.row.provider}|${it.row.itemId}" }, contentType = { "row" }) { row ->
                 val items = row.items.value
                 if (!items.isNullOrEmpty()) {
                     CardRow(row.row.name, items, model, row.row.subtitle, { model.openRow(row) }) { _, item -> model.open(item) }

@@ -4,6 +4,7 @@ import it.xonos.ma.data.Connection
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaItem
 import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.data.objects
 import it.xonos.ma.phone.model.HomePage
@@ -60,13 +61,29 @@ fun main(): Unit = runBlocking {
 
     suspend fun phase(label: String, done: () -> Boolean) {
         synchronized(stalls) { stalls.clear() }
+        val base = heapUsed()
+        // Il picco di memoria durante la fase, campionato ogni 5 ms.
+        var peak = base
+        val sampler = Thread {
+            val r = Runtime.getRuntime()
+            while (!Thread.currentThread().isInterrupted) {
+                peak = maxOf(peak, r.totalMemory() - r.freeMemory())
+                try { Thread.sleep(5) } catch (e: InterruptedException) { break }
+            }
+        }.apply { start() }
         val t = System.nanoTime()
         withTimeout(120_000) { while (!done()) delay(5) }
+        val elapsed = ms(t)
+        sampler.interrupt()
+        sampler.join()
         val blocked = synchronized(stalls) { stalls.toList() }
-        println("$label: ${ms(t)} ms · thread principale fermo oltre un fotogramma ${blocked.size} volte, al massimo ${blocked.maxOrNull() ?: 0} ms")
+        println(
+            "$label: $elapsed ms · thread principale fermo oltre un fotogramma ${blocked.size} volte, al massimo ${blocked.maxOrNull() ?: 0} ms" +
+                " · memoria in più al picco ${(peak - base) / 1_048_576} MB",
+        )
     }
 
-    val model = PhoneModel(repo, library, settings, { "xonos-perf" }, MutableStateFlow(true), scope)
+    val model = PhoneModel(repo, library, settings, ScreenCache(null), { "xonos-perf" }, MutableStateFlow(true), scope)
 
     val home = model.page as HomePage
     scope.launch { model.start(home) }

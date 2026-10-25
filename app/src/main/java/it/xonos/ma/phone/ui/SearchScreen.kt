@@ -122,18 +122,18 @@ private fun Hint() {
 private fun Results(found: SearchResults, model: PhoneModel) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
         found.best?.let { best ->
-            item(key = "best") {
+            item(key = "best", contentType = "best") {
                 SectionTitle(stringResource(R.string.top_result))
                 TopResult(best, model)
             }
         }
         val tracks = found.byType["tracks"].orEmpty()
         if (tracks.isNotEmpty()) {
-            item(key = "tracks") {
+            item(key = "tracks", contentType = "title") {
                 val title = stringResource(R.string.cat_tracks)
                 SectionTitle(title, onSeeAll = if (tracks.size > SHOWN_TRACKS) ({ model.openResults(found, "tracks", title) }) else null)
             }
-            itemsIndexed(tracks.take(SHOWN_TRACKS), key = { i, it -> "t$i|${it.uri}" }) { i, item ->
+            itemsIndexed(tracks.take(SHOWN_TRACKS), key = { i, it -> "t$i|${it.uri}" }, contentType = { _, _ -> "track" }) { i, item ->
                 ItemRow(item, model, { model.play(tracks, i, null) })
             }
         }
@@ -141,7 +141,7 @@ private fun Results(found: SearchResults, model: PhoneModel) {
             if (type == "tracks") continue
             val items = found.byType[type].orEmpty()
             if (items.isEmpty()) continue
-            item(key = type) {
+            item(key = type, contentType = "row") {
                 val title = stringResource(typeName(type))
                 CardRow(title, items, model, onSeeAll = { model.openResults(found, type, title) }) { _, item -> model.open(item) }
             }

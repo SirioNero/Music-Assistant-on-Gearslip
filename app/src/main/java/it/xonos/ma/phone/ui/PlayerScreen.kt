@@ -40,7 +40,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -79,13 +82,16 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.delay
 
-/** La posizione nel brano, aggiornata spesso mentre suona (per la barra e i testi). */
+/**
+ * La posizione nel brano, aggiornata spesso mentre suona (per la barra e i testi). È uno stato da
+ * leggere solo dove serve: chi la legge si ridisegna cinque volte al secondo, gli altri no.
+ */
 @Composable
-private fun rememberPosition(player: PlayerLink, now: NowPlaying): Long {
-    var position by remember { mutableLongStateOf(player.positionMs()) }
+private fun rememberPosition(player: PlayerLink, now: NowPlaying): State<Long> {
+    val position = remember { mutableLongStateOf(player.positionMs()) }
     LaunchedEffect(now.playing, now.buffering, now.uri) {
         while (true) {
-            position = player.positionMs()
+            position.longValue = player.positionMs()
             delay(if (now.playing && !now.buffering) 200 else 1_000)
         }
     }
@@ -118,10 +124,14 @@ internal fun MiniPlayer(now: NowPlaying, player: PlayerLink, model: PhoneModel) 
                 IconButton(onClick = player::next) { Icon(XIcons.Next, stringResource(R.string.next)) }
             }
             if (now.durationMs > 0) {
-                Box(Modifier.fillMaxWidth().height(2.dp).padding(horizontal = 8.dp).background(Color.White.copy(alpha = 0.2f))) {
-                    val fraction = (position.toFloat() / now.durationMs).coerceIn(0f, 1f)
-                    Box(Modifier.fillMaxWidth(fraction).height(2.dp).background(Color.White))
-                }
+                // La posizione si legge mentre si disegna: la barra avanza senza ricomporre il mini-lettore.
+                Box(
+                    Modifier.fillMaxWidth().height(2.dp).padding(horizontal = 8.dp).drawBehind {
+                        drawRect(Color.White.copy(alpha = 0.2f))
+                        val fraction = (position.value.toFloat() / now.durationMs).coerceIn(0f, 1f)
+                        drawRect(Color.White, size = size.copy(width = size.width * fraction))
+                    },
+                )
             }
         }
     }
@@ -236,7 +246,7 @@ private fun BigCover(now: NowPlaying) {
 }
 
 @Composable
-private fun SeekBar(now: NowPlaying, player: PlayerLink, position: Long) {
+private fun SeekBar(now: NowPlaying, player: PlayerLink, position: State<Long>) {
     if (now.durationMs <= 0 || !now.canSeek) {
         // Una radio: niente barra, solo "in diretta".
         Row(Modifier.fillMaxWidth().height(48.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -247,7 +257,7 @@ private fun SeekBar(now: NowPlaying, player: PlayerLink, position: Long) {
         return
     }
     var dragging by remember { mutableStateOf<Float?>(null) }
-    val fraction = dragging ?: (position.toFloat() / now.durationMs).coerceIn(0f, 1f)
+    val fraction = dragging ?: (position.value.toFloat() / now.durationMs).coerceIn(0f, 1f)
     Slider(
         value = fraction,
         onValueChange = { dragging = it },
@@ -358,7 +368,7 @@ private fun NowPlayingMenu(now: NowPlaying, model: PhoneModel) {
 
 /** Il testo del brano: con i tempi segue la musica e si può toccare una riga per andarci. */
 @Composable
-private fun LyricsPanel(now: NowPlaying, model: PhoneModel, player: PlayerLink, position: Long, host: Host) {
+private fun LyricsPanel(now: NowPlaying, model: PhoneModel, player: PlayerLink, position: State<Long>, host: Host) {
     val uri = now.uri?.takeIf { now.mediaType == "track" }
     if (uri == null) {
         Empty(stringResource(R.string.lyrics_none))
@@ -376,10 +386,10 @@ private fun LyricsPanel(now: NowPlaying, model: PhoneModel, player: PlayerLink, 
 }
 
 @Composable
-private fun LyricsLines(lyrics: Lyrics, position: Long, player: PlayerLink) {
+private fun LyricsLines(lyrics: Lyrics, position: State<Long>, player: PlayerLink) {
     val list = rememberLazyListState()
-    // Un attimo prima: la riga si accende quando la si sta per cantare.
-    val current = lyrics.indexAt(position + LYRICS_LEAD_MS)
+    // Un attimo prima: la riga si accende quando la si sta per cantare. Si ricompone solo quando cambia riga.
+    val current by remember(lyrics) { derivedStateOf { lyrics.indexAt(position.value + LYRICS_LEAD_MS) } }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val third = maxHeight / 3
         LaunchedEffect(current) {
@@ -391,7 +401,7 @@ private fun LyricsLines(lyrics: Lyrics, position: Long, player: PlayerLink) {
             // La riga in corso resta a un terzo dall'alto.
             contentPadding = PaddingValues(top = if (lyrics.synced) third else 16.dp, bottom = maxHeight / 2),
         ) {
-            itemsIndexed(lyrics.lines) { i, line ->
+            itemsIndexed(lyrics.lines, contentType = { _, _ -> "line" }) { i, line ->
                 val alpha = when {
                     !lyrics.synced -> 0.9f
                     i == current -> 1f
@@ -420,7 +430,7 @@ private fun QueuePanel(now: NowPlaying, player: PlayerLink) {
     Column(Modifier.fillMaxSize()) {
         Text(stringResource(R.string.queue), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(vertical = 8.dp))
         LazyColumn(state = list, modifier = Modifier.fillMaxSize()) {
-            itemsIndexed(now.queue) { i, entry ->
+            itemsIndexed(now.queue, contentType = { _, _ -> "entry" }) { i, entry ->
                 val current = i == now.queueIndex
                 Row(
                     Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp))

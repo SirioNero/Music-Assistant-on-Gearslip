@@ -50,6 +50,8 @@
     <string name="problem_unreachable">无法访问 Music Assistant</string>
     <string name="problem_lost">连接已断开，正在重新连接</string>
     <string name="problem_not_connected">未连接到 Music Assistant</string>
+    <string name="problem_bad_login">用户名或密码错误</string>
+    <string name="problem_setup_required">此 Music Assistant 还没有账户：请创建第一个</string>
     <string name="problem_refused">Music Assistant：%s</string>
     <string name="problem_not_configured">请在手机上设置 Xonos</string>
     <string name="error_unknown">未知错误</string>

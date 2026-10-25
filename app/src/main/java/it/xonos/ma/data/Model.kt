@@ -49,6 +49,12 @@ enum class Problem {
     /** Non c'è una connessione aperta. */
     NOT_CONNECTED,
 
+    /** Nome utente o password sbagliati. */
+    BAD_LOGIN,
+
+    /** Un Music Assistant appena installato, senza nessun account: va creato il primo. */
+    SETUP_REQUIRED,
+
     /** Music Assistant ha rifiutato la richiesta (dettaglio: il suo messaggio). */
     REFUSED,
 }
@@ -63,7 +69,13 @@ data class ServerInfo(
      * si apre dopo quella dell'API, quindi va riaperta a ogni riconnessione dell'API.
      */
     val limitedPlayers: Boolean = false,
+    /** Chi ha fatto l'accesso (il nome da mostrare) e il suo ruolo: "admin", "user", "guest"... */
+    val user: String? = null,
+    val role: String? = null,
 ) {
+    /** Solo gli amministratori gestiscono i servizi di Music Assistant. */
+    val admin: Boolean get() = role == "admin"
+
     companion object {
         fun from(info: JSONObject): ServerInfo? {
             if (info.str("server_id") == null) return null

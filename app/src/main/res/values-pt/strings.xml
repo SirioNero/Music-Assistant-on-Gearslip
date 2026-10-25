@@ -51,6 +51,8 @@
     <string name="problem_unreachable">O Music Assistant está inacessível</string>
     <string name="problem_lost">Conexão perdida, reconectando</string>
     <string name="problem_not_connected">Sem conexão com o Music Assistant</string>
+    <string name="problem_bad_login">Usuário ou senha incorretos</string>
+    <string name="problem_setup_required">Este Music Assistant ainda não tem contas: crie a primeira</string>
     <string name="problem_refused">Music Assistant: %s</string>
     <string name="problem_not_configured">Configure o Xonos no telefone</string>
     <string name="error_unknown">erro desconhecido</string>
