@@ -191,6 +191,14 @@ class SettingsPage(home: String, remote: String, token: String, name: String, si
     var results by mutableStateOf<List<ConnectionCheck.Result>>(emptyList())
 }
 
+/** "Aggiungi a una playlist": dove mettere [uri] (un brano, un album o una playlist), o una playlist nuova. */
+class PlaylistPicker(val uri: String) {
+    var playlists by mutableStateOf<Load<List<MaItem>>>(Load.Loading)
+
+    /** Mentre si crea la playlist nuova. */
+    var creating by mutableStateOf(false)
+}
+
 /** La scelta "Suona su": i lettori di Music Assistant e il telefono. */
 class DevicePicker {
     var devices by mutableStateOf<Load<List<Device>>>(Load.Loading)

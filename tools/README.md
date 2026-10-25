@@ -31,6 +31,7 @@ MA_TOKEN=... LANG_XONOS=it QUERIES="vasco,podcast morning" build/install/harness
 | `PlayersCheckKt` | "Suona su": il telefono e una cassa finta (Sendspin con un altro `product_name`, che MA mostra come Universal Player dopo ~15 s). La coda passa alla cassa e torna dallo stesso punto, comandi e volume della cassa, "suona" va al lettore scelto, lo schermo torna al telefono se questo suona da sé |
 | `LatencyCheckKt` | Quanto passa da play e da avanti al primo suono, e quanto ne pesa Music Assistant e quanto il telefono (`LEAD_MS`, `BUFFER_MS`; `SOURCE=slow` per una sorgente alla velocità della musica, come Spotify Soloist) |
 | `ArtCheckKt` | Le copertine per auto, notifica e lettore (`ArtCache`): la stessa copertina chiesta da 4 parti insieme, come al cambio di brano, arriva a tutte; per confronto il modo di prima, dove una richiesta su tre restava senza |
+| `PlaylistCheckKt` | Le playlist modificabili: crea, aggiunge (un album diventa i suoi brani, i doppioni si saltano), toglie per posizione, `PlaylistRemover` con tocchi veloci, poi lo stesso dal `PhoneModel` ("Aggiungi a una playlist", nuova playlist, "Togli", "Elimina"). Cancella le playlist di prova |
 | `SearchCheckKt` | La ricerca del telefono: dopo quanto compaiono i risultati della libreria e dopo quanto quelli dei servizi (`QUERY`, separate da virgole). MA ricorda le ricerche: serve una parola nuova, e un servizio lento (`SEARCH_DELAY` del finto iTunes) |
 | `ServicesCheckKt` | I servizi di MA con il servizio finto `xonos_test`: elenco, icone, flusso (modulo con errore, accesso "nel browser", fine), opzioni, pulsante, riconfigura, rimozione; poi lo stesso dal `PhoneModel` (anche la fine ricavata al ritorno nell'app) e la lingua dei moduli |
 
@@ -56,9 +57,9 @@ cd tools/screens && sh sync.sh && gradle -q installDist
 JAVA_OPTS="-Dxonos.out=/tmp/shots -Dxonos.lang=it -Dxonos.only=home,player" build/install/screens/bin/screens
 ```
 
-Le scene: `home`, `library`, `album`, `artist`, `search`, `player`, `lyrics`, `queue`, `podcast`,
-`settings`, `welcome`, `services`, `add-service`, `service-flow`, `service-login`, `service`,
-`play-on`, `remote`, `remote-mini`
+Le scene: `home`, `library`, `album`, `artist`, `artist-more`, `search`, `player`, `lyrics`, `queue`,
+`podcast`, `settings`, `welcome`, `services`, `add-service`, `service-flow`, `service-login`, `service`,
+`play-on`, `remote`, `remote-mini`, `add-to-playlist`
 (1080×2340, densità 2,625). Le scritte sono nella lingua di `-Dxonos.lang`.
 
 ## Il Music Assistant di prova (`ma-test/`)

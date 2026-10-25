@@ -165,6 +165,8 @@ internal fun ItemRow(
     subtitle: String? = item.subtitle,
     current: Boolean = false,
     showAlbum: Boolean = true,
+    /** "Togli da questa playlist", dentro una playlist che si può modificare. */
+    onRemove: (() -> Unit)? = null,
 ) {
     Row(
         modifier.testTag("item_row").fillMaxWidth().clickable(onClick = onClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
@@ -204,7 +206,7 @@ internal fun ItemRow(
                 modifier = Modifier.padding(start = 8.dp),
             )
         }
-        ItemMenu(item, model, showAlbum)
+        ItemMenu(item, model, showAlbum, onRemove)
     }
 }
 
@@ -223,9 +225,19 @@ private fun rowSubtitle(item: MaItem, subtitle: String?): String? {
     }
 }
 
-/** I tre puntini di un elemento: suona dopo, in coda, vai all'album o all'artista. */
+/**
+ * I tre puntini di un elemento: suona dopo, in coda, in una playlist, vai all'album o all'artista.
+ * Dentro una playlist modificabile anche "Togli" ([onRemove]); per una playlist di Music
+ * Assistant "Elimina" ([onDelete]).
+ */
 @Composable
-internal fun ItemMenu(item: MaItem, model: PhoneModel, showAlbum: Boolean = true) {
+internal fun ItemMenu(
+    item: MaItem,
+    model: PhoneModel,
+    showAlbum: Boolean = true,
+    onRemove: (() -> Unit)? = null,
+    onDelete: (() -> Unit)? = null,
+) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }) {
@@ -242,6 +254,18 @@ internal fun ItemMenu(item: MaItem, model: PhoneModel, showAlbum: Boolean = true
                     model.addToQueue(item)
                 }
             }
+            if (item.mediaType in PLAYLIST_ADDABLE) {
+                MenuEntry(XIcons.PlaylistAdd, stringResource(R.string.add_to_playlist)) {
+                    open = false
+                    model.addToPlaylist(item.uri)
+                }
+            }
+            if (onRemove != null) {
+                MenuEntry(XIcons.PlaylistRemove, stringResource(R.string.remove_from_playlist)) {
+                    open = false
+                    onRemove()
+                }
+            }
             val album = item.album
             if (showAlbum && album != null) {
                 MenuEntry(XIcons.Album, stringResource(R.string.go_to_album)) {
@@ -255,9 +279,18 @@ internal fun ItemMenu(item: MaItem, model: PhoneModel, showAlbum: Boolean = true
                     model.openUri(artist.uri)
                 }
             }
+            if (onDelete != null) {
+                MenuEntry(XIcons.Delete, stringResource(R.string.delete_playlist)) {
+                    open = false
+                    onDelete()
+                }
+            }
         }
     }
 }
+
+/** Cosa si può mettere in una playlist: Music Assistant apre album e playlist nei loro brani. */
+private val PLAYLIST_ADDABLE = setOf("track", "album", "playlist")
 
 @Composable
 internal fun MenuEntry(icon: ImageVector, text: String, onClick: () -> Unit) {

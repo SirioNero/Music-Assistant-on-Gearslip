@@ -119,10 +119,14 @@ class Library(private val repo: MaRepository) {
 
     /**
      * Le playlist lunghe arrivano a pezzi e un servizio come Spotify può metterci un po': [onPart]
-     * riceve i brani arrivati fin lì, per mostrarli subito.
+     * riceve i brani arrivati fin lì, per mostrarli subito. Music Assistant tiene i brani delle
+     * playlist in una cache, che dopo una modifica a volte resta vecchia: [fresh] la salta.
      */
-    suspend fun playlistTracks(playlist: MaItem, onPart: ((List<MaItem>) -> Unit)? = null) =
-        items("music/playlists/playlist_tracks", 90_000, onPart) { identify(playlist) }
+    suspend fun playlistTracks(playlist: MaItem, onPart: ((List<MaItem>) -> Unit)? = null, fresh: Boolean = false) =
+        items("music/playlists/playlist_tracks", 90_000, onPart) {
+            identify(playlist)
+            if (fresh) put("force_refresh", true)
+        }
 
     /** Gli album di un artista: quelli della libreria e tutti quelli dei servizi dove l'artista c'è. */
     suspend fun artistAlbums(artist: MaItem, onPart: ((List<MaItem>) -> Unit)? = null) = everywhere(artist, onPart) { provider, id ->
@@ -231,6 +235,42 @@ class Library(private val repo: MaRepository) {
             if (startItem != null) put("start_item", startItem)
             // Dalla 2.10 un album suona in ordine anche con il casuale acceso, se non si chiede altro.
             if (shuffle) put("shuffle", true)
+        }
+    }
+
+    /** Le playlist della libreria in cui si possono mettere brani: quelle di Music Assistant e dei servizi che lo permettono. */
+    suspend fun editablePlaylists(): List<MaItem> = libraryItems("playlists").filter { it.editable && it.provider == "library" }
+
+    /**
+     * Mette in fondo alla playlist [playlist] (della libreria) brani, album o playlist: Music
+     * Assistant apre album e playlist nei loro brani, salta quelli che ci sono già e, per la
+     * playlist di un servizio, cerca lì lo stesso brano. Dalla 2.10 lo fa poco dopo, in disparte.
+     */
+    suspend fun addToPlaylist(playlist: MaItem, uris: List<String>) {
+        repo.command("music/playlists/add_playlist_tracks", 60_000) {
+            put("db_playlist_id", playlist.itemId)
+            put("uris", JSONArray(uris))
+        }
+    }
+
+    /** Toglie dalla playlist i brani ai posti [positions] (da 1, vedi [MaItem.position]). */
+    suspend fun removeFromPlaylist(playlist: MaItem, positions: List<Int>) {
+        repo.command("music/playlists/remove_playlist_tracks", 60_000) {
+            put("db_playlist_id", playlist.itemId)
+            put("positions_to_remove", JSONArray(positions))
+        }
+    }
+
+    /** Una playlist nuova di Music Assistant, che accetta brani di tutti i servizi. */
+    suspend fun createPlaylist(name: String): MaItem =
+        (repo.command("music/playlists/create_playlist") { put("name", name) } as? JSONObject)?.let(MaItem::from)
+            ?: throw MaException("Playlist non creata")
+
+    /** Toglie un elemento dalla libreria; una playlist di Music Assistant sparisce del tutto. */
+    suspend fun removeFromLibrary(item: MaItem) {
+        repo.command("music/library/remove_item") {
+            put("media_type", item.mediaType)
+            put("library_item_id", item.itemId)
         }
     }
 

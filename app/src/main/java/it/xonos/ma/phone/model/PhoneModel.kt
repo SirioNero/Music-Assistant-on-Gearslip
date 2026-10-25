@@ -14,6 +14,7 @@ import it.xonos.ma.data.MaException
 import it.xonos.ma.data.MaImage
 import it.xonos.ma.data.MaItem
 import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.PlaylistRemover
 import it.xonos.ma.data.Problem
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
@@ -52,6 +53,13 @@ sealed interface Notice {
     data object FavoriteAdded : Notice
     data object FavoriteRemoved : Notice
     data object Saved : Notice
+
+    /** Messo nella playlist [name] (anche appena creata). */
+    data class AddedTo(val name: String) : Notice
+
+    /** Tolto dalla playlist [name]. */
+    data class RemovedFrom(val name: String) : Notice
+    data object PlaylistDeleted : Notice
     data object Removed : Notice
 
     /** La musica ora suona su questo lettore (null: sul telefono). */
@@ -473,7 +481,7 @@ class PhoneModel(
         launchLoad({ error -> page.more = false; partFailed(error, page.tracks is Load.Ready) { page.tracks = Load.Failed(error) } }) {
             val all = when (item.mediaType) {
                 "album" -> library.albumTracks(item)
-                "playlist" -> library.playlistTracks(item, part)
+                "playlist" -> library.playlistTracks(item, part, fresh = recentlyEdited(item))
                 "podcast" -> library.podcastEpisodes(item, part)
                 "genre" -> library.genreTracks(item)
                 else -> emptyList()
@@ -750,6 +758,133 @@ class PhoneModel(
         remote = null
     }
 
+    // ---------- Playlist ----------
+
+    /** "Aggiungi a una playlist", quando è aperta. */
+    var playlistPicker by mutableStateOf<PlaylistPicker?>(null)
+        private set
+
+    /** Le playlist cambiate da qui, e quando: per un po' i loro brani si chiedono senza la cache di Music Assistant. */
+    private val edited = mutableMapOf<String, Long>()
+    private val removers = mutableMapOf<String, PlaylistRemover>()
+
+    private fun recentlyEdited(playlist: MaItem) = edited[playlist.uri]?.let { System.currentTimeMillis() - it < EDITED_MS } == true
+
+    /** Una playlist in cui da qui si possono mettere e togliere brani (le playlist della libreria che lo permettono). */
+    fun canEdit(item: MaItem) = item.mediaType == "playlist" && item.provider == "library" && item.editable
+
+    /** Le playlist di Music Assistant stesso si possono anche cancellare; quelle dei servizi no. */
+    fun canDelete(item: MaItem) = canEdit(item) && item.mappings.any { (provider, _) -> provider == "builtin" }
+
+    /** Apre "Aggiungi a una playlist" per un brano, un album o una playlist. */
+    fun addToPlaylist(uri: String) {
+        val picker = PlaylistPicker(uri)
+        playlistPicker = picker
+        loadPlaylists(picker)
+    }
+
+    fun loadPlaylists(picker: PlaylistPicker) {
+        picker.playlists = Load.Loading
+        launchLoad({ picker.playlists = Load.Failed(it) }) { picker.playlists = Load.Ready(library.editablePlaylists()) }
+    }
+
+    fun closePlaylists() {
+        playlistPicker = null
+    }
+
+    /** Mette in fondo a [playlist] ciò che si era scelto: Music Assistant salta i brani che ci sono già. */
+    fun addTo(picker: PlaylistPicker, playlist: MaItem) {
+        playlistPicker = null
+        scope.launch {
+            try {
+                library.addToPlaylist(playlist, listOf(picker.uri))
+                edited[playlist.uri] = System.currentTimeMillis()
+                notice = Notice.AddedTo(playlist.name)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notice = Notice.Failed(e)
+            }
+        }
+    }
+
+    /** Una playlist nuova di Music Assistant, con dentro ciò che si era scelto. */
+    fun createPlaylist(picker: PlaylistPicker, name: String) {
+        val clean = name.trim()
+        if (clean.isEmpty() || picker.creating) return
+        picker.creating = true
+        scope.launch {
+            try {
+                val playlist = library.createPlaylist(clean)
+                library.addToPlaylist(playlist, listOf(picker.uri))
+                edited[playlist.uri] = System.currentTimeMillis()
+                if (playlistPicker === picker) playlistPicker = null
+                notice = Notice.AddedTo(playlist.name)
+                playlistsChanged()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notice = Notice.Failed(e)
+            } finally {
+                picker.creating = false
+            }
+        }
+    }
+
+    /**
+     * Toglie un brano dalla playlist aperta: sparisce subito dall'elenco, Music Assistant lo toglie
+     * poco dopo (vedi [PlaylistRemover]). Se non ci riesce, l'elenco torna quello vero.
+     */
+    fun removeFromPlaylist(page: ItemPage, track: MaItem) {
+        val playlist = page.item
+        val list = page.tracks.value ?: return
+        val index = list.indexOf(track)
+        if (index < 0) return
+        page.tracks = Load.Ready(list.toMutableList().apply { removeAt(index) })
+        edited[playlist.uri] = System.currentTimeMillis()
+        removers.getOrPut(playlist.uri) {
+            PlaylistRemover(scope, library, playlist, { _, result ->
+                edited[playlist.uri] = System.currentTimeMillis()
+                result.onFailure { error ->
+                    notice = Notice.Failed(error)
+                    // La playlist mostrata in quel momento torna quella vera.
+                    (this@PhoneModel.page as? ItemPage)?.takeIf { it.item.uri == playlist.uri }?.let(::reload)
+                }
+            })
+        }.remove(track.uri)
+        notice = Notice.RemovedFrom(playlist.name)
+    }
+
+    /** Cancella una playlist di Music Assistant (vedi [canDelete]) e torna indietro. */
+    fun deletePlaylist(page: ItemPage) {
+        val playlist = page.item
+        scope.launch {
+            try {
+                library.removeFromLibrary(playlist)
+                val stack = stacks.getValue(tab)
+                if (stack.lastOrNull() === page) back()
+                playlistsChanged(gone = playlist.uri)
+                notice = Notice.PlaylistDeleted
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notice = Notice.Failed(e)
+            }
+        }
+    }
+
+    /** Le playlist della libreria sono cambiate: gli elenchi già aperti si aggiornano. */
+    private fun playlistsChanged(gone: String? = null) {
+        for (stack in stacks.values) {
+            for (page in stack) {
+                if (page !is LibraryPage) continue
+                val list = page.lists[Shelf.PLAYLISTS] ?: continue
+                if (gone != null) list.items.removeAll { it.uri == gone }
+                if (list.shown) refresh(list, quiet = true)
+            }
+        }
+    }
+
     // ---------- Preferiti ----------
 
     fun setFavorite(page: ItemPage, favorite: Boolean) = favorite(page.item, favorite) { page.favorite = it }
@@ -954,6 +1089,9 @@ class PhoneModel(
         const val CONNECT_TIMEOUT_MS = 20_000L
         const val READY_TIMEOUT_MS = 20_000L
         const val LYRICS_KEPT = 20
+
+        /** Per quanto, dopo una modifica da qui, i brani di una playlist si chiedono senza cache. */
+        const val EDITED_MS = 10 * 60_000L
         const val LYRICS_WAIT_MS = 8_000L
         const val STALE_MS = 10 * 60_000L
         const val HOME_CACHE = "home"

@@ -129,6 +129,7 @@ fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
                 shown?.let { PlayerScreen(it, link, model, host) }
             }
             model.picker?.let { DevicesSheet(it, model, host) }
+            model.playlistPicker?.let { PlaylistSheet(it, model, host) }
         }
         PlatformBackHandler(enabled = configured && (model.playerOpen || model.depth > 0 || model.tab != Tab.HOME)) { model.back() }
     }
@@ -183,6 +184,9 @@ private fun Notices(model: PhoneModel, host: Host, snackbar: SnackbarHostState) 
         Notice.FavoriteAdded -> stringResource(R.string.notice_favorite_added)
         Notice.FavoriteRemoved -> stringResource(R.string.notice_favorite_removed)
         Notice.Saved -> stringResource(R.string.notice_saved)
+        is Notice.AddedTo -> stringResource(R.string.notice_added_to, notice.name)
+        is Notice.RemovedFrom -> stringResource(R.string.notice_removed_from, notice.name)
+        Notice.PlaylistDeleted -> stringResource(R.string.notice_playlist_deleted)
         Notice.Removed -> stringResource(R.string.notice_removed)
         is Notice.Moved -> notice.device?.let { stringResource(R.string.notice_moved, it) } ?: stringResource(R.string.notice_moved_phone)
         is Notice.Failed -> host.describe(notice.error)

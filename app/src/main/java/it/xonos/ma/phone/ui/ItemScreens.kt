@@ -20,16 +20,20 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,6 +71,9 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
     val tracks = page.tracks.value.orEmpty()
     // Nei podcast l'ordine è quello delle puntate, non un "da qui in poi".
     val numbered = item.mediaType == "album"
+    // Nelle playlist che si possono modificare i brani si tolgono dal loro menu.
+    val editable = model.canEdit(item)
+    var confirmDelete by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
             item(key = "header", contentType = "header") {
@@ -91,7 +98,7 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
                     },
                     favorite = page.favorite.takeIf { item.mediaType != "genre" },
                     onFavorite = { model.setFavorite(page, it) },
-                    menu = { ItemMenu(item, model) },
+                    menu = { ItemMenu(item, model, onDelete = if (model.canDelete(item)) ({ confirmDelete = true }) else null) },
                 )
             }
             loaded(page.tracks, host, { model.reload(page) }) { list ->
@@ -104,6 +111,7 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
                         subtitle = if (numbered) track.artists.joinToString(", ") { it.name }.ifEmpty { null } else track.subtitle,
                         current = playingUri == track.uri,
                         showAlbum = item.mediaType != "album",
+                        onRemove = if (editable) ({ model.removeFromPlaylist(page, track) }) else null,
                     )
                 }
             }
@@ -121,6 +129,20 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
             }
         }
         TopBar(item.name, state, model)
+    }
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.delete_playlist)) },
+            text = { Text(stringResource(R.string.delete_playlist_confirm, item.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDelete = false
+                    model.deletePlaylist(page)
+                }) { Text(stringResource(R.string.delete)) }
+            },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.flow_cancel)) } },
+        )
     }
 }
 

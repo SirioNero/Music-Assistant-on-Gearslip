@@ -143,6 +143,10 @@ data class MaItem(
     /** Episodi e audiolibri: dove si era arrivati e se è stato ascoltato fino in fondo. */
     val resumeMs: Long = 0,
     val fullyPlayed: Boolean = false,
+    /** Il posto di un brano nella sua playlist (da 1): serve per toglierlo. */
+    val position: Int = 0,
+    /** Una playlist in cui si possono aggiungere e togliere brani. */
+    val editable: Boolean = false,
 ) {
     /** Cosa si apre come elenco; il resto si suona e basta. */
     val browsable: Boolean get() = mediaType in BROWSABLE
@@ -181,6 +185,8 @@ data class MaItem(
                 discNumber = o.optInt("disc_number"),
                 resumeMs = o.optLong("resume_position_ms"),
                 fullyPlayed = o.optBoolean("fully_played"),
+                position = o.optInt("position"),
+                editable = o.optBoolean("is_editable"),
             )
         }
 

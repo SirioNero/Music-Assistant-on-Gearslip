@@ -74,6 +74,11 @@ object Catalog {
 
     fun playlist(id: String, name: String, owner: String) = MaItem.from(base("playlist", id, name, id).put("owner", owner))!!
 
+    /** Una playlist della libreria in cui si può aggiungere, del servizio [provider]. */
+    fun playlistJson(id: String, name: String, owner: String, provider: String): JSONObject = base("playlist", id, name, id)
+        .put("owner", owner).put("is_editable", true)
+        .put("provider_mappings", JSONArray().put(JSONObject().put("provider_instance", provider).put("provider_domain", provider.substringBefore("--")).put("item_id", id)))
+
     fun podcast(id: String, name: String, publisher: String) = MaItem.from(base("podcast", id, name, id).put("publisher", publisher))!!
 
     fun episode(podcast: String, n: Int, name: String, minutes: Int, resumeMinutes: Int = 0, played: Boolean = false) = MaItem.from(

@@ -186,6 +186,14 @@ private fun answer(command: String, args: JSONObject): Any? = when (command) {
         if (n != null && album in Catalog.ALBUMS) Catalog.trackJson(album, n) else null
     }
     "metadata/get_track_lyrics" -> JSONArray().put(JSONObject.NULL).put(Catalog.LYRICS)
+    // Le playlist in cui si può aggiungere (le prime due di Music Assistant, l'ultima di Spotify).
+    "music/playlists/library_items" -> JSONArray(
+        listOf(
+            Catalog.playlistJson("viaggio", "Viaggio in auto", "Xonos", "builtin"),
+            Catalog.playlistJson("cantautori", "Cantautori", "Xonos", "builtin"),
+            Catalog.playlistJson("estate", "Estate 2026", "Spotify", "spotify--abc"),
+        ),
+    )
     // "Suona su": le casse di casa; nel salotto suona Emozioni.
     "players/all" -> JSONArray(PLAYERS.map { JSONObject(it) })
     "player_queues/get" -> if (args.optString("queue_id") == "salotto") salottoQueue() else null
@@ -313,6 +321,12 @@ private val SCENES = listOf(
                 started = true
             },
         )
+    },
+    // "Aggiungi a una playlist" da un brano dell'album.
+    "add-to-playlist" to Scene {
+        select(Tab.LIBRARY)
+        push(ItemPage(Catalog.album("emozioni")).apply { tracks = ready(EMOZIONI); started = true })
+        addToPlaylist(EMOZIONI[0].uri)
     },
     // L'artista mentre i servizi rispondono ancora: si vede la libreria, con le rotelle (senza i più
     // ascoltati, che li danno solo i servizi).

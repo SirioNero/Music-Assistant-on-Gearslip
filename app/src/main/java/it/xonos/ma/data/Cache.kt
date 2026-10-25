@@ -72,6 +72,8 @@ fun MaItem.toCache(): JSONObject = JSONObject()
     .put("disc", discNumber)
     .put("resume", resumeMs)
     .put("played", fullyPlayed)
+    .put("position", position)
+    .put("editable", editable)
 
 /** Il contrario di [toCache]; null se il file è di una versione che non si capisce. */
 fun cachedItem(o: JSONObject): MaItem? {
@@ -101,6 +103,8 @@ fun cachedItem(o: JSONObject): MaItem? {
         discNumber = o.optInt("disc"),
         resumeMs = o.optLong("resume"),
         fullyPlayed = o.optBoolean("played"),
+        position = o.optInt("position"),
+        editable = o.optBoolean("editable"),
     )
 }
 

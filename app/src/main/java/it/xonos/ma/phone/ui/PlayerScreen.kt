@@ -343,10 +343,11 @@ private fun PanelButton(icon: ImageVector, label: Int, model: PhoneModel, panel:
     }
 }
 
-/** I tre puntini del lettore: vai all'album, vai all'artista. */
+/** I tre puntini del lettore: in una playlist, vai all'album, vai all'artista. */
 @Composable
 private fun NowPlayingMenu(now: NowPlaying, model: PhoneModel) {
-    if (now.albumUri == null && now.artistUri == null) {
+    val track = now.uri?.takeIf { now.mediaType == "track" }
+    if (track == null && now.albumUri == null && now.artistUri == null) {
         Spacer(Modifier.width(48.dp))
         return
     }
@@ -354,6 +355,12 @@ private fun NowPlayingMenu(now: NowPlaying, model: PhoneModel) {
     Box {
         IconButton(onClick = { open = true }) { Icon(XIcons.More, stringResource(R.string.more)) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            track?.let { uri ->
+                MenuEntry(XIcons.PlaylistAdd, stringResource(R.string.add_to_playlist)) {
+                    open = false
+                    model.addToPlaylist(uri)
+                }
+            }
             now.albumUri?.let { uri ->
                 MenuEntry(XIcons.Album, stringResource(R.string.go_to_album)) {
                     open = false
