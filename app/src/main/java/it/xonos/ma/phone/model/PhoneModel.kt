@@ -178,32 +178,105 @@ class PhoneModel(
         start(page)
     }
 
-    private fun loadHome(page: HomePage) {
-        page.recent = Load.Loading
-        page.rows = Load.Loading
-        launchLoad({ page.recent = Load.Failed(it) }) {
-            page.recent = Load.Ready(library.recent(RECENT))
+    /**
+     * La Home. Aggiornandola ([refresh]) resta quello che c'era finché non arriva il nuovo, e una
+     * riga che non si carica non toglie quella di prima.
+     */
+    private fun loadHome(page: HomePage, refresh: Boolean = false) {
+        if (!refresh) {
+            page.recent = Load.Loading
+            page.rows = Load.Loading
         }
-        launchLoad({ page.rows = Load.Failed(it) }) {
-            // La riga "Recently played" dei consigli ripete la prima della Home.
-            val rows = library.recommendations().filter { it.mediaType == "folder" && it.itemId != "recently_played" }.map { row ->
-                HomePage.Row(row, if (row.inline.isNotEmpty()) Load.Ready(row.inline) else Load.Loading)
+        page.loadedAt = System.currentTimeMillis()
+        val recent = scope.launch {
+            try {
+                awaitConnected()
+                page.recent = Load.Ready(library.recent(RECENT))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (!refresh || page.recent !is Load.Ready) page.recent = Load.Failed(e)
             }
-            page.rows = Load.Ready(rows)
-            coroutineScope {
-                rows.filter { it.items is Load.Loading }.map { row ->
-                    async {
-                        row.items = try {
-                            Load.Ready(library.recommendationItems(row.row))
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            Load.Failed(e)
-                        }
+        }
+        val rows = scope.launch {
+            try {
+                awaitConnected()
+                loadRows(page, refresh)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (!refresh || page.rows !is Load.Ready) page.rows = Load.Failed(e)
+            }
+        }
+        if (refresh) {
+            page.refreshing = true
+            scope.launch {
+                recent.join()
+                rows.join()
+                page.refreshing = false
+            }
+        }
+    }
+
+    private suspend fun loadRows(page: HomePage, refresh: Boolean) {
+        // La riga "Recently played" dei consigli ripete la prima della Home.
+        val rows = library.recommendations().filter { it.mediaType == "folder" && it.itemId != "recently_played" }.map { row ->
+            HomePage.Row(row, if (row.inline.isNotEmpty()) Load.Ready(row.inline) else Load.Loading)
+        }
+        // La prima volta le righe compaiono man mano; aggiornando, tutte insieme alla fine.
+        if (!refresh) page.rows = Load.Ready(rows)
+        coroutineScope {
+            rows.filter { it.items is Load.Loading }.map { row ->
+                async {
+                    row.items = try {
+                        Load.Ready(library.recommendationItems(row.row))
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Load.Failed(e)
                     }
-                }.awaitAll()
+                }
+            }.awaitAll()
+        }
+        if (refresh) page.rows = Load.Ready(rows)
+    }
+
+    /** Trascinando in giù: si ricarica la Home o l'elenco della libreria, tenendo quello di prima intanto. */
+    fun refresh(page: HomePage) {
+        if (!page.refreshing) loadHome(page, refresh = true)
+    }
+
+    fun refresh(list: ShelfList) {
+        if (list.refreshing) return
+        list.job?.cancel()
+        list.refreshing = true
+        list.loading = false
+        list.job = scope.launch {
+            try {
+                awaitConnected()
+                val shelf = list.shelf
+                val first = when (shelf) {
+                    Shelf.BROWSE -> library.browse(null)
+                    else -> library.libraryPage(shelf.kind, 0, orderBy = list.order, favorite = if (shelf.favorite) true else null)
+                }
+                list.items.clear()
+                list.items.addAll(first)
+                list.end = shelf == Shelf.BROWSE || first.size < Library.PHONE_PAGE
+                list.error = null
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                list.error = e
+            } finally {
+                list.refreshing = false
             }
         }
+    }
+
+    /** Tornando nell'app: una Home vecchia di più di dieci minuti si aggiorna da sola. */
+    fun wake() {
+        val home = stacks.getValue(Tab.HOME).first() as HomePage
+        if (home.started && System.currentTimeMillis() - home.loadedAt > STALE_MS) refresh(home)
     }
 
     private fun loadShelves(page: LibraryPage) {
@@ -542,6 +615,7 @@ class PhoneModel(
         const val CONNECT_TIMEOUT_MS = 20_000L
         const val READY_TIMEOUT_MS = 20_000L
         const val LYRICS_KEPT = 20
+        const val STALE_MS = 10 * 60_000L
 
         val TRACK_LIKE = setOf("track", "podcast_episode", "audiobook")
     }

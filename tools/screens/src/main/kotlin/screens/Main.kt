@@ -82,7 +82,7 @@ private fun draw() {
         watchdog(name) { shoot(File(out, "$name-$lang.png"), lang, scene) }
         println("$name-$lang.png in ${(System.nanoTime() - t0) / 1_000_000} ms")
     }
-    server.stop()
+    // Il server finto non si spegne: aspetterebbe i WebSocket ancora aperti. Ci pensa exitProcess.
 }
 
 /** Se una scena non finisce in un minuto, si stampano i thread (per capire dove si è fermata) e si esce. */
@@ -141,7 +141,7 @@ private fun shoot(file: File, lang: String, scene: Scene) {
     repo.release()
 }
 
-private const val SETTLE_NS = 3_000_000_000L
+private const val SETTLE_NS = 2_500_000_000L
 
 /** Cosa risponde il Music Assistant finto: il brano che suona e il suo testo; il resto è vuoto. */
 private fun answer(command: String, args: JSONObject): Any? = when (command) {

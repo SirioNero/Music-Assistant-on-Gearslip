@@ -89,6 +89,7 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         // Finché l'app è in vista, il telefono è collegato a Music Assistant e il servizio (il lettore) è acceso.
         app.repo.acquire()
+        app.phone.wake()
         val token = SessionToken(this, ComponentName(this, PlaybackService::class.java))
         val future = MediaController.Builder(this, token).buildAsync()
         controller = future

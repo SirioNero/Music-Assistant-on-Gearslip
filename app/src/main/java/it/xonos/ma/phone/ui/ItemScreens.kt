@@ -77,7 +77,12 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
                 )
                 PlayBar(
                     onPlay = { if (item.mediaType == "genre") model.playAll(tracks, false) else model.play(item) },
-                    onShuffle = { if (item.mediaType == "genre") model.playAll(tracks, true) else model.play(item, shuffle = true) },
+                    // Le puntate di un podcast non si mescolano.
+                    onShuffle = when (item.mediaType) {
+                        "podcast" -> null
+                        "genre" -> ({ model.playAll(tracks, true) })
+                        else -> ({ model.play(item, shuffle = true) })
+                    },
                     favorite = page.favorite.takeIf { item.mediaType != "genre" },
                     onFavorite = { model.setFavorite(page, it) },
                     menu = { ItemMenu(item, model) },

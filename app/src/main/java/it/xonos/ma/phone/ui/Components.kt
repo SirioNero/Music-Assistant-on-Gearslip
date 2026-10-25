@@ -267,7 +267,7 @@ internal fun MenuEntry(icon: ImageVector, text: String, onClick: () -> Unit) {
 @Composable
 internal fun PlayBar(
     onPlay: () -> Unit,
-    onShuffle: () -> Unit,
+    onShuffle: (() -> Unit)?,
     favorite: Boolean? = null,
     onFavorite: (Boolean) -> Unit = {},
     menu: @Composable () -> Unit = {},
@@ -284,8 +284,10 @@ internal fun PlayBar(
         }
         menu()
         Spacer(Modifier.weight(1f))
-        IconButton(onClick = onShuffle) {
-            Icon(XIcons.Shuffle, stringResource(R.string.shuffle), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (onShuffle != null) {
+            IconButton(onClick = onShuffle) {
+                Icon(XIcons.Shuffle, stringResource(R.string.shuffle), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
         Spacer(Modifier.width(8.dp))
         FilledIconButton(

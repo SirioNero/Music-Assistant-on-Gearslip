@@ -107,6 +107,10 @@ fun main(): Unit = runBlocking {
     delay(2_000)
     rows?.take(6)?.forEach { row -> println("   - ${row.row.name}: ${row.items.value?.size ?: row.items}") }
     check("Home: ascoltati di recente", loaded { home.recent } != null)
+    model.refresh(home)
+    check("Home: aggiornando resta quello di prima", home.refreshing && home.recent is Load.Ready && home.rows is Load.Ready)
+    withTimeoutOrNull(30_000) { while (home.refreshing) delay(50) }
+    check("Home: aggiornata", !home.refreshing && (home.rows as? Load.Ready)?.value?.size == rows?.size)
 
     // ---------- Libreria ----------
     model.select(Tab.LIBRARY)
@@ -124,6 +128,11 @@ fun main(): Unit = runBlocking {
     model.order(tracks, ORDER_ADDED)
     withTimeoutOrNull(20_000) { while (tracks.loading || tracks.items.isEmpty()) delay(50) }
     check("Libreria: ordine per data di aggiunta", tracks.items.size == 100, "primo ${tracks.items.firstOrNull()?.name}")
+    model.loadMore(tracks)
+    withTimeoutOrNull(20_000) { while (tracks.loading || tracks.items.size < 200) delay(50) }
+    model.refresh(tracks)
+    withTimeoutOrNull(20_000) { while (tracks.refreshing) delay(50) }
+    check("Libreria: aggiornando si torna alla prima pagina", tracks.items.size == 100 && !tracks.end && tracks.error == null)
     val albums = model.shelf(lib, Shelf.ALBUMS)
     model.loadMore(albums)
     withTimeoutOrNull(20_000) { while (albums.loading || albums.items.isEmpty()) delay(50) }

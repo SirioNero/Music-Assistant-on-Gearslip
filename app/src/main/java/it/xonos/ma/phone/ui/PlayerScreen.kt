@@ -50,7 +50,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -180,7 +185,8 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
                         now.title,
                         style = MaterialTheme.typography.headlineSmall,
                         maxLines = 1,
-                        modifier = Modifier.basicMarquee(),
+                        // Un titolo lungo scorre, ma solo dopo qualche secondo: prima lo si legge com'è.
+                        modifier = Modifier.basicMarquee(initialDelayMillis = 3_000),
                     )
                     now.artist?.let { artist ->
                         Text(
@@ -380,7 +386,7 @@ private fun LyricsLines(lyrics: Lyrics, position: Long, player: PlayerLink) {
         }
         LazyColumn(
             state = list,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().fadingEdges(),
             // La riga in corso resta a un terzo dall'alto.
             contentPadding = PaddingValues(top = if (lyrics.synced) third else 16.dp, bottom = maxHeight / 2),
         ) {
@@ -444,3 +450,16 @@ private fun QueuePanel(now: NowPlaying, player: PlayerLink) {
 }
 
 private const val LYRICS_LEAD_MS = 250L
+
+/** Il testo sfuma in alto e in basso invece di essere tagliato di netto. */
+private fun Modifier.fadingEdges(): Modifier = graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+    .drawWithContent {
+        drawContent()
+        val edge = size.height * 0.12f
+        drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black), endY = edge), blendMode = BlendMode.DstIn)
+        drawRect(
+            Brush.verticalGradient(listOf(Color.Black, Color.Transparent), startY = size.height - edge, endY = size.height),
+            topLeft = Offset(0f, size.height - edge),
+            blendMode = BlendMode.DstIn,
+        )
+    }

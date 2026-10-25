@@ -47,8 +47,6 @@ class FakeServer(private val answers: (String, JSONObject) -> Any?) {
         return server.url("/").toString().trimEnd('/')
     }
 
-    fun stop() = server.shutdown()
-
     private val socket = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             webSocket.send(

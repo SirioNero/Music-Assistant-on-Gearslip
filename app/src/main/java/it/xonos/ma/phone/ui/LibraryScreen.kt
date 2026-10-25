@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -84,9 +85,15 @@ internal fun LibraryScreen(page: LibraryPage, model: PhoneModel, host: Host) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShelfContent(list: ShelfList, model: PhoneModel, host: Host) {
     LaunchedEffect(list) { if (list.items.isEmpty()) model.loadMore(list) }
+    PullToRefreshBox(isRefreshing = list.refreshing, onRefresh = { model.refresh(list) }) { ShelfItems(list, model, host) }
+}
+
+@Composable
+private fun ShelfItems(list: ShelfList, model: PhoneModel, host: Host) {
     val footer: @Composable () -> Unit = {
         when {
             list.error != null -> Problem(host.describe(list.error!!), { model.loadMore(list) })

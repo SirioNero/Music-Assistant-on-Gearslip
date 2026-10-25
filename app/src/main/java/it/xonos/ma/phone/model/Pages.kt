@@ -39,6 +39,12 @@ class HomePage : Page() {
     var recent by mutableStateOf<Load<List<MaItem>>>(Load.Loading)
     var rows by mutableStateOf<Load<List<Row>>>(Load.Loading)
 
+    /** Vero mentre si aggiorna trascinando in giù: intanto resta quello di prima. */
+    var refreshing by mutableStateOf(false)
+
+    /** Quando si è caricata l'ultima volta (System.currentTimeMillis). */
+    internal var loadedAt = 0L
+
     /** Una riga di consigli: il suo titolo e cosa c'è dentro. */
     class Row(val row: MaItem, items: Load<List<MaItem>>) {
         var items by mutableStateOf(items)
@@ -77,6 +83,7 @@ class ShelfList(val shelf: Shelf) {
     var loading by mutableStateOf(false)
     var end by mutableStateOf(false)
     var error by mutableStateOf<Throwable?>(null)
+    var refreshing by mutableStateOf(false)
     internal var job: Job? = null
 }
 

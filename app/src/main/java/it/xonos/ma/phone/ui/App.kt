@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,6 +19,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,10 +78,11 @@ fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
         val nowPlaying by player.nowPlaying.collectAsState()
         // Finché non c'è un indirizzo e il token, si comincia dalle impostazioni.
         var configured by remember { mutableStateOf(model.configured) }
-        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        // Anche il lettore e il benvenuto, che stanno fuori dallo Scaffold, scrivono con i colori del tema.
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onBackground) {
             if (!configured) {
                 Onboarding(model, host) { configured = model.configured }
-                return@Box
+                return@Surface
             }
             val snackbar = remember { SnackbarHostState() }
             Scaffold(

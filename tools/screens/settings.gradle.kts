@@ -12,7 +12,13 @@ dependencyResolutionManagement {
         // Alcune librerie androidx che Compose Desktop usa stanno solo sul Maven di Google, che dalla
         // sandbox non si raggiunge: lì le prende da libs/ (le prepara il workflow "Schermate", vedi README).
         val libs = file("libs")
-        if (libs.isDirectory) maven(libs.toURI()) { content { includeGroupByRegex("androidx\\..*") } }
+        if (libs.isDirectory) {
+            maven(libs.toURI()) {
+                content { includeGroupByRegex("androidx\\..*") }
+                // La cache di Gradle su GitHub a volte ha il jar senza il suo .pom.
+                metadataSources { gradleMetadata(); mavenPom(); artifact() }
+            }
+        }
         maven("https://maven-central.storage-download.googleapis.com/maven2/")
         mavenCentral()
         google()
