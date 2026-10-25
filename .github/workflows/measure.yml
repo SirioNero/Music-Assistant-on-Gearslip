@@ -29,13 +29,13 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: measure-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   measure:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[misure]') || contains(github.event.head_commit.message, '[profilo]')
+    # Sul job e non sul workflow: un push senza [misure] non deve fermare una misura in corso.
+    concurrency:
+      group: measure-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
