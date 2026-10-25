@@ -204,6 +204,15 @@ Le misure sull'emulatore: il workflow "Misure" parte con `[misure]` nel messaggi
 release (R8) e le prove di `baselineprofile/`, e mette tabella, log e tracce in
 `refs/xonos/measures/<ramo con - al posto di />`. Sull'emulatore (senza GPU) contano i confronti, non
 i valori assoluti; le prove usano gli id dei testTag (`Modifier.automationIds()`).
+- Si confrontano solo numeri della stessa esecuzione: tra esecuzioni diverse cambiano la macchina di
+  GitHub (l'avvio è variato del 30% con lo stesso codice) e, se si toccano le prove, la lunghezza dei
+  gesti. Per un prima/dopo vero servirebbe misurare le due versioni nello stesso job (non c'è ancora).
+- Risultati che reggono (ottobre 2026, playlist di 2880 brani): conversione sul thread principale da
+  130 ms a 0, heap massimo da 163 a 83 MB, memoria anonima da 256 a 174 MB, lettura del JSON da 2,1 a
+  1,5 s. L'APK con R8 parte, si collega e suona Opus, nessun arresto. Avvio, scorrimento e lettore non
+  hanno un miglioramento dimostrato sull'emulatore; con e senza Baseline Profile la differenza è nel rumore.
+- Mentre Xonos suona, il servizio in primo piano tiene vivo il processo: la prova d'avvio a freddo a
+  volte si ferma con "must not be running prior to cold start" (andrebbe fermata la musica prima).
 
 ## Richieste dell'utente
 
