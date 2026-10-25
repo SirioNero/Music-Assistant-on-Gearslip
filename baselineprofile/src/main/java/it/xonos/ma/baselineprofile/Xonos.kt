@@ -68,8 +68,14 @@ private fun MacrobenchmarkScope.missing(what: String, timeoutMs: Long): Nothing 
     error("Non compare $what entro $timeoutMs ms")
 }
 
+/** Un dialogo "... non risponde" del sistema (sull'emulatore succede al launcher): si aspetta. */
+fun MacrobenchmarkScope.dismissSystemDialog() {
+    if (device.hasObject(By.textContains("isn't responding"))) device.findObject(By.text("Wait"))?.click()
+}
+
 /** Apre l'app sulla Home con i dati; la prima volta la collega al Music Assistant di prova. */
 fun MacrobenchmarkScope.openHome() {
+    dismissSystemDialog()
     startActivityAndWait()
     connectIfNeeded()
     // Se l'app ricorda un'altra scheda si torna alla Home.
