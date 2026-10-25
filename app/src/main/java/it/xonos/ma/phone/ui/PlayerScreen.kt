@@ -67,6 +67,7 @@ import it.xonos.ma.phone.model.Load
 import it.xonos.ma.phone.model.NowPlaying
 import it.xonos.ma.phone.model.PhoneModel
 import it.xonos.ma.phone.model.PlayerLink
+import it.xonos.ma.phone.model.PlayerPanel
 import it.xonos.ma.phone.model.Repeat
 import kotlinx.coroutines.delay
 import kotlin.math.max
@@ -135,9 +136,6 @@ private fun PlayPauseButton(now: NowPlaying, player: PlayerLink, modifier: Modif
     }
 }
 
-/** Cosa mostra il lettore al centro: la copertina, il testo o la coda. */
-private enum class Panel { COVER, LYRICS, QUEUE }
-
 /** Il lettore a schermo intero, con lo sfondo del colore della copertina. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -145,7 +143,6 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
     val backdrop = backdropOf(now.artwork)
     val background = MaterialTheme.colorScheme.background
     val position = rememberPosition(player, now)
-    var panel by remember { mutableStateOf(Panel.COVER) }
     val problem by player.problem.collectAsState()
     Box(
         Modifier.fillMaxSize()
@@ -168,11 +165,11 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
                 NowPlayingMenu(now, model)
             }
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Crossfade(panel, label = "panel") { shown ->
+                Crossfade(model.playerPanel, label = "panel") { shown ->
                     when (shown) {
-                        Panel.COVER -> BigCover(now)
-                        Panel.LYRICS -> LyricsPanel(now, model, player, position, host)
-                        Panel.QUEUE -> QueuePanel(now, player)
+                        PlayerPanel.COVER -> BigCover(now)
+                        PlayerPanel.LYRICS -> LyricsPanel(now, model, player, position, host)
+                        PlayerPanel.QUEUE -> QueuePanel(now, player)
                     }
                 }
             }
@@ -215,8 +212,8 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
             Controls(now, player)
             Spacer(Modifier.height(12.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                PanelButton(XIcons.Lyrics, R.string.lyrics, panel == Panel.LYRICS) { panel = if (panel == Panel.LYRICS) Panel.COVER else Panel.LYRICS }
-                PanelButton(XIcons.Queue, R.string.queue, panel == Panel.QUEUE) { panel = if (panel == Panel.QUEUE) Panel.COVER else Panel.QUEUE }
+                PanelButton(XIcons.Lyrics, R.string.lyrics, model, PlayerPanel.LYRICS)
+                PanelButton(XIcons.Queue, R.string.queue, model, PlayerPanel.QUEUE)
             }
             Spacer(Modifier.height(8.dp))
         }
@@ -315,9 +312,10 @@ private fun Controls(now: NowPlaying, player: PlayerLink) {
 }
 
 @Composable
-private fun PanelButton(icon: ImageVector, label: Int, selected: Boolean, onClick: () -> Unit) {
+private fun PanelButton(icon: ImageVector, label: Int, model: PhoneModel, panel: PlayerPanel) {
+    val selected = model.playerPanel == panel
     IconButton(
-        onClick = onClick,
+        onClick = { model.playerPanel = if (selected) PlayerPanel.COVER else panel },
         modifier = Modifier.clip(CircleShape).background(if (selected) Color.White.copy(alpha = 0.16f) else Color.Transparent),
     ) {
         Icon(icon, stringResource(label), tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))

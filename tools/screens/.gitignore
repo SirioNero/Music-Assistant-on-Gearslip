@@ -1,0 +1,9 @@
+build/
+.gradle/
+.kotlin/
+# Copiati dall'app e dal banco di prova da sync.sh
+src/main/kotlin/app/
+src/main/kotlin/generated/
+# Le librerie di Google per la sandbox, e le schermate disegnate
+libs/
+out/

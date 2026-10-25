@@ -2,14 +2,18 @@ package it.xonos.ma.data
 
 import it.xonos.ma.Language
 
-/** Stub di Settings per la JVM: indirizzo e token dall'ambiente, il resto in memoria. */
+/** Stub di Settings per la JVM: indirizzo e token dall'ambiente (o da -Dxonos.url e -Dxonos.token), il resto in memoria. */
 class Settings {
     data class Config(val homeUrl: String, val remoteUrl: String, val token: String) {
         val urls: List<String> get() = listOf(homeUrl, remoteUrl).filter { it.isNotBlank() }.distinct()
         val isComplete: Boolean get() = urls.isNotEmpty() && token.isNotBlank()
     }
 
-    private var config = Config(System.getenv("MA_URL") ?: "http://127.0.0.1:8095", "", System.getenv("MA_TOKEN") ?: "")
+    private var config = Config(
+        System.getProperty("xonos.url") ?: System.getenv("MA_URL") ?: "http://127.0.0.1:8095",
+        "",
+        System.getProperty("xonos.token") ?: System.getenv("MA_TOKEN") ?: "",
+    )
 
     fun load() = config
 

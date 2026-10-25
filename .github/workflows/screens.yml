@@ -1,0 +1,97 @@
+name: Schermate
+
+# Disegna le schermate dell'app del telefono con Compose Desktop (tools/screens) e le mette, insieme
+# alle librerie androidx che dalla sandbox di Claude non si scaricano, nel riferimento nascosto
+# refs/xonos/screens: non è un ramo, non compare tra i rami e non tocca la storia del codice.
+# Per prenderle: git fetch origin refs/xonos/screens && git archive FETCH_HEAD | tar -x -C <cartella>
+
+on:
+  push:
+    branches: ["claude/**"]
+    paths:
+      - "app/src/main/java/it/xonos/ma/phone/**"
+      - "app/src/main/java/it/xonos/ma/data/**"
+      - "app/src/main/res/values*/**"
+      - "tools/screens/**"
+      - ".github/workflows/screens.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: screens-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screens:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+
+      - name: Prepara Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      # Roboto come sul telefono, e i caratteri per greco, russo e cinese.
+      - name: Caratteri
+        run: |
+          sudo apt-get update -q > /dev/null
+          sudo apt-get install -y -q fonts-roboto fonts-noto-core fonts-noto-cjk > /dev/null
+          mkdir -p ~/.config/fontconfig
+          cat > ~/.config/fontconfig/fonts.conf <<'XML'
+          <?xml version="1.0"?>
+          <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+          <fontconfig>
+            <alias><family>sans-serif</family><prefer><family>Roboto</family><family>Noto Sans CJK SC</family></prefer></alias>
+          </fontconfig>
+          XML
+          fc-cache -f > /dev/null
+
+      - name: Disegna le schermate
+        run: |
+          set -o pipefail
+          cd tools/screens
+          sh sync.sh
+          gradle installDist --no-daemon -q 2>&1 | tee build.log
+          for lang in it en; do
+            JAVA_OPTS="-Dxonos.out=out -Dxonos.lang=$lang" build/install/screens/bin/screens 2>&1 | tee -a build.log
+          done
+
+      - name: Riassumi gli errori
+        if: failure()
+        run: |
+          errors=$(grep -E "^e: |error:|Exception|What went wrong" -A3 tools/screens/build.log | head -n 60 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+          if [ -n "$errors" ]; then echo "::error title=Schermate non riuscite::$errors"; fi
+
+      # Le librerie androidx che Gradle ha scaricato, nella forma di un repository Maven (per tools/screens/libs).
+      - name: Metti da parte le librerie di Google
+        run: |
+          OUT="$GITHUB_WORKSPACE/tools/screens/out/libs"
+          cd ~/.gradle/caches/modules-2/files-2.1
+          find . -mindepth 5 -maxdepth 5 -type f -path './androidx.*' | while read -r f; do
+            group=$(echo "$f" | cut -d/ -f2); module=$(echo "$f" | cut -d/ -f3); version=$(echo "$f" | cut -d/ -f4)
+            dir="$OUT/$(echo "$group" | tr . /)/$module/$version"
+            mkdir -p "$dir" && cp "$f" "$dir/"
+          done
+          du -sh "$OUT"
+
+      - name: Pubblica in refs/xonos/screens
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd tools/screens/out
+          git init -q
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Schermate di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/xonos/screens
+          echo "::notice title=Schermate::$(ls *.png | wc -l) schermate in refs/xonos/screens"

@@ -29,6 +29,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 /** Le schede in fondo allo schermo. */
 enum class Tab { HOME, SEARCH, LIBRARY }
 
+/** Cosa mostra il lettore al centro: la copertina, il testo o la coda. */
+enum class PlayerPanel { COVER, LYRICS, QUEUE }
+
 /** Un avviso breve in fondo allo schermo, dopo un comando. */
 sealed interface Notice {
     data object PlayNext : Notice
@@ -78,6 +81,9 @@ class PhoneModel(
 
     /** Il lettore a schermo intero, sopra tutto il resto. */
     var playerOpen by mutableStateOf(false)
+
+    /** Resta quella scelta: chi legge il testo lo ritrova riaprendo il lettore. */
+    var playerPanel by mutableStateOf(PlayerPanel.COVER)
 
     var notice by mutableStateOf<Notice?>(null)
 
