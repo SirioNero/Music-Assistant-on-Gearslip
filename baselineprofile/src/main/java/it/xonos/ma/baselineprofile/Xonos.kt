@@ -1,6 +1,7 @@
 package it.xonos.ma.baselineprofile
 
 import android.os.SystemClock
+import android.util.Log
 import androidx.benchmark.macro.BaselineProfileMode
 import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.MacrobenchmarkScope
@@ -9,6 +10,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
+import java.io.ByteArrayOutputStream
 
 /**
  * L'app da guidare e il Music Assistant di prova. Gli argomenti arrivano dal workflow "Misure"
@@ -52,11 +54,18 @@ object Xonos {
 
 /** L'elemento con questo testTag, aspettandolo; se non arriva un errore che dice quale. */
 fun MacrobenchmarkScope.waitFor(tag: String, timeoutMs: Long = 20_000): UiObject2 =
-    device.wait(Until.findObject(By.res(tag)), timeoutMs) ?: error("Non compare \"$tag\" entro $timeoutMs ms")
+    device.wait(Until.findObject(By.res(tag)), timeoutMs) ?: missing("\"$tag\"", timeoutMs)
 
 /** Il testo dato (una scheda, una voce della libreria...), aspettandolo. */
 fun MacrobenchmarkScope.waitForText(text: String, timeoutMs: Long = 20_000): UiObject2 =
-    device.wait(Until.findObject(By.text(text)), timeoutMs) ?: error("Non compare \"$text\" entro $timeoutMs ms")
+    device.wait(Until.findObject(By.text(text)), timeoutMs) ?: missing("il testo \"$text\"", timeoutMs)
+
+/** Qualcosa non è comparso: nel log va lo schermo com'è (la gerarchia vista da UiAutomator), poi l'errore. */
+private fun MacrobenchmarkScope.missing(what: String, timeoutMs: Long): Nothing {
+    val dump = ByteArrayOutputStream().also { device.dumpWindowHierarchy(it) }.toString()
+    dump.chunked(3_000).forEach { Log.e("XonosMisure", it) }
+    error("Non compare $what entro $timeoutMs ms")
+}
 
 /** Apre l'app sulla Home con i dati; la prima volta la collega al Music Assistant di prova. */
 fun MacrobenchmarkScope.openHome() {
@@ -85,7 +94,7 @@ private fun MacrobenchmarkScope.scrollToVisible(tag: String, timeoutMs: Long = 2
         device.findObject(By.scrollable(true))?.scroll(Direction.DOWN, 0.6f)
         Thread.sleep(300)
     }
-    error("Non compare \"$tag\" entro $timeoutMs ms")
+    missing("\"$tag\"", timeoutMs)
 }
 
 /** Se la coda del telefono è vuota fa suonare l'album di prova, cercandolo. */

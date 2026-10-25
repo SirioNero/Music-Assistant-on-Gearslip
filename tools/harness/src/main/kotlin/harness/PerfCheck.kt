@@ -97,6 +97,13 @@ fun main(): Unit = runBlocking {
             put("provider_instance_id_or_domain", playlist.provider)
         } as JSONArray
         println("   JSON: ${raw.toString().length / 1024} KB")
+        // Quanta memoria tiene l'albero JSON intero, rispetto ai soli MaItem che ne escono.
+        val tree = heapUsed()
+        val converted = raw.objects().mapNotNull(MaItem::from)
+        val withItems = heapUsed()
+        println("   memoria: albero JSON + MaItem ${(withItems) / 1_048_576} MB in tutto")
+        val onlyItems = converted.also { System.gc() }
+        println("   memoria dei soli MaItem: circa ${(withItems - tree) / 1_048_576} MB (${onlyItems.size} elementi)")
         repeat(6) { i ->
             val t = System.nanoTime()
             val items = raw.objects().mapNotNull(MaItem::from)
@@ -109,5 +116,12 @@ fun main(): Unit = runBlocking {
 }
 
 private const val FRAME_MS = 16L
+
+/** La memoria occupata adesso, dopo una pulizia (una stima: la JVM non è ART). */
+private fun heapUsed(): Long {
+    repeat(3) { System.gc(); Thread.sleep(100) }
+    val r = Runtime.getRuntime()
+    return r.totalMemory() - r.freeMemory()
+}
 
 private fun ms(since: Long) = (System.nanoTime() - since) / 1_000_000
