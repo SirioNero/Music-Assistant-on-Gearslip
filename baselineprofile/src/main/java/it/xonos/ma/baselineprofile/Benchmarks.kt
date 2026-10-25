@@ -37,6 +37,14 @@ abstract class XonosBenchmark(protected val mode: String) {
         TraceSectionMetric("Xonos.json", TraceSectionMetric.Mode.Sum),
     )
 
+    /** Dove va il tempo dell'avvio sul thread principale: l'app, l'Activity, il servizio di riproduzione. */
+    protected val startup = listOf(
+        TraceSectionMetric("bindApplication", TraceSectionMetric.Mode.First),
+        TraceSectionMetric("activityStart", TraceSectionMetric.Mode.First),
+        TraceSectionMetric("serviceCreate%", TraceSectionMetric.Mode.Sum, label = "serviceCreate"),
+        TraceSectionMetric("Choreographer#doFrame%", TraceSectionMetric.Mode.Sum, label = "frames"),
+    )
+
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
@@ -50,7 +58,7 @@ class StartupBenchmark(mode: String) : XonosBenchmark(mode) {
     @Test
     fun startup() = rule.measureRepeated(
         packageName = Xonos.packageName,
-        metrics = listOf(StartupTimingMetric()) + conversion,
+        metrics = listOf(StartupTimingMetric()) + startup + conversion,
         compilationMode = Xonos.compilation(mode),
         startupMode = StartupMode.COLD,
         iterations = 10,
