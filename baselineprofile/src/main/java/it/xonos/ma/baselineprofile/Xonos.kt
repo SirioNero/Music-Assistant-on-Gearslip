@@ -11,6 +11,7 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import java.io.ByteArrayOutputStream
+import java.util.regex.Pattern
 
 /**
  * L'app da guidare e il Music Assistant di prova. Gli argomenti arrivano dal workflow "Misure"
@@ -78,7 +79,9 @@ fun MacrobenchmarkScope.openHome() {
 
 /** Il benvenuto: indirizzo e token del Music Assistant di prova, "Salva" e poi "Vai alla tua musica". */
 private fun MacrobenchmarkScope.connectIfNeeded() {
-    val home = device.wait(Until.findObject(By.res("field_home")), 3_000) ?: return
+    // Il primo avvio dopo l'installazione è lento: si aspetta il benvenuto o la Home, quello che arriva.
+    device.wait(Until.hasObject(By.res(Pattern.compile("field_home|home"))), 30_000)
+    val home = device.findObject(By.res("field_home")) ?: return
     home.text = Xonos.url
     waitFor("field_token").text = Xonos.token
     scrollToVisible("save").click()
