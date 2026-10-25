@@ -200,6 +200,14 @@ fun main(): Unit = runBlocking {
     val bollicine = library.search("vita spericolata")["tracks"]?.first()
     val tagged = bollicine?.let { loaded { model.lyrics(it.uri).load } }
     check("Testo LRC nel tag", tagged?.synced == true && tagged.lines.size == 10)
+    // Senza testo Music Assistant lo cerca nei servizi di testi: senza rete ci mette molto.
+    val west = library.search("armonica")["tracks"]?.firstOrNull()
+    if (west != null) {
+        val asked = System.nanoTime()
+        val none = loaded { model.lyrics(west.uri).load }
+        val waited = (System.nanoTime() - asked) / 1_000_000
+        check("Senza testo: \"nessun testo\" entro ${PhoneModel.LYRICS_WAIT_MS / 1000} s", none == null && waited < PhoneModel.LYRICS_WAIT_MS + 2_000, "$waited ms")
+    }
 
     // ---------- Artista ----------
     model.select(Tab.LIBRARY)

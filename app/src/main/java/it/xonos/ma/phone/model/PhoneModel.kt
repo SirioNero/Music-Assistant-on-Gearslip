@@ -782,20 +782,39 @@ class PhoneModel(
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, LyricsState>?) = size > LYRICS_KEPT
     }
 
-    /** Il testo di un brano, chiesto una volta sola. */
-    fun lyrics(uri: String): LyricsState = lyrics.getOrPut(uri) {
-        LyricsState().also { state ->
-            scope.launch {
-                state.load = try {
-                    awaitConnected()
-                    Load.Ready(library.lyrics(uri))
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    Load.Failed(e)
-                }
+    /**
+     * Il testo di un brano, chiesto una volta sola. Se il brano non ha testo, Music Assistant lo
+     * cerca nei servizi di testi (LRCLIB...): senza rete può metterci decine di secondi. Dopo
+     * [LYRICS_WAIT_MS] si dice "nessun testo"; se poi arriva, si mostra. Dopo un errore, la volta
+     * dopo si chiede di nuovo.
+     */
+    fun lyrics(uri: String): LyricsState {
+        lyrics[uri]?.let { return it }
+        val state = LyricsState()
+        lyrics[uri] = state
+        val wait = scope.launch {
+            delay(LYRICS_WAIT_MS)
+            if (state.load is Load.Loading) state.load = Load.Ready(null)
+        }
+        scope.launch {
+            val result: Load<Lyrics?> = try {
+                awaitConnected()
+                Load.Ready(library.lyrics(uri))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Load.Failed(e)
+            }
+            wait.cancel()
+            if (result is Load.Failed) {
+                if (lyrics[uri] === state) lyrics.remove(uri)
+                // Se si dice già "nessun testo", resta.
+                if (state.load is Load.Loading) state.load = result
+            } else {
+                state.load = result
             }
         }
+        return state
     }
 
     // ---------- Impostazioni ----------
@@ -935,6 +954,7 @@ class PhoneModel(
         const val CONNECT_TIMEOUT_MS = 20_000L
         const val READY_TIMEOUT_MS = 20_000L
         const val LYRICS_KEPT = 20
+        const val LYRICS_WAIT_MS = 8_000L
         const val STALE_MS = 10 * 60_000L
         const val HOME_CACHE = "home"
         const val SHELVES_CACHE = "shelves"
