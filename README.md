@@ -40,16 +40,18 @@ Out of the car, Xonos is a music player on the phone too: your whole Music Assis
 - **Albums, playlists, artists, podcasts**: a large cover with its colors in the background, play and shuffle, the heart, and the tracks; tapping one plays from there. The ⋮ menu plays a track next, adds it to the queue, or opens its album or artist.
 - **The player**: the mini player above the tabs, and full screen with the colors of the cover, the seek bar, shuffle and repeat, the heart, **synced lyrics** (tap a line to jump there) and **the queue**. Lyrics come from the files themselves (an `.lrc` file next to the track, or the lyrics tag) or from Music Assistant’s lyrics providers, such as LRCLIB.
 - What you start on the phone plays on the phone, and the car shows it the same way: it’s the same player and the same queue.
+- **Play on**: from the player (or the cast icon on Home) you can send the music to a speaker Music Assistant knows (Chromecast, AirPlay, Sonos, DLNA, groups…). The queue moves there and carries on from the same point, and the phone stops; the screen then controls that speaker, volume included, and what you play goes there. Choose “This phone” to bring the music back. In the car nothing changes: Gearslip always plays on the phone.
+- **Music Assistant services** (for Music Assistant administrators, from Settings, or from Home when the library is empty): see the services, add one (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, podcasts, radio, folders…), sign in to it in the browser when it asks, change its options, set it up again or remove it. The forms are Music Assistant’s own, in your language when Music Assistant has the translation. Needs Music Assistant 2.10 or later to add and set up services.
 
 ### Installation
 
 1. From the [Releases](../../releases) page, download `Xonos.apk` to your phone and install it. Android asks you to allow installing unknown apps; Play Protect may warn that the app is unknown.
 2. Open Xonos on your phone: the first time it shows its settings. Pick your language at the top (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: English until you choose), and enter:
-   - your Music Assistant address at home, for example `http://homeassistant.local:8095` (the Home Assistant add-on) or `http://192.168.1.10:8095`;
+   - your Music Assistant address at home: Xonos lists the Music Assistant servers it finds on your network, tap yours; otherwise type it, for example `http://homeassistant.local:8095` (the Home Assistant add-on) or `http://192.168.1.10:8095`;
    - the address to use away from home (see below);
-   - a long-lived access token (in Music Assistant: Settings, Profile, Long-lived access tokens);
+   - your Music Assistant username and password (Xonos asks Music Assistant for a token of its own and doesn’t keep the password), or a long-lived access token (in Music Assistant: Settings, Profile, Long-lived access tokens);
    - optionally, the name the phone gets among Music Assistant’s players.
-   Tap “Save and test the connection”: it checks both the API and the audio. Then “Go to your music”.
+   Tap “Sign in and test the connection” (or “Save and test the connection” with a token): it checks both the API and the audio. Then “Go to your music”. On a Music Assistant just installed, with no users yet, Xonos offers to create the first account (the administrator).
 3. Tap “Allow in background”, so Android doesn’t stop the music with the screen off. The settings are behind the gear icon, on Home and in Library.
 4. In the car, open Gearslip: Xonos appears among the music apps.
 
@@ -79,6 +81,7 @@ Home Assistant Cloud (Nabu Casa) only reaches Home Assistant, not Music Assistan
 ### Limitations
 
 - The phone’s player is private: Music Assistant’s other apps and Home Assistant don’t offer it as a target. You start the music from Xonos, on the phone or in the car.
+- Signing in to a service in the browser (Spotify, Tidal…) brings you back to your Music Assistant’s address: do it at home, or with a remote address that works in the browser too.
 - The audio uses Sendspin without its own encryption, a mode Music Assistant accepts by default; the connection is signed in with your token, and encrypted when the address is `https://`.
 - One phone, one queue: if you change the player name, Music Assistant keeps the same player and its queue.
 
@@ -153,16 +156,18 @@ Fuori dall’auto, Xonos è un lettore musicale anche sul telefono: tutta la lib
 - **Album, playlist, artisti, podcast**: copertina grande con i suoi colori sullo sfondo, play e casuale, il cuore e i brani; toccandone uno si parte da lì. Il menu ⋮ mette un brano subito dopo, lo aggiunge alla coda, o apre il suo album o il suo artista.
 - **Il lettore**: il mini-lettore sopra le schede, e a schermo intero con i colori della copertina, la barra per spostarsi, casuale e ripeti, il cuore, il **testo sincronizzato** (tocca una riga per andarci) e **la coda**. I testi vengono dai file stessi (un file `.lrc` accanto al brano, o il tag del testo) o dai servizi di testi di Music Assistant, come LRCLIB.
 - Quello che fai partire dal telefono suona sul telefono, e l’auto lo mostra allo stesso modo: è lo stesso lettore con la stessa coda.
+- **Suona su**: dal lettore (o dall’icona in alto nella Home) mandi la musica a una cassa che Music Assistant conosce (Chromecast, AirPlay, Sonos, DLNA, gruppi…). La coda passa lì e continua dallo stesso punto, e il telefono si ferma; da quel momento lo schermo comanda quella cassa, volume compreso, e quello che fai partire suona lì. Scegli “Questo telefono” per riportare indietro la musica. In auto non cambia niente: Gearslip suona sempre sul telefono.
+- **I servizi di Music Assistant** (per chi amministra Music Assistant, dalle Impostazioni, o dalla Home quando la libreria è vuota): vedi i servizi, ne aggiungi uno (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, podcast, radio, cartelle…), fai l’accesso nel browser quando lo chiede, cambi le opzioni, lo configuri di nuovo o lo togli. I moduli sono quelli di Music Assistant, nella tua lingua quando Music Assistant ha la traduzione. Per aggiungere e configurare i servizi serve Music Assistant 2.10 o successivo.
 
 ### Installazione
 
 1. Dalla pagina [Releases](../../releases) scarica `Xonos.apk` sul telefono e installalo. Android chiede di consentire l’installazione di app sconosciute; Play Protect può avvisare che l’app non è nota.
 2. Apri Xonos sul telefono: la prima volta mostra le impostazioni. Scegli in cima la lingua (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: finché non la scegli è l’inglese) e inserisci:
-   - l’indirizzo di casa di Music Assistant, per esempio `http://homeassistant.local:8095` (il componente aggiuntivo di Home Assistant) oppure `http://192.168.1.10:8095`;
+   - l’indirizzo di casa di Music Assistant: Xonos elenca i Music Assistant che trova nella tua rete, tocca il tuo; altrimenti scrivilo, per esempio `http://homeassistant.local:8095` (il componente aggiuntivo di Home Assistant) oppure `http://192.168.1.10:8095`;
    - l’indirizzo da fuori casa (vedi sotto);
-   - un token di accesso a lungo termine (in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine);
+   - nome utente e password di Music Assistant (Xonos si fa dare da Music Assistant un token suo e la password non la tiene), oppure un token di accesso a lungo termine (in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine);
    - se vuoi, il nome del telefono tra i lettori di Music Assistant.
-   Premi “Salva e prova la connessione”: controlla sia l’API sia l’audio. Poi “Vai alla tua musica”.
+   Premi “Accedi e prova la connessione” (o “Salva e prova la connessione” con un token): controlla sia l’API sia l’audio. Poi “Vai alla tua musica”. Su un Music Assistant appena installato, ancora senza utenti, Xonos propone di creare il primo account (l’amministratore).
 3. Premi “Consenti in background”, così Android non ferma la musica a schermo spento. Le impostazioni stanno dietro l’ingranaggio, nella Home e nella Libreria.
 4. In auto apri Gearslip: Xonos compare tra le app musicali.
 
@@ -192,6 +197,7 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 ### Limiti
 
 - Il lettore del telefono è privato: le altre app di Music Assistant e Home Assistant non lo offrono come destinazione. La musica la fai partire da Xonos, sul telefono o in auto.
+- L’accesso a un servizio nel browser (Spotify, Tidal…) torna all’indirizzo del tuo Music Assistant: fallo a casa, o con un indirizzo remoto che funzioni anche nel browser.
 - L’audio usa Sendspin senza la sua cifratura, una modalità che Music Assistant accetta di serie; la connessione è comunque autenticata dal token, e cifrata quando l’indirizzo è `https://`.
 - Un telefono, una coda: se cambi il nome del lettore, Music Assistant tiene lo stesso lettore e la sua coda.
 

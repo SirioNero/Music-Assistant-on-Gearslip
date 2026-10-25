@@ -35,8 +35,13 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   password `plancia-android`); il workflow prova da sé le password `xonos-android` e `plancia-android`.
 - Strumenti: AGP 8.11.1, Kotlin 2.2.0, Gradle 8.14.3, compileSdk 36, targetSdk 34, minSdk 26,
   Media3 1.11.1, OkHttp 4.12.0, coroutines 1.10.2, Compose 1.9.4, Material 3 1.4.0, activity-compose
-  1.10.1, Coil 3.3.0. Pacchetto `it.xonos.ma`. R8 è spento (`isMinifyEnabled = false`): non si può
-  provare qui un APK ridotto, e un errore di riflessione lo vedrebbe solo l'utente.
+  1.10.1, Coil 3.3.0 (con coil-svg per le icone dei servizi), profileinstaller 1.4.1. Pacchetto `it.xonos.ma`.
+- R8 è acceso nella release (`isMinifyEnabled` e `isShrinkResources`, regole in `app/proguard-rules.pro`,
+  `-dontobfuscate` così gli errori restano leggibili). L'APK ridotto si prova sull'emulatore con le misure
+  (sotto): parte, si collega, suona Opus, nessun arresto.
+- Baseline Profile: il modulo `baselineprofile/` (Macrobenchmark 1.4.1, UiAutomator) lo genera
+  sull'emulatore; il profilo sta in `app/src/main/generated/baselineProfiles/baseline-prof.txt` e va
+  rigenerato (commit con `[profilo]`) quando cambiano molto avvio, Home, Libreria o lettore.
 - Compose e Material 3 hanno le versioni di Compose Multiplatform 1.9.3 / material3 1.9.0 (lo dicono i
   file `.module` di CMP su Maven Central): così `tools/screens` disegna le stesse composable. Coil 3.3.0
   è l'ultimo compilato con Kotlin 2.2 (il 3.4 vuole la stdlib 2.3).
@@ -59,10 +64,16 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 | `playback/BrowseTree.kt`, `ResourceLabels.kt` | Il menu come MediaItem; le sue scritte dalle risorse |
 | `playback/Artwork.kt` | Copertine servite a Gearslip come `content://` firmati |
 | `data/Lyrics.kt` | Il testo di un brano: lettore LRC (più tempi per riga, offset, tag, parole a tempo) e testo semplice |
+| `data/Cache.kt` | `ScreenCache`: le ultime schermate (Home, prime pagine della Libreria) su disco, mostrate subito all'apertura |
+| `data/Account.kt` | Accesso con nome utente e password (auth/login, poi un token suo con auth/token/create), primo account (POST /setup) |
+| `data/Services.kt` | I servizi (provider) di MA: elenco, tipi, icone, opzioni, pulsanti, flussi a passi; i campi come `ConfigField` |
+| `data/Devices.kt` | I lettori di MA su cui suonare ("Suona su"), il passaggio della coda, i comandi a una coda |
 | `phone/MainActivity.kt` | L'app sul telefono: Compose, lingua, MediaController verso il servizio finché è in vista |
 | `phone/ControllerLink.kt` | `PlayerLink` dal MediaController: lo stesso `MaPlayer` che vede Gearslip |
-| `phone/model/` | `PhoneModel` (schede con pile di pagine, caricamenti, ricerca, suona/dopo/in coda, preferiti, testi, impostazioni), `Pages.kt`, `Player.kt` (`NowPlaying`, `PlayerLink`), `ConnectionCheck.kt`. Senza Android: si prova sulla JVM |
-| `phone/ui/` | Le schermate in Compose/Material 3. Tutto comune tranne `Platform.kt` (indietro, pixel della copertina) |
+| `phone/model/` | `PhoneModel` (schede con pile di pagine, caricamenti, ricerca, suona/dopo/in coda, preferiti, testi, impostazioni, "Suona su"), `Pages.kt`, `Player.kt` (`NowPlaying`, `PlayerLink`), `ConnectionCheck.kt`, `Discovery.kt` (server trovati con mDNS), `ServicesModel.kt` e `ServicePages.kt` (i servizi), `RemoteLink.kt` (un lettore di MA comandato dallo schermo). Senza Android: si prova sulla JVM |
+| `phone/NsdFinder.kt` | Cerca Music Assistant nella rete con NsdManager (`_mass._tcp`) |
+| `phone/ui/` | Le schermate in Compose/Material 3. Tutto comune tranne `Platform.kt` (indietro, pixel della copertina, "schermata piena" per le misure, id per UiAutomator). `ServicesScreens.kt` disegna i moduli di MA dai campi; `Markdown.kt` i loro testi; `DevicesSheet.kt` "Suona su" |
+| `baselineprofile/` | Le prove sull'emulatore: avvio, scorrimento di Home e Libreria, lettore, playlist lunga; genera il Baseline Profile |
 | `Language.kt`, `Texts.kt` | Le lingue (senza Android); `wrap()` e `describe()`, che racconta un `Problem` nella lingua scelta |
 
 ## Music Assistant: cose verificate (2.10.8 e 2.11.0b7)
@@ -92,6 +103,30 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `music/recommendations/items`. La riga `recently_played` ripete gli ascolti recenti.
 - Gli indirizzi HTTP dei brani in coda (`/single/<session>/...`, porta 8097) sono protetti da un
   codice di sessione interno che l'API non dà; `music/tracks/preview` è solo un assaggio di 30 s.
+- Accesso: `auth/login` (username, password, device_name) apre una sessione; con quella
+  `auth/token/create` dà un token a lunga durata, poi `auth/logout`. Agli ospiti niente token: resta
+  la sessione. Senza utenti MA risponde 200 a `GET /setup` e all'API `setup_required` (codice 503); il
+  primo account si crea con `POST /setup`. Password di almeno 8 caratteri. Ruoli: admin, user, guest.
+- `auth` accetta `locale` (e c'è `translations/set_locale`): MA traduce da sé etichette dei moduli,
+  errori e titoli (pt_PT è molto più completa di pt_BR; l'italiano ha poche voci, il resto resta inglese).
+- MA si annuncia con mDNS `_mass._tcp`; nei TXT le informazioni di `server_info` (internal_url, base_url,
+  external_url, server_version...).
+- Servizi (solo admin): `config/providers` (dalla 2.10 `last_error` è un oggetto con `message`),
+  `providers/manifests`, `providers/icon` (data URI, di solito SVG), `config/providers/get` + `get_entries`
+  (l'ordine dei campi), `save` (solo i valori cambiati; una password salvata torna come
+  `this_value_is_encrypted`), `remove`, `invoke_action`. Dalla 2.10 (schema 63) si aggiunge con
+  `config/providers/setup` e i flussi (`config/flows/submit|get|abort`, `config/providers/reconfigure`):
+  passi form/external/progress/finish/abort, anche con l'evento `setup_flow_updated`. L'accesso nel
+  browser torna a `{base_url}/setup_flow/callback/<flow>`. I flussi restano vivi 15 minuti anche se la
+  connessione cade. Nei moduli dei flussi non ci sono pulsanti; i segreti non tornano mai.
+- Bug di MA: dopo `save` il servizio si ricarica un secondo più tardi (`call_later(1, ...)`); un
+  `remove` in quel momento lascia in settings.json una voce senza `domain` e da lì `config/providers`
+  risponde `'domain'` per sempre. `Services.remove` aspetta 3 s dal salvataggio e la fine del
+  caricamento. Nel Docker di prova la voce rotta si toglie a mano da `data/settings.json` (MA fermo).
+- Lettori: `players/all` dà anche `private` (i lettori delle app, come il telefono: non si offrono) e
+  `hide_in_ui`; i lettori di tipo `protocol` non compaiono. Una cassa Sendspin che non è un'app diventa
+  un Universal Player (`up...`) circa 15 s dopo. `player_queues/transfer` sposta coda, punto e casuale,
+  svuota e ferma la coda di prima, e riparte se quella suonava.
 
 ### Sendspin (come arriva l'audio)
 
@@ -126,7 +161,15 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 - Le copertine sul telefono: indirizzi http dell'imageproxy con Coil (OkHttp dell'app, con timeout);
   quelle del lettore sono i `content://` di `Artwork`. Il colore di fondo si calcola dai pixel della
   copertina (`backdropColor`). Le icone sono disegnate in `Icons.kt` (la libreria di icone pesa megabyte).
-- La Home si aggiorna trascinando in giù, e da sola riaprendo l'app se ha più di dieci minuti.
+- La Home si aggiorna trascinando in giù, e da sola riaprendo l'app se ha più di dieci minuti. Home e
+  prime pagine della Libreria si mostrano subito da `ScreenCache`, poi si aggiornano.
+- Gli elenchi lunghi si convertono a pezzi mentre arrivano, fuori dal thread principale
+  (`MaClient.items`): la "Playlist grande" di prova (2880 brani) è ~14 MB di JSON, come MaItem ~1 MB.
+- Impostazioni: i server trovati in rete, accesso con nome utente e password (o token), primo account.
+  I servizi di MA solo per gli admin (Impostazioni, e la Home vuota).
+- "Suona su": `PhoneModel.remote` è il lettore di MA comandato dallo schermo (null: il telefono); "suona"
+  va lì. In auto non cambia niente: il menu suona sempre sulla coda del telefono. Se il telefono comincia
+  a suonare da sé, lo schermo torna al telefono (`phonePlaying`). La scelta non si salva.
 - Ciò che sta fuori dallo `Scaffold` (lettore, benvenuto) ha bisogno della `Surface` della radice
   sopra, altrimenti `LocalContentColor` è nero.
 
@@ -153,11 +196,24 @@ gesti e animazioni sono diversi).
 
 Nella sandbox: Docker Hub risponde 429, si usa `mirror.gcr.io` (vedi `tools/README.md`); se il lavoro
 si riavvia, il demone Docker si ferma e i container `ma` e `pods` vanno riavviati (`docker start`).
+Altre prove del banco: `ServicesCheckKt` (con il servizio finto `tools/ma-test/xonos_test`),
+`PlayersCheckKt` (una cassa finta), `AccountCheckKt`, `PerfCheckKt`.
+
+Le misure sull'emulatore: il workflow "Misure" parte con `[misure]` nel messaggio del commit (con
+`[profilo]` genera anche il Baseline Profile) o a mano; costruisce MA in Docker sul runner, l'app
+release (R8) e le prove di `baselineprofile/`, e mette tabella, log e tracce in
+`refs/xonos/measures/<ramo con - al posto di />`. Sull'emulatore (senza GPU) contano i confronti, non
+i valori assoluti; le prove usano gli id dei testTag (`Modifier.automationIds()`).
 
 ## Richieste dell'utente
 
-Fatte: app sul telefono con grafica moderna (riproduzione, mini-lettore, libreria, ricerca) e testi
-sincronizzati sul telefono. Ancora da fare:
+Fatte: app sul telefono con grafica moderna (riproduzione, mini-lettore, libreria, ricerca), testi
+sincronizzati sul telefono, fluidità (R8, Baseline Profile, elenchi fuori dal thread principale, meno
+ricomposizioni, schermate salvate), server trovati in rete e accesso con nome utente e password,
+gestione dei servizi di MA per gli admin, "Suona su" con passaggio della coda. Studiato, in attesa
+della scelta dell'utente: un server MA sul telefono stesso (Termux, proot dentro l'app, Chaquopy).
+Proposto, non fatto: cercare dal telefono con mDNS/SSDP le casse che MA non vede e suggerire il
+servizio da aggiungere. Ancora da fare:
 
 3. Cali di rete: almeno 3 brani coperti (per poter saltare in galleria) e 10 minuti di podcast.
    Per i podcast si può (episodi scaricati dall'indirizzo diretto). Per la musica in streaming il
@@ -165,6 +221,5 @@ sincronizzati sul telefono. Ancora da fare:
    per la musica dei server propri (Jellyfin, Plex, Subsonic) si può scaricando direttamente da lì.
 4. Offline: podcast e librerie proprie; per le playlist di Spotify, scaricare le copie dei brani
    presenti nella libreria propria dell'utente. Niente copie dai servizi in streaming.
-5. Casse di casa, passaggio della musica tra telefono e casa, coda e playlist. Già fatti: la coda nel
-   lettore (si salta toccando), "suona dopo" e "in coda" dal menu ⋮. Mancano le casse di casa
-   (`players/all`, `player_queues/transfer`) e il modificare le playlist.
+5. Coda e playlist. Già fatti: la coda nel lettore (si salta toccando), "suona dopo" e "in coda" dal
+   menu ⋮, le casse di casa ("Suona su"). Manca il modificare le playlist.
