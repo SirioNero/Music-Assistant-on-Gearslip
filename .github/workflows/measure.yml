@@ -71,7 +71,17 @@ jobs:
 
       # Prima di accendere l'emulatore: se non compila lo si sa subito.
       - name: Compila app e misure
-        run: gradle :app:assembleBenchmarkRelease :baselineprofile:assembleBenchmarkRelease --stacktrace
+        run: |
+          set -o pipefail
+          mkdir -p "$OUT"
+          gradle :app:assembleBenchmarkRelease :baselineprofile:assembleBenchmarkRelease 2>&1 | tee "$OUT/build.log"
+
+      # Gli errori di compilazione diventano un'annotazione, leggibile senza scaricare il log.
+      - name: Riassumi gli errori
+        if: failure()
+        run: |
+          errors=$(grep -E "^e: |error:|What went wrong" -A3 "$OUT/build.log" | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+          if [ -n "$errors" ]; then echo "::error title=Compilazione non riuscita::$errors"; fi
 
       - name: Misura sull'emulatore
         uses: reactivecircus/android-emulator-runner@v2

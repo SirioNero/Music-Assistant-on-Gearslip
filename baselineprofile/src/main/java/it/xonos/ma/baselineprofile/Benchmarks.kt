@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMetricApi::class)
+
 package it.xonos.ma.baselineprofile
 
 import androidx.benchmark.macro.ExperimentalMetricApi
@@ -22,7 +24,6 @@ import org.junit.runners.Parameterized
  * compilazione di [Xonos.modes]. Le sezioni "Xonos.items@main" e "Xonos.json" dicono quanto
  * lavoro di conversione finisce sul thread principale e quanto costa leggere il JSON.
  */
-@OptIn(ExperimentalMetricApi::class)
 abstract class XonosBenchmark(protected val mode: String) {
     @get:Rule
     val rule = MacrobenchmarkRule()
