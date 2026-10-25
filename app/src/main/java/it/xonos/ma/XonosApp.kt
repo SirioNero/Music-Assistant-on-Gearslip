@@ -8,6 +8,7 @@ import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import coil3.request.crossfade
+import it.xonos.ma.data.ArtCache
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.ScreenCache
@@ -23,6 +24,9 @@ class XonosApp : Application(), SingletonImageLoader.Factory {
     val settings: Settings by lazy { Settings(this) }
     val repo: MaRepository by lazy { MaRepository(settings) }
     val library: Library by lazy { Library(repo) }
+
+    /** Le copertine scaricate per l'auto, la notifica e il lettore (vedi playback/Artwork). */
+    val artCache: ArtCache by lazy { ArtCache(File(cacheDir, "art"), repo.http) }
 
     /** Vero quando il servizio ha fatto del telefono un lettore di Music Assistant (API e audio collegati). */
     val playerReady = MutableStateFlow(false)

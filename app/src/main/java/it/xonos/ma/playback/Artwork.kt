@@ -10,18 +10,15 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.net.Uri
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import androidx.core.content.ContextCompat
 import it.xonos.ma.XonosApp
 import it.xonos.ma.R
 import it.xonos.ma.data.MaImage
 import it.xonos.ma.data.MaRepository
-import okhttp3.Request
 import java.io.File
 import java.io.FileNotFoundException
 import java.security.MessageDigest
 import java.util.Base64
-import java.util.concurrent.TimeUnit
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -63,9 +60,6 @@ class Artwork(private val context: Context) {
         .build()
 
     companion object {
-        private const val TAG = "Xonos"
-        private const val MAX_FILES = 400
-
         /** Le icone del menu, disegnate dall'app. */
         val ICONS = mapOf(
             "recent" to R.drawable.ic_cat_recent,
@@ -102,59 +96,31 @@ class Artwork(private val context: Context) {
         /** Il file con l'immagine chiesta, scaricato o disegnato se non c'è ancora. Gira su un thread del binder. */
         fun open(context: Context, uri: Uri): File? {
             val app = context.applicationContext as XonosApp
-            val dir = File(context.cacheDir, "art").apply { mkdirs() }
             return when (uri.pathSegments.firstOrNull()) {
-                "icon" -> icon(context, dir, uri.lastPathSegment ?: return null)
-                "img" -> image(app, dir, uri)
+                "icon" -> icon(context, File(context.cacheDir, "art").apply { mkdirs() }, uri.lastPathSegment ?: return null)
+                "img" -> image(app, uri)
                 else -> null
             }
         }
 
-        private fun image(app: XonosApp, dir: File, uri: Uri): File? {
+        private fun image(app: XonosApp, uri: Uri): File? {
             val encoded = uri.getQueryParameter("v") ?: return null
             val size = uri.getQueryParameter("s")?.toIntOrNull() ?: return null
             val signature = uri.getQueryParameter("h") ?: return null
             if (signature != sign(app.settings.artKey, "$encoded|$size")) return null
-            val file = File(dir, hash("$encoded|$size") + ".img")
-            if (file.length() > 0) {
-                file.setLastModified(System.currentTimeMillis())
-                return file
-            }
-            val value = decode(encoded)
-            val base = app.repo.baseUrl ?: app.settings.load().urls.firstOrNull()
-            val url = when {
-                value.startsWith("url:") -> value.removePrefix("url:")
-                base == null -> return null
-                value.startsWith("id:") -> MaRepository.imageUrl(base, MaImage("", "", value.removePrefix("id:"), false), size)
-                value.startsWith("path:") -> {
-                    val (provider, path) = value.removePrefix("path:").split('|', limit = 2).let { it[0] to it.getOrElse(1) { "" } }
-                    MaRepository.imageUrl(base, MaImage(path, provider, null, false), size)
+            return app.artCache.get(hash("$encoded|$size") + ".img") {
+                val value = decode(encoded)
+                val base = app.repo.baseUrl ?: app.settings.load().urls.firstOrNull()
+                when {
+                    value.startsWith("url:") -> value.removePrefix("url:")
+                    base == null -> null
+                    value.startsWith("id:") -> MaRepository.imageUrl(base, MaImage("", "", value.removePrefix("id:"), false), size)
+                    value.startsWith("path:") -> {
+                        val (provider, path) = value.removePrefix("path:").split('|', limit = 2).let { it[0] to it.getOrElse(1) { "" } }
+                        MaRepository.imageUrl(base, MaImage(path, provider, null, false), size)
+                    }
+                    else -> null
                 }
-                else -> return null
-            }
-            return download(app, url, file)
-        }
-
-        private fun download(app: XonosApp, url: String, file: File): File? {
-            val http = app.repo.http.newBuilder().readTimeout(10, TimeUnit.SECONDS).callTimeout(15, TimeUnit.SECONDS).build()
-            val request = try {
-                Request.Builder().url(url).build()
-            } catch (e: IllegalArgumentException) {
-                return null
-            }
-            return try {
-                http.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) return null
-                    val body = response.body ?: return null
-                    val temp = File(file.parentFile, file.name + ".part")
-                    temp.outputStream().use { out -> body.byteStream().copyTo(out) }
-                    if (!temp.renameTo(file)) return null
-                    prune(file.parentFile)
-                    file
-                }
-            } catch (e: Exception) {
-                Log.w(TAG, "Copertina non scaricata: ${e.message}")
-                null
             }
         }
 
@@ -173,16 +139,12 @@ class Artwork(private val context: Context) {
             drawable.setBounds(inset, inset, size - inset, size - inset)
             drawable.setTint(ContextCompat.getColor(context, R.color.warm))
             drawable.draw(canvas)
-            val temp = File(dir, file.name + ".part")
+            // Un file temporaneo tutto suo, come per le copertine (vedi ArtCache).
+            val temp = File.createTempFile(file.name, ".part", dir)
             temp.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
             bitmap.recycle()
-            return if (temp.renameTo(file)) file else null
-        }
-
-        private fun prune(dir: File?) {
-            val files = dir?.listFiles { f -> f.name.endsWith(".img") } ?: return
-            if (files.size <= MAX_FILES) return
-            files.sortedBy { it.lastModified() }.take(files.size - MAX_FILES).forEach { it.delete() }
+            if (!temp.renameTo(file)) temp.delete()
+            return file.takeIf { it.length() > 0 }
         }
     }
 }
