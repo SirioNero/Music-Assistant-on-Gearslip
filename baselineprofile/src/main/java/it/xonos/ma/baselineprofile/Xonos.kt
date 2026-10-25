@@ -8,6 +8,7 @@ import androidx.benchmark.macro.MacrobenchmarkScope
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.StaleObjectException
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.Until
 import java.io.ByteArrayOutputStream
@@ -117,21 +118,39 @@ fun MacrobenchmarkScope.ensurePlaying() {
     waitForText("Home").click()
 }
 
-/** Scorre un elenco: [times] colpi in giù e uno su. */
-fun MacrobenchmarkScope.flingList(list: UiObject2, times: Int) {
+/**
+ * Scorre l'elenco con questo testTag: [times] colpi in giù e uno su. L'elenco si ritrova prima di
+ * ogni colpo: mentre arrivano i dati Compose può rifarne il nodo, e quello vecchio non vale più.
+ */
+fun MacrobenchmarkScope.flingList(tag: String, times: Int) {
+    repeat(times) { fling(tag, Direction.DOWN) }
+    fling(tag, Direction.UP)
+}
+
+private fun MacrobenchmarkScope.fling(tag: String, direction: Direction) {
+    val list = waitFor(tag)
     // Lontano dai bordi, dove il gesto indietro di Android ruberebbe il tocco.
     list.setGestureMargin(device.displayWidth / 5)
-    repeat(times) {
-        list.fling(Direction.DOWN)
-        device.waitForIdle()
+    try {
+        list.fling(direction)
+    } catch (e: StaleObjectException) {
+        waitFor(tag).fling(direction)
     }
-    list.fling(Direction.UP)
     device.waitForIdle()
 }
 
 /** Una voce della libreria (Albums, Tracks, Playlists...): la scheda Libreria e il suo filtro. */
-fun MacrobenchmarkScope.openShelf(name: String): UiObject2 {
+fun MacrobenchmarkScope.openShelf(name: String) {
     waitForText("Library").click()
     waitForText(name, 30_000).click()
-    return waitFor("library_list", 30_000)
+    waitFor("library_list", 30_000)
+}
+
+/** Un elemento dell'elenco [tag] con questo testo, scorrendo in giù finché non compare. */
+fun MacrobenchmarkScope.scrollToText(tag: String, text: String): UiObject2 {
+    repeat(15) {
+        device.findObject(By.text(text))?.let { return it }
+        waitFor(tag).scroll(Direction.DOWN, 0.8f)
+    }
+    return waitForText(text)
 }
