@@ -189,16 +189,21 @@ private class MediaCodecDecoder(format: StreamFormat, mime: String) : AudioDecod
     }
 
     override fun decode(data: ByteArray, offset: Int, length: Int, timestampUs: Long, out: (ShortArray, Int, Long) -> Unit) {
-        val index = codec.dequeueInputBuffer(INPUT_TIMEOUT_US)
-        if (index >= 0) {
-            val buffer = codec.getInputBuffer(index) ?: return
-            buffer.clear()
-            buffer.put(data, offset, length)
-            codec.queueInputBuffer(index, 0, length, timestampUs, 0)
-        } else {
-            Log.w("Xonos", "Decoder pieno: pacchetto audio saltato")
+        // Con gli ingressi tutti occupati il decoder di solito aspetta che si prendano le sue uscite:
+        // le si prende e si riprova. Prima il pacchetto si buttava, e nella musica restava un buco.
+        repeat(INPUT_TRIES) {
+            val index = codec.dequeueInputBuffer(INPUT_TIMEOUT_US)
+            if (index >= 0) {
+                val buffer = codec.getInputBuffer(index) ?: return
+                buffer.clear()
+                buffer.put(data, offset, length)
+                codec.queueInputBuffer(index, 0, length, timestampUs, 0)
+                drain(out)
+                return
+            }
+            drain(out)
         }
-        drain(out)
+        Log.w("Xonos", "Decoder fermo: pacchetto audio saltato")
     }
 
     private fun drain(out: (ShortArray, Int, Long) -> Unit) {
@@ -237,7 +242,8 @@ private class MediaCodecDecoder(format: StreamFormat, mime: String) : AudioDecod
     }
 
     private companion object {
-        const val INPUT_TIMEOUT_US = 20_000L
+        const val INPUT_TIMEOUT_US = 10_000L
+        const val INPUT_TRIES = 20
 
         /** L'intestazione di identificazione di Opus (RFC 7845), con pre-skip a zero. */
         fun opusHead(channels: Int, sampleRate: Int): ByteBuffer =
