@@ -141,6 +141,8 @@ private fun MacrobenchmarkScope.fling(tag: String, direction: Direction) {
 
 /** Una voce della libreria (Albums, Tracks, Playlists...): la scheda Libreria e il suo filtro. */
 fun MacrobenchmarkScope.openShelf(name: String) {
+    // Il secondo tocco riporta la scheda alla sua prima schermata (può essere rimasta aperta una playlist).
+    waitForText("Library").click()
     waitForText("Library").click()
     waitForText(name, 30_000).click()
     waitFor("library_list", 30_000)
