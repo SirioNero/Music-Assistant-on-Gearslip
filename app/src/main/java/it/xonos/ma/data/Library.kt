@@ -165,10 +165,19 @@ class Library(private val repo: MaRepository) {
      * Cerca nella libreria e in tutti i servizi collegati, ogni tipo di elemento: i risultati
      * arrivano divisi per tipo ("artists", "tracks", "podcasts"...), i più pertinenti per primi.
      */
-    suspend fun search(query: String, limit: Int = SEARCH_LIMIT): Map<String, List<MaItem>> {
+    /**
+     * Cerca nella libreria e in tutti i servizi. Con [libraryOnly] solo nella libreria: risponde
+     * subito, mentre i servizi possono metterci secondi.
+     */
+    suspend fun search(query: String, limit: Int = SEARCH_LIMIT, libraryOnly: Boolean = false): Map<String, List<MaItem>> {
         val result = repo.command("music/search", 45_000) {
             put("search_query", query)
             put("limit", limit)
+            if (libraryOnly) {
+                // library_only c'è dalla 2.7; dalla 2.10 si dice anche con providers.
+                put("library_only", true)
+                put("providers", JSONArray().put("library"))
+            }
         } as? JSONObject ?: return emptyMap()
         // Lo stesso podcast o brano può arrivare da più servizi: resta il primo, che è il più pertinente.
         return withContext(Dispatchers.Default) {

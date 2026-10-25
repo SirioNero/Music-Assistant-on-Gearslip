@@ -1,11 +1,13 @@
 """Finto iTunes Search + feed RSS per provare Music Assistant con un provider di podcast cercabile."""
-import glob, json, os, sys
+import asyncio, glob, json, os, sys
 from email.utils import formatdate
 from aiohttp import web
 
 MUSIC = sys.argv[1] if len(sys.argv) > 1 else "music"
 ART = sys.argv[2] if len(sys.argv) > 2 else "art.jpg"
 BASE = "http://127.0.0.1:8770"
+# Con SEARCH_DELAY (secondi) la ricerca risponde in ritardo, come un servizio lento.
+SEARCH_DELAY = float(os.environ.get("SEARCH_DELAY", "0"))
 # Gli episodi suonano i primi file FLAC della cartella di musica.
 AUDIO = sorted(glob.glob(f"{MUSIC}/**/*.flac", recursive=True))[:2]
 assert AUDIO, f"nessun file FLAC in {MUSIC}"
@@ -29,6 +31,8 @@ def result(slug, name, author, count):
     }
 
 async def search(request):
+    if SEARCH_DELAY:
+        await asyncio.sleep(SEARCH_DELAY)
     term = request.query.get("term", "").lower()
     limit = int(request.query.get("limit", "50"))
     hits = [result(*p) for p in CATALOG if term in p[1].lower()][:limit]

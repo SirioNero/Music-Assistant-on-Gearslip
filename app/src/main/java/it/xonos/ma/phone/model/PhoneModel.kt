@@ -575,7 +575,10 @@ class PhoneModel(
 
     // ---------- Ricerca ----------
 
-    /** Cerca mentre si scrive: aspetta una breve pausa, e una ricerca nuova cancella la precedente. */
+    /**
+     * Cerca mentre si scrive: aspetta una breve pausa, e una ricerca nuova cancella la precedente.
+     * La libreria risponde subito, i servizi (Spotify...) anche in secondi: intanto si vede lei.
+     */
     fun search(page: SearchPage, text: String) {
         page.query = text
         page.job?.cancel()
@@ -592,8 +595,21 @@ class PhoneModel(
             try {
                 awaitConnected()
                 val (wanted, rest) = Menu.typeHint(query)
-                val found = library.search(rest)
-                page.results = Load.Ready(SearchResults(query, Menu.bestMatches(rest, found, wanted).firstOrNull()?.second, found))
+                fun show(found: Map<String, List<MaItem>>) {
+                    page.results = Load.Ready(SearchResults(query, Menu.bestMatches(rest, found, wanted).firstOrNull()?.second, found))
+                }
+                coroutineScope {
+                    val everywhere = async { library.search(rest) }
+                    val own = try {
+                        library.search(rest, libraryOnly = true)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        null
+                    }
+                    if (!own.isNullOrEmpty() && !everywhere.isCompleted) show(own)
+                    show(everywhere.await())
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
