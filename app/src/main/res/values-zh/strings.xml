@@ -96,4 +96,67 @@
     <plurals name="count_genres">
         <item quantity="other">%d 个流派</item>
     </plurals>
+
+    <!-- L'app sul telefono -->
+    <string name="nav_home">首页</string>
+    <string name="nav_search">搜索</string>
+    <string name="nav_library">音乐库</string>
+    <string name="settings">设置</string>
+    <string name="back">返回</string>
+    <string name="more">更多选项</string>
+    <string name="clear">清除</string>
+    <string name="close_player">关闭播放器</string>
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
+    <string name="shuffle">随机播放</string>
+    <string name="next">下一首</string>
+    <string name="previous">上一首</string>
+    <string name="repeat">重复</string>
+    <string name="favorite_add">添加到收藏</string>
+    <string name="favorite_remove">从收藏中移除</string>
+    <string name="play_next">下一首播放</string>
+    <string name="add_to_queue">添加到播放队列</string>
+    <string name="go_to_album">前往专辑</string>
+    <string name="go_to_artist">前往艺人</string>
+    <string name="see_all">查看全部</string>
+    <string name="lyrics">歌词</string>
+    <string name="lyrics_none">这首歌没有歌词</string>
+    <string name="queue">接下来播放</string>
+    <string name="live">直播</string>
+    <string name="playing_on">正在 %s 上播放</string>
+    <string name="search_hint">艺人、歌曲、播客…</string>
+    <string name="search_start">搜索你的音乐库以及连接到 Music Assistant 的所有服务。</string>
+    <string name="search_none">没有找到“%s”的结果</string>
+    <string name="top_result">最佳结果</string>
+    <string name="sort">排序</string>
+    <string name="sort_name">从 A 到 Z</string>
+    <string name="sort_added">最近添加</string>
+    <string name="sort_played">最近播放</string>
+    <string name="empty">这里还没有内容</string>
+    <string name="retry">重试</string>
+    <string name="connecting">正在连接 Music Assistant…</string>
+    <string name="notice_play_next">将在下一首播放</string>
+    <string name="notice_added">已添加到播放队列</string>
+    <string name="notice_favorite_added">已添加到收藏</string>
+    <string name="notice_favorite_removed">已从收藏中移除</string>
+    <string name="welcome">欢迎使用 Xonos</string>
+    <string name="onboarding_done">前往你的音乐</string>
+    <string name="show_token">显示令牌</string>
+    <string name="hide_token">隐藏令牌</string>
+    <string name="duration_minutes">%d 分钟</string>
+    <string name="duration_hours">%1$d 小时 %2$d 分钟</string>
+    <string name="episode_played">已收听</string>
+    <string name="kind_track">歌曲</string>
+    <string name="kind_artist">艺人</string>
+    <string name="kind_album">专辑</string>
+    <string name="kind_playlist">播放列表</string>
+    <string name="kind_podcast">播客</string>
+    <string name="kind_episode">单集</string>
+    <string name="kind_audiobook">有声书</string>
+    <string name="kind_radio">电台</string>
+    <string name="kind_genre">流派</string>
+    <string name="kind_folder">文件夹</string>
+    <plurals name="episode_left">
+        <item quantity="other">还剩 %d 分钟</item>
+    </plurals>
 </resources>

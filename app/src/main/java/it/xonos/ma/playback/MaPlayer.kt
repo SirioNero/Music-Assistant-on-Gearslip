@@ -1,6 +1,7 @@
 package it.xonos.ma.playback
 
 import android.net.Uri
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -207,6 +208,15 @@ class MaPlayer(
             .setIsPlayable(true)
             .setIsBrowsable(false)
             .setUserRating(HeartRating(favorite))
+            // Per lo schermo del telefono: il testo del brano, e da lì l'album e l'artista.
+            .setExtras(
+                Bundle().apply {
+                    putString(EXTRA_URI, item.uri)
+                    putString(EXTRA_TYPE, item.mediaType)
+                    putString(EXTRA_ALBUM, item.albumRef?.uri)
+                    putString(EXTRA_ARTIST, item.artistRef?.uri)
+                },
+            )
             .apply { if (item.durationSec > 0) setDurationMs(item.durationSec * 1000L) }
             .build()
         val mediaItem = MediaItem.Builder()
@@ -523,29 +533,35 @@ class MaPlayer(
         }
     }
 
-    private companion object {
-        const val TAG = "Xonos"
-        const val BEHIND = 3
-        const val AHEAD = 50
-        const val AHEAD_MARGIN = 5
-        const val NOW_PLAYING_ART = 512
-        const val POSITION_TOLERANCE_MS = 1_500L
-        const val WINDOW_DEBOUNCE_MS = 150L
-        const val EXPECT_TIMEOUT_MS = 3_000L
-        const val PLAY_SETTLE_MS = 4_000L
-        const val READY_TIMEOUT_MS = 20_000L
-        const val RECENT_PLAY_MS = 30_000L
-        const val RESUME_WINDOW_MS = 10 * 60_000L
+    companion object {
+        /** Negli extra dei metadati: l'uri di Music Assistant del brano, il suo tipo, il suo album e il suo artista. */
+        const val EXTRA_URI = "xonos.uri"
+        const val EXTRA_TYPE = "xonos.type"
+        const val EXTRA_ALBUM = "xonos.album"
+        const val EXTRA_ARTIST = "xonos.artist"
+
+        private const val TAG = "Xonos"
+        private const val BEHIND = 3
+        private const val AHEAD = 50
+        private const val AHEAD_MARGIN = 5
+        private const val NOW_PLAYING_ART = 512
+        private const val POSITION_TOLERANCE_MS = 1_500L
+        private const val WINDOW_DEBOUNCE_MS = 150L
+        private const val EXPECT_TIMEOUT_MS = 3_000L
+        private const val PLAY_SETTLE_MS = 4_000L
+        private const val READY_TIMEOUT_MS = 20_000L
+        private const val RECENT_PLAY_MS = 30_000L
+        private const val RESUME_WINDOW_MS = 10 * 60_000L
 
         /** Quanto audio il telefono ha di solito in serbo quando la rete cade. */
-        const val BUFFER_GUESS_MS = 25_000L
+        private const val BUFFER_GUESS_MS = 25_000L
 
-        val AUDIO_ATTRIBUTES: AudioAttributes = AudioAttributes.Builder()
+        private val AUDIO_ATTRIBUTES: AudioAttributes = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
             .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .build()
 
-        val BASE_COMMANDS = intArrayOf(
+        private val BASE_COMMANDS = intArrayOf(
             Player.COMMAND_PLAY_PAUSE,
             Player.COMMAND_PREPARE,
             Player.COMMAND_STOP,

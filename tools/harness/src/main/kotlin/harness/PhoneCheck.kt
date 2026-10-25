@@ -1,0 +1,276 @@
+package harness
+
+import it.xonos.ma.data.Connection
+import it.xonos.ma.data.Library
+import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.QueueState
+import it.xonos.ma.data.Settings
+import it.xonos.ma.phone.model.ArtistPage
+import it.xonos.ma.phone.model.HomePage
+import it.xonos.ma.phone.model.ItemPage
+import it.xonos.ma.phone.model.LibraryPage
+import it.xonos.ma.phone.model.ListPage
+import it.xonos.ma.phone.model.Load
+import it.xonos.ma.phone.model.ORDER_ADDED
+import it.xonos.ma.phone.model.PhoneModel
+import it.xonos.ma.phone.model.SearchPage
+import it.xonos.ma.phone.model.SettingsPage
+import it.xonos.ma.phone.model.Shelf
+import it.xonos.ma.phone.model.Tab
+import it.xonos.ma.phone.model.value
+import it.xonos.ma.sendspin.AudioEngine
+import it.xonos.ma.sendspin.PcmDecoder
+import it.xonos.ma.sendspin.SendspinClient
+import it.xonos.ma.sendspin.StreamFormat
+import it.xonos.ma.sendspin.TimeFilter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONObject
+import java.util.concurrent.Executors
+
+/**
+ * L'app del telefono senza schermo: il PhoneModel contro un Music Assistant vero, come se si
+ * toccassero le schermate. Controlla caricamenti, pagine della libreria, ricerca, riproduzione,
+ * coda, preferiti e testi.
+ */
+fun main(): Unit = runBlocking {
+    val url = System.getenv("MA_URL") ?: "http://127.0.0.1:8095"
+    val token = System.getenv("MA_TOKEN") ?: error("MA_TOKEN")
+    val playerId = "xonos-phonecheck"
+    val settings = Settings()
+    val repo = MaRepository(settings)
+    val library = Library(repo)
+    repo.acquire()
+    withTimeout(15_000) { repo.connection.first { it is Connection.Connected } }
+
+    // Il telefono come lettore, come fa il servizio sul telefono.
+    val outputs = mutableListOf<FakeOutput>()
+    val engine = AudioEngine({ r, c -> FakeOutput(r, c).also { outputs += it } }, { f -> PcmDecoder(f.channels, f.bitDepth) }, TimeFilter())
+    val identity = SendspinClient.Identity(playerId, "Prova telefono", "JVM", "test", listOf(StreamFormat("pcm", 48000, 2, 16)), 800, 300, 50, false)
+    val client = SendspinClient(repo.http, engine, { identity }) { _, _ -> }
+    val ready = MutableStateFlow(false)
+    client.start(url, token)
+    withTimeout(20_000) { client.phase.first { it == SendspinClient.Phase.READY } }
+    ready.value = true
+
+    // Un solo thread per il modello, come il thread principale del telefono.
+    val main = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    val model = PhoneModel(repo, library, settings, { playerId }, ready, CoroutineScope(SupervisorJob() + main))
+    var failures = 0
+
+    fun check(label: String, ok: Boolean, detail: String = "") {
+        if (!ok) failures++
+        println("${if (ok) "OK " else "NO "} $label${if (detail.isNotEmpty()) " · $detail" else ""}")
+    }
+
+    suspend fun <T> loaded(what: () -> Load<T>?): T? = withTimeoutOrNull(60_000) {
+        while (true) {
+            when (val load = what()) {
+                is Load.Ready -> return@withTimeoutOrNull load.value
+                is Load.Failed -> {
+                    println("   errore: ${load.error.message}")
+                    return@withTimeoutOrNull null
+                }
+                else -> delay(50)
+            }
+        }
+        @Suppress("UNREACHABLE_CODE")
+        null
+    }
+
+    suspend fun queue(): QueueState? = QueueState.from(repo.command("player_queues/get") { put("queue_id", playerId) } as? JSONObject)
+
+    suspend fun settle(until: (QueueState?) -> Boolean): QueueState? {
+        var q: QueueState? = null
+        withTimeoutOrNull(10_000) {
+            while (true) {
+                q = queue()
+                if (until(q)) break
+                delay(200)
+            }
+        }
+        return q
+    }
+
+    // ---------- Home ----------
+    val home = model.page as HomePage
+    model.start(home)
+    val rows = loaded { home.rows }
+    check("Home: righe di Per te", !rows.isNullOrEmpty(), "${rows?.size} righe: ${rows?.take(4)?.joinToString { it.row.name }}")
+    delay(2_000)
+    rows?.take(6)?.forEach { row -> println("   - ${row.row.name}: ${row.items.value?.size ?: row.items}") }
+    check("Home: ascoltati di recente", loaded { home.recent } != null)
+
+    // ---------- Libreria ----------
+    model.select(Tab.LIBRARY)
+    val lib = model.page as LibraryPage
+    model.start(lib)
+    withTimeoutOrNull(20_000) { while (lib.shelves == null) delay(50) }
+    check("Libreria: voci non vuote", lib.shelves?.contains(Shelf.ALBUMS) == true && lib.shelves?.contains(Shelf.AUDIOBOOKS) == false, "${lib.shelves}")
+    val tracks = model.shelf(lib, Shelf.TRACKS)
+    model.loadMore(tracks)
+    withTimeoutOrNull(20_000) { while (tracks.loading || tracks.items.isEmpty()) delay(50) }
+    check("Libreria: prima pagina di brani", tracks.items.size == 100, "${tracks.items.size}, primo ${tracks.items.firstOrNull()?.name}")
+    model.loadMore(tracks)
+    withTimeoutOrNull(20_000) { while (tracks.loading || tracks.items.size < 200) delay(50) }
+    check("Libreria: seconda pagina", tracks.items.size == 200 && tracks.items.distinctBy { it.uri }.size == 200)
+    model.order(tracks, ORDER_ADDED)
+    withTimeoutOrNull(20_000) { while (tracks.loading || tracks.items.isEmpty()) delay(50) }
+    check("Libreria: ordine per data di aggiunta", tracks.items.size == 100, "primo ${tracks.items.firstOrNull()?.name}")
+    val albums = model.shelf(lib, Shelf.ALBUMS)
+    model.loadMore(albums)
+    withTimeoutOrNull(20_000) { while (albums.loading || albums.items.isEmpty()) delay(50) }
+    check("Libreria: prima pagina di album", albums.items.size == 100)
+    withTimeoutOrNull(20_000) { while (albums.loading) delay(50) }
+    model.loadMore(albums)
+    withTimeoutOrNull(20_000) { while (albums.loading) delay(50) }
+    check("Libreria: album finiti", albums.end && albums.items.size == 124, "${albums.items.size}")
+    check("Libreria: copertina di un album", albums.items.first { it.name == "Emozioni" }.image?.proxyId != null)
+
+    // ---------- Un album ----------
+    val emozioni = albums.items.first { it.name == "Emozioni" }
+    model.open(emozioni)
+    val albumPage = model.page as ItemPage
+    model.start(albumPage)
+    val albumTracks = loaded { albumPage.tracks }.orEmpty()
+    check("Album: brani in ordine", albumTracks.map { it.trackNumber } == listOf(1, 2, 3, 4), albumTracks.joinToString { "${it.trackNumber} ${it.name}" })
+    check("Album: artisti e album dei brani", albumTracks.first().artists.firstOrNull()?.name == "Lucio Battisti" && albumTracks.first().album?.uri == emozioni.uri)
+    model.play(albumTracks, 1, albumPage.context)
+    var q = settle { it?.playing == true && it.current?.title == albumTracks[1].name }
+    // Music Assistant lascia fuori i brani prima di quello scelto.
+    check("Suona l'album dal secondo brano", q?.current?.title == albumTracks[1].name && q.items == 3, "${q?.state} ${q?.items} \"${q?.current?.title}\"")
+    check("Brano in coda con album e artista", q?.current?.albumRef?.uri == emozioni.uri && q.current.artistRef?.name == "Lucio Battisti")
+
+    // Testo sincronizzato del brano in corso.
+    val lyricsState = model.lyrics(albumTracks[1].uri)
+    val lyrics = loaded { lyricsState.load }
+    check("Testo sincronizzato", lyrics?.synced == true && lyrics.lines.size == 10, "${lyrics?.lines?.take(2)}")
+    check("Riga a 13 s", lyrics?.indexAt(13_000) == 2)
+
+    // Suona dopo e in coda.
+    val vasco = library.search("bollicine")["albums"]?.firstOrNull()
+    check("Ricerca diretta: Bollicine", vasco != null)
+    if (vasco != null) {
+        model.playNext(vasco)
+        q = settle { (it?.items ?: 0) >= 7 }
+        check("Suona dopo: l'album entra in coda", q?.items == 7, "${q?.items} brani")
+        val brava = library.search("brava")["tracks"]?.firstOrNull()
+        brava?.let { model.addToQueue(it) }
+        q = settle { (it?.items ?: 0) >= 8 }
+        check("In coda: il brano va in fondo", q?.items == 8)
+        println("   avviso: ${model.notice}")
+        val items = repo.command("player_queues/items") { put("queue_id", playerId); put("limit", 20); put("offset", 0) } as org.json.JSONArray
+        println("   coda: " + (0 until items.length()).joinToString { items.getJSONObject(it).optString("name") })
+    }
+
+    // Album mescolato.
+    model.play(emozioni, shuffle = true)
+    q = settle { it?.shuffle == true && it.items == 4 }
+    check("Album mescolato", q?.shuffle == true && q.items == 4, "casuale ${q?.shuffle}, ${q?.items} brani")
+    repo.command("player_queues/shuffle") { put("queue_id", playerId); put("shuffle_enabled", false) }
+
+    // Testi semplici e senza testo.
+    val mina = library.search("brava")["tracks"]?.first()
+    val plain = mina?.let { loaded { model.lyrics(it.uri).load } }
+    check("Testo semplice", plain?.synced == false && plain.lines.firstOrNull()?.text == "Brava", "${plain?.lines?.size} righe")
+    val bollicine = library.search("vita spericolata")["tracks"]?.first()
+    val tagged = bollicine?.let { loaded { model.lyrics(it.uri).load } }
+    check("Testo LRC nel tag", tagged?.synced == true && tagged.lines.size == 10)
+
+    // ---------- Artista ----------
+    model.select(Tab.LIBRARY)
+    val artists = model.shelf(lib, Shelf.ARTISTS)
+    model.loadMore(artists)
+    withTimeoutOrNull(20_000) { while (artists.loading || artists.items.isEmpty()) delay(50) }
+    model.open(artists.items.first { it.name == "Vasco Rossi" })
+    val artistPage = model.page as ArtistPage
+    model.start(artistPage)
+    val artistAlbums = loaded { artistPage.albums }.orEmpty()
+    val artistTracks = loaded { artistPage.tracks }.orEmpty()
+    check("Artista: album dal più recente", artistAlbums.firstOrNull()?.year == 2014 && artistAlbums.size == 5, artistAlbums.joinToString { "${it.name} ${it.year}" })
+    check("Artista: tutti i brani", artistTracks.size == 28)
+    model.openArtistTracks(artistPage, "Tutti i brani", top = false)
+    val list = model.page as ListPage
+    model.start(list)
+    check("Artista: schermata dei brani", loaded { list.items }?.size == 28)
+    model.play(artistTracks, 26, null)
+    q = settle { it?.playing == true && it.current?.title == artistTracks[26].name }
+    check("Brano 27 di 28: suonano lui e il successivo", q?.items == 2 && q.current?.title == artistTracks[26].name, "${q?.items} brani")
+
+    // ---------- Podcast ----------
+    val podcasts = model.shelf(lib, Shelf.PODCASTS)
+    model.loadMore(podcasts)
+    withTimeoutOrNull(20_000) { while (podcasts.loading || podcasts.items.isEmpty()) delay(50) }
+    model.open(podcasts.items.first())
+    val podcastPage = model.page as ItemPage
+    model.start(podcastPage)
+    val episodes = loaded { podcastPage.tracks }.orEmpty()
+    check("Podcast: episodi", episodes.size == 8 && episodes.first().mediaType == "podcast_episode")
+    model.play(episodes, 2, podcastPage.context)
+    q = settle { it?.playing == true && it.current?.title == episodes[2].name }
+    check("Podcast: suona l'episodio scelto", q?.current?.title == episodes[2].name, "${q?.items} in coda")
+
+    // ---------- Ricerca ----------
+    model.select(Tab.SEARCH)
+    val search = model.page as SearchPage
+    model.search(search, "v")
+    check("Ricerca: una lettera non cerca", search.results == null)
+    model.search(search, "vasc")
+    model.search(search, "vasco")
+    val results = loaded { search.results }
+    check("Ricerca: risultati per tipo", results?.query == "vasco" && results.byType["artists"]?.firstOrNull()?.name == "Vasco Rossi", "${results?.byType?.mapValues { it.value.size }}")
+    check("Ricerca: risultato migliore", results?.best?.name == "Vasco Rossi", "${results?.best?.name} (${results?.best?.mediaType})")
+    model.search(search, "podcast morning")
+    val morning = loaded { search.results?.takeIf { (it as? Load.Ready)?.value?.query != "vasco" } }
+    check("Ricerca: \"podcast morning\" mette davanti il podcast", morning?.best?.mediaType == "podcast", "${morning?.best?.name}")
+
+    // ---------- Preferiti ----------
+    model.select(Tab.LIBRARY)
+    model.open(emozioni)
+    val again = model.page as ItemPage
+    model.setFavorite(again, true)
+    delay(1_500)
+    check("Preferito: album aggiunto", library.item(emozioni.uri)?.favorite == true, "${model.notice}")
+    model.setFavorite(again, false)
+    delay(1_500)
+    check("Preferito: album tolto", library.item(emozioni.uri)?.favorite == false)
+
+    // ---------- Navigazione ----------
+    val depth = model.depth
+    model.back()
+    check("Indietro toglie una schermata", model.depth == depth - 1)
+    model.select(Tab.LIBRARY)
+    check("Toccare di nuovo la scheda torna all'inizio", model.depth == 0 && model.page is LibraryPage)
+    model.playerOpen = true
+    model.back()
+    check("Indietro chiude prima il lettore", !model.playerOpen && model.tab == Tab.LIBRARY)
+    model.back()
+    check("Dalla prima schermata di una scheda torna alla Home", model.tab == Tab.HOME)
+    check("Dalla Home indietro esce", !model.back())
+
+    // ---------- Impostazioni ----------
+    model.openSettings()
+    val settingsPage = model.page as SettingsPage
+    settingsPage.remote = "127.0.0.1:1"
+    model.save(settingsPage)
+    withTimeoutOrNull(30_000) { while (settingsPage.checking || settingsPage.results.size < 2) delay(100) }
+    check("Impostazioni: prova di casa e fuori casa", settingsPage.results.size == 2, settingsPage.results.joinToString())
+    settingsPage.remote = ""
+    model.save(settingsPage)
+    withTimeout(15_000) { repo.connection.first { it is Connection.Connected } }
+
+    repo.command("player_queues/stop") { put("queue_id", playerId) }
+    delay(500)
+    println(if (failures == 0) "\nTutto bene" else "\n$failures prove non riuscite")
+    client.stop()
+    engine.release()
+    repo.release()
+    kotlin.system.exitProcess(if (failures == 0) 0 else 1)
+}

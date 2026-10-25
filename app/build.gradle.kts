@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 // Su GitHub ogni compilazione ha un numero crescente: così ogni APK nuovo si installa sopra il precedente.
@@ -56,6 +57,7 @@ android {
 
     buildFeatures {
         buildConfig = true
+        compose = true
     }
 
     lint {
@@ -77,4 +79,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Lo schermo del telefono. Le versioni sono quelle di Compose Multiplatform 1.9.3, che il banco di
+    // prova (tools/screens) usa per disegnare le stesse schermate sulla JVM.
+    implementation("androidx.activity:activity-compose:1.10.1")
+    implementation("androidx.compose.ui:ui:1.9.4")
+    implementation("androidx.compose.foundation:foundation:1.9.4")
+    implementation("androidx.compose.material3:material3:1.4.0")
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
 }

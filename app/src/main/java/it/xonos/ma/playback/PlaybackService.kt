@@ -36,10 +36,11 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import it.xonos.ma.XonosApp
 import it.xonos.ma.describe
+import it.xonos.ma.wrap
 import it.xonos.ma.BuildConfig
 import it.xonos.ma.R
 import it.xonos.ma.data.Connection
-import it.xonos.ma.phone.SettingsActivity
+import it.xonos.ma.phone.MainActivity
 import it.xonos.ma.sendspin.AndroidAudio
 import it.xonos.ma.sendspin.AudioEngine
 import it.xonos.ma.sendspin.SendspinClient
@@ -47,7 +48,6 @@ import it.xonos.ma.sendspin.StreamFormat
 import it.xonos.ma.sendspin.TimeFilter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
@@ -74,7 +74,6 @@ class PlaybackService : MediaLibraryService() {
 
     private val scope = MainScope()
     private val main = Handler(Looper.getMainLooper())
-    private val ready = MutableStateFlow(false)
     private val searches = mutableMapOf<String, List<MediaItem>>()
 
     private var wakeLock: PowerManager.WakeLock? = null
@@ -101,20 +100,21 @@ class PlaybackService : MediaLibraryService() {
             settings.volume = volume
             settings.muted = muted
         }
-        player = MaPlayer(mainLooper, app.repo, settings.playerId, ready, engine.outputting, artwork::uriFor) { connection ->
+        player = MaPlayer(mainLooper, app.repo, settings.playerId, app.playerReady, engine.outputting, artwork::uriFor) { connection ->
             describe(settings.language.wrap(this), connection)
         }
         tree = BrowseTree(Menu(app.library, ResourceLabels(this) { settings.language }) { settings.playerId }, artwork)
         player.onPlayRequest = { item -> tree.play(item) }
 
-        val openSettings = PendingIntent.getActivity(
+        // Toccando la notifica si apre il lettore sul telefono.
+        val openPlayer = PendingIntent.getActivity(
             this,
             0,
-            Intent(this, SettingsActivity::class.java),
+            Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_PLAYER, true).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         session = MediaLibrarySession.Builder(this, player, Callback())
-            .setSessionActivity(openSettings)
+            .setSessionActivity(openPlayer)
             .build()
         setMediaNotificationProvider(
             DefaultMediaNotificationProvider.Builder(this).build().also { it.setSmallIcon(R.drawable.ic_notification) },
@@ -126,7 +126,7 @@ class PlaybackService : MediaLibraryService() {
         scope.launch {
             combine(app.repo.connection, sendspin.phase) { connection, phase ->
                 connection is Connection.Connected && phase == SendspinClient.Phase.READY
-            }.collect { ready.value = it }
+            }.collect { app.playerReady.value = it }
         }
         scope.launch { engine.outputting.collect(::onOutputting) }
         connectivity.registerDefaultNetworkCallback(networkCallback)
@@ -135,6 +135,7 @@ class PlaybackService : MediaLibraryService() {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession = session
 
     override fun onDestroy() {
+        app.playerReady.value = false
         runCatching { connectivity.unregisterNetworkCallback(networkCallback) }
         main.removeCallbacksAndMessages(null)
         setNoisyReceiver(false)

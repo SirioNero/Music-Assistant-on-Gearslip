@@ -146,45 +146,6 @@ class Menu(
         return lookup(rest.substringAfter('|'))[rest.substringBefore('|')].orEmpty()
     }
 
-    /** I risultati migliori: per ogni tipo il più somigliante tra i primi, poi in ordine di somiglianza. */
-    private fun bestMatches(text: String, found: Map<String, List<MaItem>>, wanted: String?): List<Pair<String, MaItem>> {
-        val query = fold(text)
-        val words = query.split(' ').filter { it.isNotEmpty() }
-        fun score(item: MaItem): Int {
-            val name = fold(item.name)
-            return when {
-                name == query -> 3
-                name.startsWith(query) -> 2
-                words.isNotEmpty() && words.all { it in name } -> 1
-                else -> 0
-            }
-        }
-        val picks = Library.SEARCH_TYPES.mapNotNull { type ->
-            val candidates = found[type]?.take(PICK_FROM) ?: return@mapNotNull null
-            // A parità vince l'ordine di Music Assistant, che mette davanti i nomi uguali e la libreria.
-            val best = candidates.maxByOrNull(::score) ?: return@mapNotNull null
-            Triple(type, best, score(best))
-        }
-        val anyMatch = picks.any { it.third > 0 }
-        val chosen = picks.filter { !anyMatch || it.third > 0 }
-            .sortedByDescending { it.third }
-            .map { it.first to it.second }
-        if (wanted == null) return chosen
-        val first = found[wanted].orEmpty().take(WANTED_FIRST).map { wanted to it }
-        return first + chosen.filter { pick -> first.none { it.second.uri == pick.second.uri } }
-    }
-
-    /** "podcast morning", "il podcast morning" o "morning podcast": il tipo cercato e il resto. */
-    private fun typeHint(query: String): Pair<String?, String> {
-        val words = query.trim().split(' ').filter { it.isNotEmpty() }
-        val start = if (words.size > 2 && fold(words[0]) in ARTICLES) 1 else 0
-        val leading = words.getOrNull(start)?.let { TYPE_WORDS[fold(it)] }
-        if (leading != null && words.size > start + 1) return leading to words.drop(start + 1).joinToString(" ")
-        val trailing = words.lastOrNull()?.let { TYPE_WORDS[fold(it)] }
-        if (trailing != null && words.size > 1) return trailing to words.dropLast(1).joinToString(" ")
-        return null to words.joinToString(" ")
-    }
-
     // ---------- Riproduzione ----------
 
     /** Suona ciò che l'auto ha scelto: un elemento del menu, una ricerca a voce o la ripresa. */
@@ -440,6 +401,48 @@ class Menu(
         /** Minuscolo, senza accenti né punteggiatura: per confrontare ciò che si cerca con i nomi. */
         fun fold(text: String): String =
             Normalizer.normalize(text, Normalizer.Form.NFD).replace(MARKS, "").lowercase().replace(SEPARATORS, " ").trim()
+
+        /**
+         * I risultati migliori: per ogni tipo il più somigliante tra i primi, poi in ordine di somiglianza.
+         * Con [wanted] ("podcasts", ...) i primi di quel tipo vanno davanti. Li usa anche il telefono.
+         */
+        fun bestMatches(text: String, found: Map<String, List<MaItem>>, wanted: String?): List<Pair<String, MaItem>> {
+            val query = fold(text)
+            val words = query.split(' ').filter { it.isNotEmpty() }
+            fun score(item: MaItem): Int {
+                val name = fold(item.name)
+                return when {
+                    name == query -> 3
+                    name.startsWith(query) -> 2
+                    words.isNotEmpty() && words.all { it in name } -> 1
+                    else -> 0
+                }
+            }
+            val picks = Library.SEARCH_TYPES.mapNotNull { type ->
+                val candidates = found[type]?.take(PICK_FROM) ?: return@mapNotNull null
+                // A parità vince l'ordine di Music Assistant, che mette davanti i nomi uguali e la libreria.
+                val best = candidates.maxByOrNull(::score) ?: return@mapNotNull null
+                Triple(type, best, score(best))
+            }
+            val anyMatch = picks.any { it.third > 0 }
+            val chosen = picks.filter { !anyMatch || it.third > 0 }
+                .sortedByDescending { it.third }
+                .map { it.first to it.second }
+            if (wanted == null) return chosen
+            val first = found[wanted].orEmpty().take(WANTED_FIRST).map { wanted to it }
+            return first + chosen.filter { pick -> first.none { it.second.uri == pick.second.uri } }
+        }
+
+        /** "podcast morning", "il podcast morning" o "morning podcast": il tipo cercato e il resto. */
+        fun typeHint(query: String): Pair<String?, String> {
+            val words = query.trim().split(' ').filter { it.isNotEmpty() }
+            val start = if (words.size > 2 && fold(words[0]) in ARTICLES) 1 else 0
+            val leading = words.getOrNull(start)?.let { TYPE_WORDS[fold(it)] }
+            if (leading != null && words.size > start + 1) return leading to words.drop(start + 1).joinToString(" ")
+            val trailing = words.lastOrNull()?.let { TYPE_WORDS[fold(it)] }
+            if (trailing != null && words.size > 1) return trailing to words.dropLast(1).joinToString(" ")
+            return null to words.joinToString(" ")
+        }
 
         /** L'iniziale con cui Music Assistant mette in ordine l'elemento; "#" per numeri e simboli. */
         private fun initialOf(item: MaItem): String {

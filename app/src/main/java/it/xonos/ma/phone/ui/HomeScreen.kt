@@ -1,0 +1,92 @@
+package it.xonos.ma.phone.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import it.xonos.ma.R
+import it.xonos.ma.data.Connection
+import it.xonos.ma.phone.model.HomePage
+import it.xonos.ma.phone.model.Load
+import it.xonos.ma.phone.model.PhoneModel
+import it.xonos.ma.phone.model.value
+
+/** La prima scheda: gli ascolti recenti e le righe "Per te" di Music Assistant. */
+@Composable
+internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
+    val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = top, bottom = 24.dp)) {
+        item(key = "header") {
+            Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+                IconButton(onClick = model::openSettings) { Icon(XIcons.Settings, stringResource(R.string.settings)) }
+            }
+            ConnectionBanner(model, host)
+        }
+        item(key = "recent") {
+            when (val recent = page.recent) {
+                Load.Loading -> Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                is Load.Failed -> Problem(host.describe(recent.error), { model.reload(page) })
+                is Load.Ready -> if (recent.value.isNotEmpty()) {
+                    CardRow(stringResource(R.string.cat_recent), recent.value, model) { _, item -> model.open(item) }
+                }
+            }
+        }
+        // Le righe vuote (o non riuscite) non si mostrano: sono solo consigli.
+        val rows = page.rows.value.orEmpty()
+        items(rows, key = { "${it.row.provider}|${it.row.itemId}" }) { row ->
+            val items = row.items.value
+            if (!items.isNullOrEmpty()) {
+                CardRow(row.row.name, items, model, row.row.subtitle, { model.openRow(row) }) { _, item -> model.open(item) }
+            }
+        }
+    }
+}
+
+/** Una riga sotto il titolo quando Music Assistant non risponde: il motivo, o che ci si sta collegando. */
+@Composable
+internal fun ConnectionBanner(model: PhoneModel, host: Host) {
+    val connection by model.connection.collectAsState()
+    val text = when (connection) {
+        is Connection.Connected -> return
+        is Connection.Connecting -> stringResource(R.string.connecting)
+        else -> host.describe(connection) ?: return
+    }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (connection is Connection.Connecting) {
+                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+            } else {
+                Icon(XIcons.Offline, null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error)
+            }
+            Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        }
+    }
+}

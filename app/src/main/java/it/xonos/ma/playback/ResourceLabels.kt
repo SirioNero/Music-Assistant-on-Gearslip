@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import it.xonos.ma.Language
 import it.xonos.ma.R
+import it.xonos.ma.wrap
 
 /** Le scritte del menu dalle risorse dell'app, nella lingua scelta sul telefono, anche se cambia con l'auto collegata. */
 class ResourceLabels(private val context: Context, private val language: () -> Language) : MenuLabels {

@@ -1,0 +1,547 @@
+package it.xonos.ma.phone.model
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import it.xonos.ma.data.Connection
+import it.xonos.ma.data.Library
+import it.xonos.ma.data.Lyrics
+import it.xonos.ma.data.MaException
+import it.xonos.ma.data.MaImage
+import it.xonos.ma.data.MaItem
+import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.Problem
+import it.xonos.ma.data.Settings
+import it.xonos.ma.playback.Menu
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+
+/** Le schede in fondo allo schermo. */
+enum class Tab { HOME, SEARCH, LIBRARY }
+
+/** Un avviso breve in fondo allo schermo, dopo un comando. */
+sealed interface Notice {
+    data object PlayNext : Notice
+    data object Added : Notice
+    data object FavoriteAdded : Notice
+    data object FavoriteRemoved : Notice
+    data class Failed(val error: Throwable) : Notice
+}
+
+/**
+ * Lo stato dell'app sul telefono: le schede con le loro pile di schermate, i caricamenti dalla
+ * libreria, la ricerca, i comandi di riproduzione e i testi. Non usa Android: lo schermo lo
+ * disegna Compose, e il banco di prova lo usa contro un Music Assistant vero.
+ *
+ * Lo stato è fatto di valori osservabili di Compose; i comandi partono su [scope].
+ */
+class PhoneModel(
+    private val repo: MaRepository,
+    private val library: Library,
+    private val settings: Settings,
+    /** La coda del telefono in Music Assistant (l'id del lettore). */
+    private val queueId: () -> String,
+    /** Vero quando il telefono è un lettore di Music Assistant: solo allora si può suonare. */
+    private val ready: StateFlow<Boolean>,
+    private val scope: CoroutineScope,
+) {
+    val connection: StateFlow<Connection> get() = repo.connection
+
+    var tab by mutableStateOf(Tab.HOME)
+        private set
+
+    private val stacks = Tab.entries.associateWith { tab ->
+        mutableStateListOf(
+            when (tab) {
+                Tab.HOME -> HomePage()
+                Tab.SEARCH -> SearchPage()
+                Tab.LIBRARY -> LibraryPage()
+            },
+        )
+    }
+
+    /** La schermata in cima alla scheda scelta. */
+    val page: Page get() = stacks.getValue(tab).last()
+
+    /** Quante schermate ci sono sotto quella mostrata: con zero, "indietro" esce o torna alla Home. */
+    val depth: Int get() = stacks.getValue(tab).size - 1
+
+    /** Il lettore a schermo intero, sopra tutto il resto. */
+    var playerOpen by mutableStateOf(false)
+
+    var notice by mutableStateOf<Notice?>(null)
+
+    /** Le impostazioni vanno mostrate per prime finché non c'è almeno un indirizzo e il token. */
+    val configured: Boolean get() = settings.load().isComplete
+
+    /** Il nome del telefono tra i lettori di Music Assistant. */
+    val playerName: String get() = settings.playerName
+
+    // ---------- Navigazione ----------
+
+    fun select(tab: Tab) {
+        if (tab == this.tab) {
+            // Toccare di nuovo la scheda torna alla sua prima schermata.
+            val stack = stacks.getValue(tab)
+            while (stack.size > 1) stack.removeAt(stack.lastIndex)
+        }
+        this.tab = tab
+    }
+
+    fun push(page: Page) {
+        stacks.getValue(tab).add(page)
+    }
+
+    /** Indietro: chiude il lettore, poi toglie una schermata, poi torna alla Home. Falso se non c'è altro. */
+    fun back(): Boolean {
+        val stack = stacks.getValue(tab)
+        when {
+            playerOpen -> playerOpen = false
+            stack.size > 1 -> stack.removeAt(stack.lastIndex)
+            tab != Tab.HOME -> tab = Tab.HOME
+            else -> return false
+        }
+        return true
+    }
+
+    fun openSettings() = push(settingsPage())
+
+    /** Le impostazioni con i valori salvati. */
+    fun settingsPage(): SettingsPage {
+        val config = settings.load()
+        return SettingsPage(config.homeUrl, config.remoteUrl, config.token, settings.playerName)
+    }
+
+    /** Apre un elemento: album, playlist, artista, podcast, genere o cartella; il resto lo suona. */
+    fun open(item: MaItem) {
+        playerOpen = false
+        when {
+            item.mediaType == "artist" -> push(ArtistPage(item))
+            item.mediaType == "folder" -> push(ListPage(item.name, item.subtitle, item.image) { library.browse(item.path) })
+            item.browsable -> push(ItemPage(item))
+            else -> play(listOf(item.uri))
+        }
+    }
+
+    /** Apre un album o un artista di cui si sa solo l'uri (dal lettore). */
+    fun openUri(uri: String) {
+        scope.launch {
+            try {
+                library.item(uri)?.let(::open)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notice = Notice.Failed(e)
+            }
+        }
+    }
+
+    // ---------- Caricamenti ----------
+
+    /** Carica i dati di una schermata la prima volta che compare. */
+    fun start(page: Page) {
+        if (page.started) return
+        page.started = true
+        when (page) {
+            is HomePage -> loadHome(page)
+            is LibraryPage -> loadShelves(page)
+            is ItemPage -> loadItem(page)
+            is ArtistPage -> loadArtist(page)
+            is ListPage -> load(page)
+            is SearchPage, is SettingsPage -> Unit
+        }
+    }
+
+    /** Ricarica una schermata (per esempio dopo un errore di rete). */
+    fun reload(page: Page) {
+        if (page is LibraryPage) {
+            page.lists.values.filter { it.error != null }.forEach(::loadMore)
+            if (page.shelves != null) return
+        }
+        page.started = false
+        start(page)
+    }
+
+    private fun loadHome(page: HomePage) {
+        page.recent = Load.Loading
+        page.rows = Load.Loading
+        launchLoad({ page.recent = Load.Failed(it) }) {
+            page.recent = Load.Ready(library.recent(RECENT))
+        }
+        launchLoad({ page.rows = Load.Failed(it) }) {
+            // La riga "Recently played" dei consigli ripete la prima della Home.
+            val rows = library.recommendations().filter { it.mediaType == "folder" && it.itemId != "recently_played" }.map { row ->
+                HomePage.Row(row, if (row.inline.isNotEmpty()) Load.Ready(row.inline) else Load.Loading)
+            }
+            page.rows = Load.Ready(rows)
+            coroutineScope {
+                rows.filter { it.items is Load.Loading }.map { row ->
+                    async {
+                        row.items = try {
+                            Load.Ready(library.recommendationItems(row.row))
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            Load.Failed(e)
+                        }
+                    }
+                }.awaitAll()
+            }
+        }
+    }
+
+    private fun loadShelves(page: LibraryPage) {
+        launchLoad({ page.shelves = Shelf.entries }) {
+            // Si mostrano solo le voci con qualcosa dentro, come in auto.
+            val shelves = coroutineScope {
+                Shelf.entries.map { shelf -> async { shelf to has(shelf) } }.awaitAll()
+            }.filter { it.second }.map { it.first }
+            page.shelves = shelves
+            if (page.shelf !in shelves) shelves.firstOrNull()?.let { page.shelf = it }
+        }
+    }
+
+    private suspend fun has(shelf: Shelf): Boolean = try {
+        when (shelf) {
+            Shelf.BROWSE -> true
+            // Music Assistant conta anche i generi senza musica, e prima della 2.10 non li ha.
+            Shelf.GENRES -> library.hasGenres()
+            else -> library.count(shelf.kind, shelf.favorite) != 0
+        }
+    } catch (e: MaException) {
+        shelf != Shelf.GENRES
+    }
+
+    /** L'elenco di una voce della libreria, che si carica a pagine. */
+    fun shelf(page: LibraryPage, shelf: Shelf): ShelfList = page.lists.getOrPut(shelf) { ShelfList(shelf) }
+
+    /** Chiede la pagina successiva di un elenco della libreria, se non la sta già chiedendo. */
+    fun loadMore(list: ShelfList) {
+        if (list.loading || list.end) return
+        list.loading = true
+        list.error = null
+        list.job = scope.launch {
+            try {
+                awaitConnected()
+                val shelf = list.shelf
+                val page = when (shelf) {
+                    Shelf.BROWSE -> library.browse(null).also { list.end = true }
+                    else -> library.libraryPage(shelf.kind, list.items.size, orderBy = list.order, favorite = if (shelf.favorite) true else null)
+                }
+                list.items.addAll(page)
+                if (shelf != Shelf.BROWSE && page.size < Library.PHONE_PAGE) list.end = true
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                list.error = e
+            } finally {
+                list.loading = false
+            }
+        }
+    }
+
+    /** Cambia l'ordine di un elenco della libreria e lo ricarica da capo. */
+    fun order(list: ShelfList, order: String) {
+        if (list.order == order) return
+        list.job?.cancel()
+        list.order = order
+        list.items.clear()
+        list.end = false
+        list.loading = false
+        loadMore(list)
+    }
+
+    private fun loadItem(page: ItemPage) {
+        val item = page.item
+        page.tracks = Load.Loading
+        launchLoad({ page.tracks = Load.Failed(it) }) {
+            page.tracks = Load.Ready(
+                when (item.mediaType) {
+                    "album" -> library.albumTracks(item)
+                    "playlist" -> library.playlistTracks(item)
+                    "podcast" -> library.podcastEpisodes(item)
+                    "genre" -> library.genreTracks(item)
+                    else -> emptyList()
+                },
+            )
+        }
+        if (item.mediaType == "genre") {
+            page.albums = Load.Loading
+            launchLoad({ page.albums = Load.Failed(it) }) { page.albums = Load.Ready(library.genreAlbums(item)) }
+        }
+    }
+
+    private fun loadArtist(page: ArtistPage) {
+        val artist = page.artist
+        page.top = Load.Loading
+        page.albums = Load.Loading
+        page.tracks = Load.Loading
+        launchLoad({ page.top = Load.Failed(it) }) { page.top = Load.Ready(library.artistTopTracks(artist)) }
+        launchLoad({ page.albums = Load.Failed(it) }) {
+            page.albums = Load.Ready(library.artistAlbums(artist).sortedByDescending { it.year })
+        }
+        launchLoad({ page.tracks = Load.Failed(it) }) { page.tracks = Load.Ready(library.artistTracks(artist)) }
+    }
+
+    private fun load(page: ListPage) {
+        page.items = Load.Loading
+        launchLoad({ page.items = Load.Failed(it) }) { page.items = Load.Ready(page.source()) }
+    }
+
+    /** Tutti i brani di un artista, su una schermata loro. */
+    fun openArtistTracks(page: ArtistPage, title: String, top: Boolean) {
+        val tracks = (if (top) page.top else page.tracks).value
+        push(
+            ListPage(title, page.artist.name, page.artist.image) {
+                tracks ?: if (top) library.artistTopTracks(page.artist) else library.artistTracks(page.artist)
+            },
+        )
+    }
+
+    /** Una riga di "Per te" intera. */
+    fun openRow(row: HomePage.Row) {
+        val items = row.items.value
+        push(ListPage(row.row.name, row.row.subtitle, null) { items ?: library.recommendationItems(row.row) })
+    }
+
+    /** Tutti i risultati di un tipo di una ricerca. */
+    fun openResults(results: SearchResults, type: String, title: String) {
+        val items = results.byType[type].orEmpty()
+        push(ListPage(title, results.query, null) { items })
+    }
+
+    /** Aspetta la connessione (al primo avvio ci vuole un attimo), poi carica; un errore va in [failed]. */
+    private fun launchLoad(failed: (Throwable) -> Unit, block: suspend () -> Unit) {
+        scope.launch {
+            try {
+                awaitConnected()
+                block()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                failed(e)
+            }
+        }
+    }
+
+    private suspend fun awaitConnected() {
+        withTimeoutOrNull(CONNECT_TIMEOUT_MS) { repo.connection.first { it is Connection.Connected } }
+            ?: throw MaException("Music Assistant non è collegato", problem = Problem.NOT_CONNECTED)
+    }
+
+    // ---------- Ricerca ----------
+
+    /** Cerca mentre si scrive: aspetta una breve pausa, e una ricerca nuova cancella la precedente. */
+    fun search(page: SearchPage, text: String) {
+        page.query = text
+        page.job?.cancel()
+        val query = text.trim()
+        if (query.length < MIN_QUERY) {
+            page.results = null
+            page.searching = false
+            return
+        }
+        page.job = scope.launch {
+            delay(SEARCH_PAUSE_MS)
+            page.searching = true
+            if (page.results !is Load.Ready) page.results = Load.Loading
+            try {
+                awaitConnected()
+                val (wanted, rest) = Menu.typeHint(query)
+                val found = library.search(rest)
+                page.results = Load.Ready(SearchResults(query, Menu.bestMatches(rest, found, wanted).firstOrNull()?.second, found))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                page.results = Load.Failed(e)
+            } finally {
+                // Una ricerca cancellata da una più nuova lascia a quella la rotella.
+                if (page.job === coroutineContext[Job]) page.searching = false
+            }
+        }
+    }
+
+    // ---------- Riproduzione ----------
+
+    /** Suona un elemento intero (album, playlist, artista, radio...), eventualmente mescolato. */
+    fun play(item: MaItem, shuffle: Boolean = false) = play(listOf(item.uri), shuffle = shuffle)
+
+    /**
+     * Suona il brano [index] di un elenco. Dentro un album o una playlist ([context]) parte tutto
+     * da lì; altrimenti suonano quel brano e quelli che lo seguono.
+     */
+    fun play(list: List<MaItem>, index: Int, context: String?) {
+        val item = list.getOrNull(index) ?: return
+        when {
+            context != null -> play(listOf(context), start = item.uri)
+            item.mediaType in TRACK_LIKE -> play(list.drop(index).filter { it.mediaType in TRACK_LIKE }.take(MAX_QUEUE).map { it.uri })
+            item.browsable -> open(item)
+            else -> play(listOf(item.uri))
+        }
+    }
+
+    /** Suona tutti i brani di un elenco, dal primo o mescolati. */
+    fun playAll(list: List<MaItem>, shuffle: Boolean) {
+        val uris = list.filter { it.mediaType in TRACK_LIKE }.take(MAX_QUEUE).map { it.uri }
+        if (uris.isNotEmpty()) play(uris, shuffle = shuffle)
+    }
+
+    fun playNext(item: MaItem) = play(listOf(item.uri), option = "next")
+
+    fun addToQueue(item: MaItem) = play(listOf(item.uri), option = "add")
+
+    private fun play(media: List<String>, start: String? = null, option: String = "replace", shuffle: Boolean = false) {
+        scope.launch {
+            try {
+                awaitReady()
+                library.playMedia(queueId(), media, start, option, shuffle)
+                when (option) {
+                    "next" -> notice = Notice.PlayNext
+                    "add" -> notice = Notice.Added
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                notice = Notice.Failed(e)
+            }
+        }
+    }
+
+    /** Aspetta che il telefono sia un lettore di Music Assistant: appena aperta l'app ci vuole un attimo. */
+    private suspend fun awaitReady() {
+        withTimeoutOrNull(READY_TIMEOUT_MS) { ready.first { it } }
+            ?: throw MaException("Il lettore del telefono non è pronto", problem = Problem.NOT_CONNECTED)
+    }
+
+    // ---------- Preferiti ----------
+
+    fun setFavorite(page: ItemPage, favorite: Boolean) = favorite(page.item, favorite) { page.favorite = it }
+
+    fun setFavorite(page: ArtistPage, favorite: Boolean) = favorite(page.artist, favorite) { page.favorite = it }
+
+    private fun favorite(item: MaItem, favorite: Boolean, show: (Boolean) -> Unit) {
+        show(favorite)
+        scope.launch {
+            try {
+                library.setFavorite(item.uri, item.mediaType, item.provider, item.itemId, favorite)
+                notice = if (favorite) Notice.FavoriteAdded else Notice.FavoriteRemoved
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                show(!favorite)
+                notice = Notice.Failed(e)
+            }
+        }
+    }
+
+    // ---------- Testi ----------
+
+    private val lyrics = object : LinkedHashMap<String, LyricsState>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, LyricsState>?) = size > LYRICS_KEPT
+    }
+
+    /** Il testo di un brano, chiesto una volta sola. */
+    fun lyrics(uri: String): LyricsState = lyrics.getOrPut(uri) {
+        LyricsState().also { state ->
+            scope.launch {
+                state.load = try {
+                    awaitConnected()
+                    Load.Ready(library.lyrics(uri))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Load.Failed(e)
+                }
+            }
+        }
+    }
+
+    // ---------- Impostazioni ----------
+
+    /** Salva le impostazioni, ricollega Xonos e prova ogni indirizzo. */
+    fun save(page: SettingsPage) {
+        val config = Settings.Config(
+            homeUrl = Settings.normalizeUrl(page.home),
+            remoteUrl = Settings.normalizeUrl(page.remote),
+            token = page.token.trim(),
+        )
+        page.home = config.homeUrl
+        page.remote = config.remoteUrl
+        page.token = config.token
+        settings.save(config)
+        settings.playerName = page.name
+        page.name = settings.playerName
+        repo.reconnect()
+        page.results = emptyList()
+        page.tried = true
+        if (!config.isComplete) return
+        page.checking = true
+        scope.launch {
+            val check = ConnectionCheck(repo)
+            val places = listOf(ConnectionCheck.Place.HOME to config.homeUrl, ConnectionCheck.Place.AWAY to config.remoteUrl)
+            try {
+                for ((place, url) in places) {
+                    if (url.isBlank()) continue
+                    page.results = page.results + check.check(place, url, config.token)
+                }
+            } finally {
+                page.checking = false
+            }
+        }
+    }
+
+    init {
+        // Tornata la connessione, le schermate che non si erano caricate ci riprovano da sole.
+        scope.launch {
+            repo.connection.collect { connection ->
+                if (connection !is Connection.Connected) return@collect
+                stacks.values.flatten().filter { it.started && failed(it) }.forEach(::reload)
+            }
+        }
+    }
+
+    private fun failed(page: Page): Boolean = when (page) {
+        is HomePage -> page.recent is Load.Failed || page.rows is Load.Failed
+        is LibraryPage -> page.lists.values.any { it.error != null }
+        is ItemPage -> page.tracks is Load.Failed || page.albums is Load.Failed
+        is ArtistPage -> page.top is Load.Failed || page.albums is Load.Failed || page.tracks is Load.Failed
+        is ListPage -> page.items is Load.Failed
+        is SearchPage, is SettingsPage -> false
+    }
+
+    // ---------- Immagini ----------
+
+    /** L'indirizzo di un'immagine di Music Assistant alla misura chiesta (256 o 512), se si è collegati. */
+    fun image(image: MaImage?, size: Int): String? {
+        image ?: return null
+        val base = repo.baseUrl ?: return null
+        return MaRepository.imageUrl(base, image, size)
+    }
+
+    companion object {
+        const val RECENT = 30
+        const val MAX_QUEUE = 200
+        const val MIN_QUERY = 2
+        const val SEARCH_PAUSE_MS = 350L
+        const val CONNECT_TIMEOUT_MS = 20_000L
+        const val READY_TIMEOUT_MS = 20_000L
+        const val LYRICS_KEPT = 20
+
+        val TRACK_LIKE = setOf("track", "podcast_episode", "audiobook")
+    }
+}
+
+/** Il testo di un brano mentre arriva: Ready(null) se il brano non ne ha. */
+class LyricsState {
+    var load by mutableStateOf<Load<Lyrics?>>(Load.Loading)
+}

@@ -121,6 +121,15 @@ data class MaItem(
     val year: Int = 0,
     /** In quali servizi si trova: istanza del provider e id dell'elemento lì. */
     val mappings: List<Pair<String, String>> = emptyList(),
+    /** Gli artisti di un brano o di un album, per aprirli dal telefono. */
+    val artists: List<Ref> = emptyList(),
+    /** L'album di un brano. */
+    val album: Ref? = null,
+    val trackNumber: Int = 0,
+    val discNumber: Int = 0,
+    /** Episodi e audiolibri: dove si era arrivati e se è stato ascoltato fino in fondo. */
+    val resumeMs: Long = 0,
+    val fullyPlayed: Boolean = false,
 ) {
     /** Cosa si apre come elenco; il resto si suona e basta. */
     val browsable: Boolean get() = mediaType in BROWSABLE
@@ -153,6 +162,12 @@ data class MaItem(
                     val id = m.str("item_id") ?: return@mapNotNull null
                     instance to id
                 },
+                artists = o.optJSONArray("artists").objects().mapNotNull(Ref::from),
+                album = Ref.from(o.optJSONObject("album")),
+                trackNumber = o.optInt("track_number"),
+                discNumber = o.optInt("disc_number"),
+                resumeMs = o.optLong("resume_position_ms"),
+                fullyPlayed = o.optBoolean("fully_played"),
             )
         }
 
@@ -171,6 +186,16 @@ data class MaItem(
     }
 }
 
+/** Un rimando a un altro elemento (l'album o l'artista di un brano): basta per aprirlo. */
+data class Ref(val uri: String, val name: String) {
+    companion object {
+        fun from(o: JSONObject?): Ref? {
+            if (o == null) return null
+            return Ref(o.str("uri") ?: return null, o.str("name") ?: return null)
+        }
+    }
+}
+
 /** Un elemento della coda di Music Assistant. */
 data class QueueItem(
     val id: String,
@@ -184,6 +209,9 @@ data class QueueItem(
     val favorite: Boolean,
     val itemId: String?,
     val provider: String?,
+    /** Per aprire dal telefono l'album e l'artista del brano. */
+    val albumRef: Ref? = null,
+    val artistRef: Ref? = null,
 ) {
     companion object {
         fun from(o: JSONObject?): QueueItem? {
@@ -202,6 +230,9 @@ data class QueueItem(
                 favorite = media?.optBoolean("favorite") ?: false,
                 itemId = media?.str("item_id"),
                 provider = media?.str("provider"),
+                albumRef = Ref.from(media?.optJSONObject("album")),
+                artistRef = media?.optJSONArray("artists").objects().firstNotNullOfOrNull(Ref::from)
+                    ?: Ref.from(media?.optJSONObject("podcast")),
             )
         }
     }

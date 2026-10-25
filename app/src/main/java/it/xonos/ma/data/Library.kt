@@ -54,6 +54,29 @@ class Library(private val repo: MaRepository) {
         put("fully_played_only", false)
     }
 
+    /**
+     * Una pagina della libreria, per gli elenchi del telefono che si caricano scorrendo.
+     * [orderBy]: "sort_name", "sort_name_desc", "timestamp_added_desc", "last_played_desc", "play_count_desc", "year".
+     */
+    suspend fun libraryPage(
+        kind: String,
+        offset: Int,
+        limit: Int = PHONE_PAGE,
+        orderBy: String = "sort_name",
+        favorite: Boolean? = null,
+        search: String? = null,
+    ) = items("music/$kind/library_items") {
+        if (favorite != null) put("favorite", favorite)
+        if (!search.isNullOrBlank()) put("search", search)
+        if (kind == "genres") {
+            put("hide_empty", true)
+            put("content_type", "music")
+        }
+        put("order_by", orderBy)
+        put("limit", limit)
+        put("offset", offset)
+    }
+
     /** Tutti gli elementi della libreria di un tipo ("albums", "artists", "playlists", "tracks", "radios", ...). */
     suspend fun libraryItems(kind: String, favorite: Boolean? = null, orderBy: String = "sort_name") =
         paged("music/$kind/library_items") {
@@ -141,13 +164,46 @@ class Library(private val repo: MaRepository) {
     suspend fun item(uri: String): MaItem? =
         (repo.command("music/item_by_uri") { put("uri", uri) } as? JSONObject)?.let(MaItem::from)
 
-    /** Suona sulla coda [queueId]: uno o più indirizzi, eventualmente partendo da [startItem]. */
-    suspend fun playMedia(queueId: String, media: List<String>, startItem: String? = null, option: String = "replace") {
+    /**
+     * Il testo di un brano: quello che il brano ha già (tag o file .lrc accanto), altrimenti quello
+     * dei servizi di testi attivi in Music Assistant (per esempio LRCLIB). Null se non c'è.
+     */
+    suspend fun lyrics(uri: String): Lyrics? {
+        val track = repo.command("music/item_by_uri") { put("uri", uri) } as? JSONObject ?: return null
+        if (track.str("media_type") != "track") return null
+        // Risponde con [testo semplice, testo LRC].
+        val result = repo.command("metadata/get_track_lyrics", 60_000) { put("track", track) } as? JSONArray ?: return null
+        val plain = if (result.isNull(0)) null else result.optString(0)
+        val lrc = if (result.length() < 2 || result.isNull(1)) null else result.optString(1)
+        return Lyrics.of(plain, lrc)
+    }
+
+    /**
+     * Suona sulla coda [queueId]: uno o più indirizzi, eventualmente partendo da [startItem].
+     * [option]: "replace" sostituisce la coda, "next" mette dopo il brano in corso, "add" in fondo.
+     * [shuffle] mescola ciò che parte.
+     */
+    suspend fun playMedia(
+        queueId: String,
+        media: List<String>,
+        startItem: String? = null,
+        option: String = "replace",
+        shuffle: Boolean = false,
+    ) {
+        if (shuffle) {
+            // Prima della 2.10 play_media non ha "shuffle" (lo ignora): vale il casuale della coda.
+            repo.command("player_queues/shuffle") {
+                put("queue_id", queueId)
+                put("shuffle_enabled", true)
+            }
+        }
         repo.command("player_queues/play_media", 60_000) {
             put("queue_id", queueId)
             put("media", if (media.size == 1) media[0] else JSONArray(media))
             put("option", option)
             if (startItem != null) put("start_item", startItem)
+            // Dalla 2.10 un album suona in ordine anche con il casuale acceso, se non si chiede altro.
+            if (shuffle) put("shuffle", true)
         }
     }
 
@@ -211,6 +267,9 @@ class Library(private val repo: MaRepository) {
     companion object {
         private const val PAGE = 500
         private const val PAGES_AT_ONCE = 4
+
+        /** Le pagine degli elenchi del telefono: abbastanza per riempire lo schermo più volte. */
+        const val PHONE_PAGE = 100
 
         /** Un tetto solo contro gli errori: nessuna libreria vera ci arriva vicino. */
         private const val MAX_ITEMS = 50_000
