@@ -49,6 +49,8 @@ sealed interface Notice {
     data object Added : Notice
     data object FavoriteAdded : Notice
     data object FavoriteRemoved : Notice
+    data object Saved : Notice
+    data object Removed : Notice
     data class Failed(val error: Throwable) : Notice
 }
 
@@ -116,7 +118,7 @@ class PhoneModel(
         if (tab == this.tab) {
             // Toccare di nuovo la scheda torna alla sua prima schermata.
             val stack = stacks.getValue(tab)
-            while (stack.size > 1) stack.removeAt(stack.lastIndex)
+            while (stack.size > 1) removed(stack.removeAt(stack.lastIndex))
         }
         this.tab = tab
     }
@@ -125,12 +127,17 @@ class PhoneModel(
         stacks.getValue(tab).add(page)
     }
 
+    /** Una schermata tolta dalla pila: un flusso di configurazione lasciato a metà si chiude anche in Music Assistant. */
+    private fun removed(page: Page) {
+        if (page is FlowPage) services.leave(page)
+    }
+
     /** Indietro: chiude il lettore, poi toglie una schermata, poi torna alla Home. Falso se non c'è altro. */
     fun back(): Boolean {
         val stack = stacks.getValue(tab)
         when {
             playerOpen -> playerOpen = false
-            stack.size > 1 -> stack.removeAt(stack.lastIndex)
+            stack.size > 1 -> removed(stack.removeAt(stack.lastIndex))
             tab != Tab.HOME -> tab = Tab.HOME
             else -> return false
         }
@@ -188,6 +195,10 @@ class PhoneModel(
             is ItemPage -> loadItem(page)
             is ArtistPage -> loadArtist(page)
             is ListPage -> load(page)
+            is ServicesPage -> services.load(page)
+            is AddServicePage -> services.load(page)
+            is FlowPage -> services.start(page)
+            is ServicePage -> services.load(page)
             is SearchPage, is SettingsPage -> Unit
         }
     }
@@ -367,6 +378,8 @@ class PhoneModel(
     fun wake() {
         val home = stacks.getValue(Tab.HOME).first() as HomePage
         if (home.started && System.currentTimeMillis() - home.loadedAt > STALE_MS) refresh(home)
+        // Di ritorno dal browser (l'accesso a un servizio): il flusso può essere andato avanti.
+        (page as? FlowPage)?.let(services::refresh)
     }
 
     private fun loadShelves(page: LibraryPage) {
@@ -506,7 +519,7 @@ class PhoneModel(
     }
 
     /** Aspetta la connessione (al primo avvio ci vuole un attimo), poi carica; un errore va in [failed]. */
-    private fun launchLoad(failed: (Throwable) -> Unit, block: suspend () -> Unit) {
+    internal fun launchLoad(failed: (Throwable) -> Unit, block: suspend () -> Unit) {
         scope.launch {
             try {
                 awaitConnected()
@@ -519,7 +532,7 @@ class PhoneModel(
         }
     }
 
-    private suspend fun awaitConnected() {
+    internal suspend fun awaitConnected() {
         withTimeoutOrNull(CONNECT_TIMEOUT_MS) { repo.connection.first { it is Connection.Connected } }
             ?: throw MaException("Music Assistant non è collegato", problem = Problem.NOT_CONNECTED)
     }
@@ -632,6 +645,9 @@ class PhoneModel(
     // ---------- Testi ----------
 
     private val account = Account(repo)
+
+    /** I servizi di Music Assistant (solo per gli amministratori). */
+    val services = ServicesModel(this, repo, scope)
 
     private val lyrics = object : LinkedHashMap<String, LyricsState>(16, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, LyricsState>?) = size > LYRICS_KEPT
@@ -760,7 +776,11 @@ class PhoneModel(
         is ItemPage -> page.tracks is Load.Failed || page.albums is Load.Failed
         is ArtistPage -> page.top is Load.Failed || page.albums is Load.Failed || page.tracks is Load.Failed
         is ListPage -> page.items is Load.Failed
-        is SearchPage, is SettingsPage -> false
+        is ServicesPage -> page.services is Load.Failed
+        is AddServicePage -> page.kinds is Load.Failed
+        is ServicePage -> page.service is Load.Failed
+        // Un flusso non si ricomincia da solo: lo si rifà a mano.
+        is FlowPage, is SearchPage, is SettingsPage -> false
     }
 
     // ---------- Immagini ----------

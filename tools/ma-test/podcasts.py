@@ -63,6 +63,14 @@ async def feed(request):
 async def audio(request):
     return web.FileResponse(AUDIO[int(request.match_info["n"]) % len(AUDIO)])
 
+async def oauth(request):
+    """Un finto accesso OAuth per il servizio di prova di Xonos: rimanda subito al callback con un codice."""
+    state = request.query.get("state", "")
+    if not state.startswith("http"):
+        raise web.HTTPBadRequest()
+    sep = "&" if "?" in state else "?"
+    raise web.HTTPFound(f"{state}{sep}code=xonos")
+
 async def art(request):
     return web.FileResponse(ART)
 
@@ -73,4 +81,5 @@ app.router.add_get("/api/v2/{country}/podcasts/top/15/podcasts.json", top)
 app.router.add_get("/feeds/{slug}.xml", feed)
 app.router.add_get("/audio/{n}.flac", audio)
 app.router.add_get("/art/{slug}.jpg", art)
+app.router.add_get("/oauth", oauth)
 web.run_app(app, host="127.0.0.1", port=8770, print=None)

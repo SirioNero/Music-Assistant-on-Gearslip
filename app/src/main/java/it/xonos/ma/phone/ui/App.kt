@@ -35,7 +35,9 @@ import androidx.compose.ui.res.stringResource
 import it.xonos.ma.Language
 import it.xonos.ma.R
 import it.xonos.ma.data.Connection
+import it.xonos.ma.phone.model.AddServicePage
 import it.xonos.ma.phone.model.ArtistPage
+import it.xonos.ma.phone.model.FlowPage
 import it.xonos.ma.phone.model.HomePage
 import it.xonos.ma.phone.model.ItemPage
 import it.xonos.ma.phone.model.LibraryPage
@@ -46,6 +48,8 @@ import it.xonos.ma.phone.model.Page
 import it.xonos.ma.phone.model.PhoneModel
 import it.xonos.ma.phone.model.PlayerLink
 import it.xonos.ma.phone.model.SearchPage
+import it.xonos.ma.phone.model.ServicePage
+import it.xonos.ma.phone.model.ServicesPage
 import it.xonos.ma.phone.model.SettingsPage
 import it.xonos.ma.phone.model.Tab
 import kotlinx.coroutines.launch
@@ -130,6 +134,10 @@ private fun PageScreen(page: Page, model: PhoneModel, player: PlayerLink, host: 
         is ArtistPage -> ArtistScreen(page, model, host)
         is ListPage -> ListScreen(page, model, host)
         is SettingsPage -> SettingsScreen(page, model, host, onboarding = false) { model.back() }
+        is ServicesPage -> ServicesScreen(page, model, host)
+        is AddServicePage -> AddServiceScreen(page, model, host)
+        is FlowPage -> FlowScreen(page, model, host)
+        is ServicePage -> ServiceScreen(page, model, host)
     }
 }
 
@@ -163,6 +171,8 @@ private fun Notices(model: PhoneModel, host: Host, snackbar: SnackbarHostState) 
         Notice.Added -> stringResource(R.string.notice_added)
         Notice.FavoriteAdded -> stringResource(R.string.notice_favorite_added)
         Notice.FavoriteRemoved -> stringResource(R.string.notice_favorite_removed)
+        Notice.Saved -> stringResource(R.string.notice_saved)
+        Notice.Removed -> stringResource(R.string.notice_removed)
         is Notice.Failed -> host.describe(notice.error)
     }
     // L'avviso si mostra fuori dall'effetto, che riparte appena lo si toglie dal modello.

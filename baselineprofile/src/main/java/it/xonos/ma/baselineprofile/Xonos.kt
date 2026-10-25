@@ -79,6 +79,8 @@ fun MacrobenchmarkScope.dismissSystemDialog() {
 /** Apre l'app sulla Home con i dati; la prima volta la collega al Music Assistant di prova. */
 fun MacrobenchmarkScope.openHome() {
     dismissSystemDialog()
+    // Un gesto di una prova precedente può aver tirato giù la tendina delle notifiche: copre l'app.
+    device.executeShellCommand("cmd statusbar collapse")
     startActivityAndWait()
     connectIfNeeded()
     // Se l'app ricorda un'altra scheda si torna alla Home.
@@ -139,8 +141,8 @@ fun MacrobenchmarkScope.flingList(tag: String, times: Int) {
 
 private fun MacrobenchmarkScope.fling(tag: String, direction: Direction) {
     val list = waitFor(tag)
-    // Lontano dai bordi, dove il gesto indietro di Android ruberebbe il tocco.
-    list.setGestureMargin(device.displayWidth / 5)
+    // Lontano dai bordi: ai lati il gesto indietro di Android ruberebbe il tocco, in alto la tendina delle notifiche.
+    list.setGestureMargins(device.displayWidth / 5, device.displayHeight / 6, device.displayWidth / 5, device.displayHeight / 8)
     try {
         list.fling(direction)
     } catch (e: StaleObjectException) {

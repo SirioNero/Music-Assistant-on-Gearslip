@@ -25,7 +25,11 @@ class MaException(
  * Una singola connessione WebSocket all'API di Music Assistant (/ws).
  * Gestisce l'accesso con il token, i comandi con la loro risposta e gli eventi del server.
  */
-class MaClient(private val http: OkHttpClient) {
+class MaClient(
+    private val http: OkHttpClient,
+    /** La lingua dei testi che Music Assistant traduce da sé (per esempio "it" o "pt_PT"): c'è nella 2.10.8, chi non la conosce la ignora. */
+    private val locale: String? = null,
+) {
 
     private class Box(val value: Any?)
 
@@ -85,7 +89,10 @@ class MaClient(private val http: OkHttpClient) {
     /** L'accesso con il token, su una connessione aperta con [open]; dice anche chi ha fatto l'accesso. */
     suspend fun authenticate(server: ServerInfo, token: String, timeoutMs: Long = 10_000): ServerInfo {
         val auth = try {
-            command("auth", timeoutMs) { put("token", token) } as? JSONObject
+            command("auth", timeoutMs) {
+                put("token", token)
+                locale?.let { put("locale", it) }
+            } as? JSONObject
         } catch (e: MaException) {
             when {
                 // Prima della 2.7 Music Assistant non aveva accessi né token, e nemmeno l'audio per i telefoni.

@@ -6,6 +6,7 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.svg.SvgDecoder
 import coil3.request.crossfade
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaRepository
@@ -45,7 +46,11 @@ class XonosApp : Application(), SingletonImageLoader.Factory {
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         val http = repo.http.newBuilder().readTimeout(15, TimeUnit.SECONDS).callTimeout(20, TimeUnit.SECONDS).build()
         return ImageLoader.Builder(context)
-            .components { add(OkHttpNetworkFetcherFactory(callFactory = { http })) }
+            .components {
+                add(OkHttpNetworkFetcherFactory(callFactory = { http }))
+                // Le icone dei servizi di Music Assistant.
+                add(SvgDecoder.Factory())
+            }
             .crossfade(true)
             .build()
     }

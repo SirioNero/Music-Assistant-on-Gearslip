@@ -41,7 +41,7 @@ class MaRepository(private val settings: Settings) {
     private var loop: Job? = null
     private var users = 0
 
-    fun newClient() = MaClient(http)
+    fun newClient() = MaClient(http, settings.language.maLocale)
 
     /** Riceve tutti gli eventi del server (nome, object_id, dati), sul thread di OkHttp. */
     fun addEventListener(listener: (String, String?, Any?) -> Unit) {
@@ -80,6 +80,12 @@ class MaRepository(private val settings: Settings) {
         loop = scope.launch { connectLoop() }
     }
 
+    /** Cambiata la lingua: i testi che Music Assistant traduce da sé (i moduli dei servizi) arrivano nella nuova. */
+    fun languageChanged() {
+        val c = client ?: return
+        scope.launch { runCatching { c.command("translations/set_locale", 10_000) { put("locale", settings.language.maLocale) } } }
+    }
+
     /** L'indirizzo che sta rispondendo: lo usano anche l'audio e le copertine. */
     val baseUrl: String? get() = (connection.value as? Connection.Connected)?.url
 
@@ -116,7 +122,7 @@ class MaRepository(private val settings: Settings) {
             var lastError = MaException("Music Assistant non raggiungibile", problem = Problem.NETWORK)
             for (url in config.urls) {
                 _connection.value = Connection.Connecting(url)
-                val candidate = MaClient(http)
+                val candidate = MaClient(http, settings.language.maLocale)
                 try {
                     server = candidate.connect(url, config.token)
                     session = candidate

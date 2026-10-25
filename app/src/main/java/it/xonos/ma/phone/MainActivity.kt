@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
 
             override fun changeLanguage(language: Language) {
                 app.settings.language = language
+                app.repo.languageChanged()
                 recreate()
             }
 

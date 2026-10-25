@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.Density
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.svg.SvgDecoder
 import it.xonos.ma.Language
 import it.xonos.ma.R
 import it.xonos.ma.data.Connection
@@ -15,7 +16,12 @@ import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.Problem
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
+import it.xonos.ma.data.FlowStep
+import it.xonos.ma.data.ServiceConfig
+import it.xonos.ma.data.ServiceKind
+import it.xonos.ma.phone.model.AddServicePage
 import it.xonos.ma.phone.model.ArtistPage
+import it.xonos.ma.phone.model.FlowPage
 import it.xonos.ma.phone.model.ConnectionCheck
 import it.xonos.ma.phone.model.FixedFinder
 import it.xonos.ma.phone.model.FoundServer
@@ -31,7 +37,11 @@ import it.xonos.ma.phone.model.QueueEntry
 import it.xonos.ma.phone.model.Repeat
 import it.xonos.ma.phone.model.SearchPage
 import it.xonos.ma.phone.model.SearchResults
+import it.xonos.ma.phone.model.ServicePage
+import it.xonos.ma.phone.model.ServicesModel
+import it.xonos.ma.phone.model.ServicesPage
 import it.xonos.ma.phone.model.Shelf
+import it.xonos.ma.phone.model.initialValues
 import it.xonos.ma.phone.model.Tab
 import it.xonos.ma.phone.ui.Host
 import it.xonos.ma.phone.ui.XonosScreen
@@ -73,7 +83,10 @@ private fun draw() {
     System.setProperty("xonos.url", server.start())
     System.setProperty("xonos.token", "screens")
     SingletonImageLoader.setSafe { context ->
-        ImageLoader.Builder(context).components { add(OkHttpNetworkFetcherFactory()) }.build()
+        ImageLoader.Builder(context).components {
+            add(OkHttpNetworkFetcherFactory())
+            add(SvgDecoder.Factory())
+        }.build()
     }
     val out = File(System.getProperty("xonos.out") ?: "out").apply { mkdirs() }
     val lang = System.getProperty("xonos.lang") ?: "it"
@@ -172,6 +185,12 @@ private fun answer(command: String, args: JSONObject): Any? = when (command) {
         if (n != null && album in Catalog.ALBUMS) Catalog.trackJson(album, n) else null
     }
     "metadata/get_track_lyrics" -> JSONArray().put(JSONObject.NULL).put(Catalog.LYRICS)
+    // Le icone dei servizi, come le manda Music Assistant: SVG in un data URI.
+    "providers/icon" -> ICONS[args.optString("provider")]?.let { (color, letter) ->
+        val svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="$color"/>""" +
+            """<text x="12" y="16.5" font-size="12" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle">$letter</text></svg>"""
+        "data:image/svg+xml;base64," + java.util.Base64.getEncoder().encodeToString(svg.toByteArray())
+    }
     else -> null
 }
 
@@ -350,4 +369,99 @@ private val SCENES = listOf(
         push(settings)
     },
     "welcome" to Scene(now = null, configured = false) {},
+    "services" to Scene {
+        (page as HomePage).started = true
+        push(ServicesPage().apply { services = ready(SERVICES.mapNotNull { ServiceConfig.from(JSONObject(it)) }); started = true })
+    },
+    "add-service" to Scene {
+        (page as HomePage).started = true
+        push(AddServicePage().apply { kinds = ready(KINDS.mapNotNull { ServiceKind.from(JSONObject(it)) }); started = true })
+    },
+    "service-flow" to Scene {
+        (page as HomePage).started = true
+        val step = FlowStep.from(JSONObject(FLOW_FORM))!!
+        push(FlowPage("Jellyfin", "jellyfin") { step }.apply { this.step = ready(step); values.putAll(initialValues(step.fields)); started = true })
+    },
+    "service-login" to Scene {
+        (page as HomePage).started = true
+        val step = FlowStep.from(JSONObject(FLOW_EXTERNAL))!!
+        push(FlowPage("Spotify", "spotify") { step }.apply { this.step = ready(step); started = true })
+    },
+    "service" to Scene {
+        (page as HomePage).started = true
+        val service = ServiceConfig.from(JSONObject(SERVICE))!!
+        push(
+            ServicePage(service.instanceId, service.name).apply {
+                this.service = ready(service)
+                values.putAll(initialValues(service.fields) + (ServicesModel.ENABLED to true))
+                values["bitrate"] = 256
+                started = true
+            },
+        )
+    },
 )
+
+/** Colore e lettera delle icone finte dei servizi. */
+private val ICONS = mapOf(
+    "spotify" to ("#1DB954" to "S"),
+    "jellyfin" to ("#7B4FD6" to "J"),
+    "tidal" to ("#222222" to "T"),
+    "podcastfeed" to ("#E8590C" to "P"),
+    "radiobrowser" to ("#1C7ED6" to "R"),
+    "chromecast" to ("#F59F00" to "C"),
+)
+
+private val SERVICES = listOf(
+    """{"instance_id":"spotify--a1","domain":"spotify","type":"music","name":"Spotify (Sirio)","enabled":true,"status":"loaded"}""",
+    """{"instance_id":"jellyfin--b2","domain":"jellyfin","type":"music","name":"Jellyfin","enabled":true,"status":"error","last_error":{"error_code":999,"message":"Server non raggiungibile: http://192.168.1.40:8096"}}""",
+    """{"instance_id":"podcastfeed--c3","domain":"podcastfeed","type":"music","name":"Il Post","enabled":true,"status":"loaded"}""",
+    """{"instance_id":"tidal--d4","domain":"tidal","type":"music","name":"Tidal","enabled":false,"status":"disabled"}""",
+    """{"instance_id":"radiobrowser--e5","domain":"radiobrowser","type":"music","name":"Radio Browser","enabled":true,"status":"loaded"}""",
+    """{"instance_id":"chromecast--f6","domain":"chromecast","type":"player","name":"Chromecast","enabled":true,"status":"loaded"}""",
+    """{"instance_id":"lrclib--g7","domain":"lrclib","type":"metadata","name":"LRCLIB","enabled":true,"status":"loaded"}""",
+)
+
+private val KINDS = listOf(
+    """{"domain":"spotify","type":"music","name":"Spotify","description":"Ascolta la tua libreria e le playlist di Spotify (serve Premium).","stage":"stable","multi_instance":true}""",
+    """{"domain":"tidal","type":"music","name":"Tidal","description":"Brani in alta qualità dal tuo account Tidal.","stage":"stable","multi_instance":true}""",
+    """{"domain":"jellyfin","type":"music","name":"Jellyfin","description":"La musica del tuo server Jellyfin.","stage":"stable","multi_instance":true}""",
+    """{"domain":"opensubsonic","type":"music","name":"Subsonic / Navidrome","description":"Server compatibili con Subsonic.","stage":"stable","multi_instance":true}""",
+    """{"domain":"ytmusic","type":"music","name":"YouTube Music","description":"La tua libreria di YouTube Music.","stage":"beta","multi_instance":true}""",
+    """{"domain":"podcastfeed","type":"music","name":"Podcast RSS","description":"Un podcast dal suo feed RSS.","stage":"stable","multi_instance":true}""",
+    """{"domain":"chromecast","type":"player","name":"Chromecast","description":"Casse e TV con Google Cast.","stage":"stable","multi_instance":false}""",
+    """{"domain":"lrclib","type":"metadata","name":"LRCLIB","description":"Testi sincronizzati.","stage":"stable","multi_instance":false}""",
+)
+
+private val FLOW_FORM = """
+{"flow_id":"f1","step_id":"user","type":"form","title":"Collega Jellyfin",
+ "description":"Scrivi l'indirizzo del tuo server **Jellyfin** e accedi. Non hai un server? Vedi [la guida](https://jellyfin.org/docs/).",
+ "last_step":true,
+ "errors":{"password":"Nome utente o password sbagliati"},
+ "entries":[
+  {"key":"url","type":"string","label":"Indirizzo del server","description":"Per esempio http://192.168.1.40:8096","value":"http://192.168.1.40:8096","required":true},
+  {"key":"username","type":"string","label":"Nome utente","value":"sirio","required":true},
+  {"key":"password","type":"secure_string","label":"Password","required":true},
+  {"key":"quality","type":"string","label":"Qualità","default_value":"original","options":[{"title":"Originale","value":"original"},{"title":"Alta (320 kbps)","value":"high"},{"title":"Bassa (128 kbps)","value":"low"}]},
+  {"key":"verify_ssl","type":"boolean","label":"Controlla il certificato","description":"Spegnilo solo per un server con certificato fatto in casa.","default_value":true,"advanced":true}
+ ]}
+"""
+
+private val FLOW_EXTERNAL = """
+{"flow_id":"f2","step_id":"auth","type":"external","title":"Accedi a Spotify",
+ "description":"Si apre la pagina di Spotify: accedi e consenti a Music Assistant di usare il tuo account.\n\n- Serve un account **Premium**\n- La pagina torna a Music Assistant da sola",
+ "url":"https://accounts.spotify.com/authorize?client_id=x"}
+"""
+
+private val SERVICE = """
+{"instance_id":"xonos_test--x1","domain":"jellyfin","type":"music","name":"Jellyfin","enabled":true,"status":"loaded",
+ "values":{
+  "nickname":{"key":"nickname","type":"string","label":"Nome da mostrare","value":"Casa"},
+  "password":{"key":"password","type":"secure_string","label":"Password","value":"this_value_is_encrypted"},
+  "genres":{"key":"genres","type":"string","label":"Generi da importare","multi_value":true,"value":["rock","jazz"],"options":[{"title":"Rock","value":"rock"},{"title":"Jazz","value":"jazz"},{"title":"Classica","value":"classical"},{"title":"Pop","value":"pop"}]},
+  "divider":{"key":"divider","type":"divider","label":""},
+  "bitrate":{"key":"bitrate","type":"integer","label":"Bitrate massimo (kbps)","range":[64,320],"default_value":192},
+  "sync":{"key":"sync","type":"boolean","label":"Sincronizza i preferiti","description":"I preferiti di Xonos finiscono anche in Jellyfin.","value":true},
+  "warning":{"key":"warning","type":"alert","label":"Dopo aver cambiato i generi la libreria si aggiorna da sola."},
+  "test":{"key":"test","type":"action","label":"Prova","action":"test","action_label":"Prova la connessione","description":"Controlla che il server risponda."}
+ }}
+"""

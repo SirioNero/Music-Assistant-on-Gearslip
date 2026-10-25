@@ -2,6 +2,9 @@ package it.xonos.ma.phone.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.xonos.ma.R
 import it.xonos.ma.data.Connection
@@ -80,6 +85,7 @@ internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
                     CardRow(row.row.name, items, model, row.row.subtitle, { model.openRow(row) }) { _, item -> model.open(item) }
                 }
             }
+            if (empty(page)) item(key = "empty", contentType = "empty") { EmptyHome(model) }
         }
     }
 }
@@ -105,6 +111,33 @@ internal fun ConnectionBanner(model: PhoneModel, host: Host) {
                 Icon(XIcons.Offline, null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error)
             }
             Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+/** Niente da mostrare: né ascolti né consigli (un Music Assistant appena installato). */
+private fun empty(page: HomePage): Boolean {
+    val recent = page.recent.value ?: return false
+    val rows = page.rows.value ?: return false
+    return recent.isEmpty() && rows.all { it.items is Load.Failed || it.items.value?.isEmpty() == true }
+}
+
+/** La Home vuota: chi amministra Music Assistant può aggiungere subito un servizio. */
+@Composable
+private fun EmptyHome(model: PhoneModel) {
+    val admin = rememberAdmin(model)
+    Column(Modifier.fillMaxWidth().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(XIcons.Services, null, Modifier.size(40.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(12.dp))
+        Text(
+            stringResource(if (admin) R.string.home_empty_admin else R.string.home_empty),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        if (admin) {
+            Spacer(Modifier.height(16.dp))
+            Button(onClick = { model.services.open() }, modifier = Modifier.testTag("home_services")) { Text(stringResource(R.string.services_add)) }
         }
     }
 }

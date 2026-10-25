@@ -50,7 +50,7 @@ class FakeServer(private val answers: (String, JSONObject) -> Any?) {
     private val socket = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             webSocket.send(
-                JSONObject().put("server_id", "screens").put("server_version", "2.10.8").put("schema_version", 28)
+                JSONObject().put("server_id", "screens").put("server_version", "2.10.8").put("schema_version", 65)
                     .put("name", "Music Assistant").toString(),
             )
         }
@@ -59,7 +59,9 @@ class FakeServer(private val answers: (String, JSONObject) -> Any?) {
             val message = JSONObject(text)
             val command = message.getString("command")
             val args = message.optJSONObject("args") ?: JSONObject()
-            val result = if (command == "auth") JSONObject().put("user", JSONObject()) else answers(command, args) ?: JSONArray()
+            // Un amministratore: le impostazioni mostrano anche i servizi.
+            val user = JSONObject().put("username", "sirio").put("display_name", "Sirio").put("role", "admin")
+            val result = if (command == "auth") JSONObject().put("user", user) else answers(command, args) ?: JSONArray()
             webSocket.send(JSONObject().put("message_id", message.getString("message_id")).put("result", result).toString())
         }
     }

@@ -103,4 +103,6 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+    // Le icone dei servizi di Music Assistant sono SVG.
+    implementation("io.coil-kt.coil3:coil-svg:3.3.0")
 }

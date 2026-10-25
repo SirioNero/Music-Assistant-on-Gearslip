@@ -164,6 +164,25 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
                     },
                 )
             }
+            // Solo un amministratore di Music Assistant può aggiungere e configurare i servizi.
+            if (!onboarding && rememberAdmin(model)) {
+                Surface(
+                    onClick = { model.services.open() },
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.testTag("open_services").fillMaxWidth(),
+                ) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(XIcons.Services, null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(16.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.services_title), style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.services_help), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Icon(XIcons.Chevron, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
             if (onboarding && page.results.any { it is ConnectionCheck.Result.Ok }) {
                 FilledTonalButton(onClick = onDone, modifier = Modifier.testTag("onboarding_done").fillMaxWidth().height(52.dp)) { Text(stringResource(R.string.onboarding_done)) }
             }
