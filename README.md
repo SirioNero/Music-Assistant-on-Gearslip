@@ -10,7 +10,11 @@ Xonos turns your phone into a [Music Assistant](https://music-assistant.io) play
 
 It’s also a way around Spotify, which refuses to show its library to Gearslip: add Spotify to Music Assistant, and your playlists, liked songs, albums and artists are in Xonos.
 
-The app’s interface is in Italian for now.
+Out of the car, Xonos is a music player on the phone too: your whole Music Assistant library, search, a player with synced lyrics and the queue.
+
+<p align="center">
+  <img src="docs/home.jpg" width="200" alt="Home"> <img src="docs/album.jpg" width="200" alt="Album"> <img src="docs/player.jpg" width="200" alt="Player"> <img src="docs/lyrics.jpg" width="200" alt="Synced lyrics">
+</p>
 
 ### How it works
 
@@ -28,16 +32,25 @@ The app’s interface is in Italian for now.
 - **Calls and the voice assistant** pause the music, which comes back afterwards. Navigation prompts lower it. If the car’s Bluetooth disconnects, the music pauses instead of moving to the phone’s speaker.
 - **No signal** (a tunnel): the phone keeps playing what it has already received, up to about half a minute, then picks up where the music would have been.
 
+### On the phone
+
+- **Home**: what you played recently and Music Assistant’s recommendations (recently added, random artists, favorite playlists…), a row each. Pull down to refresh.
+- **Search** while you type, in the library and every service: the best match first, then tracks, artists, albums, playlists, podcasts, audiobooks, radio and genres.
+- **Library**: playlists, albums, artists, tracks, favorite tracks, podcasts, audiobooks, radio, genres and the services’ folders, sorted A to Z, by date added or by last played. Long lists load as you scroll.
+- **Albums, playlists, artists, podcasts**: a large cover with its colors in the background, play and shuffle, the heart, and the tracks; tapping one plays from there. The ⋮ menu plays a track next, adds it to the queue, or opens its album or artist.
+- **The player**: the mini player above the tabs, and full screen with the colors of the cover, the seek bar, shuffle and repeat, the heart, **synced lyrics** (tap a line to jump there) and **the queue**. Lyrics come from the files themselves (an `.lrc` file next to the track, or the lyrics tag) or from Music Assistant’s lyrics providers, such as LRCLIB.
+- What you start on the phone plays on the phone, and the car shows it the same way: it’s the same player and the same queue.
+
 ### Installation
 
 1. From the [Releases](../../releases) page, download `Xonos.apk` to your phone and install it. Android asks you to allow installing unknown apps; Play Protect may warn that the app is unknown.
-2. Open Xonos on your phone, pick your language at the top (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: English until you choose), and enter:
+2. Open Xonos on your phone: the first time it shows its settings. Pick your language at the top (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: English until you choose), and enter:
    - your Music Assistant address at home, for example `http://homeassistant.local:8095` (the Home Assistant add-on) or `http://192.168.1.10:8095`;
    - the address to use away from home (see below);
    - a long-lived access token (in Music Assistant: Settings, Profile, Long-lived access tokens);
    - optionally, the name the phone gets among Music Assistant’s players.
-   Tap “Save and test the connection”: it checks both the API and the audio.
-3. Tap “Allow in background”, so Android doesn’t stop the music with the screen off.
+   Tap “Save and test the connection”: it checks both the API and the audio. Then “Go to your music”.
+3. Tap “Allow in background”, so Android doesn’t stop the music with the screen off. The settings are behind the gear icon, on Home and in Library.
 4. In the car, open Gearslip: Xonos appears among the music apps.
 
 To get updates automatically, add `https://github.com/SirioNero/Music-Assistant-on-Gearslip` to [Obtainium](https://github.com/ImranR98/Obtainium). Each release is named after the app version (`v0.1.N`), so Obtainium can tell when an update is out.
@@ -65,7 +78,7 @@ Home Assistant Cloud (Nabu Casa) only reaches Home Assistant, not Music Assistan
 
 ### Limitations
 
-- The phone’s player is private: Music Assistant’s other apps and Home Assistant don’t offer it as a target. You start the music from Xonos, in the car.
+- The phone’s player is private: Music Assistant’s other apps and Home Assistant don’t offer it as a target. You start the music from Xonos, on the phone or in the car.
 - The audio uses Sendspin without its own encryption, a mode Music Assistant accepts by default; the connection is signed in with your token, and encrypted when the address is `https://`.
 - One phone, one queue: if you change the player name, Music Assistant keeps the same player and its queue.
 
@@ -93,9 +106,14 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `playback/BrowseTree.kt` | The menu as Media3 items for Gearslip |
 | `playback/ResourceLabels.kt` | The menu’s labels, in the language chosen on the phone |
 | `playback/Artwork.kt` | Cover art served to Gearslip |
-| `phone/SettingsActivity.kt` | The settings screen on the phone |
-| `Language.kt` | The app’s languages, and problems told in the chosen one |
+| `phone/MainActivity.kt`, `phone/ControllerLink.kt` | The app on the phone, and the player it controls |
+| `phone/model/` | What the phone app shows and does, without Android: pages, loading, search, playback, lyrics, settings |
+| `phone/ui/` | The phone’s screens, in Compose and Material 3 |
+| `data/Lyrics.kt` | Synced (LRC) and plain lyrics |
+| `Language.kt`, `Texts.kt` | The app’s languages, and problems told in the chosen one |
 | `res/values*/strings.xml` | Every text, in English (`values`) and in each language (`values-it`, `values-es`…) |
+
+`tools/` has what’s needed to check Xonos without a phone: a test Music Assistant in Docker, a JVM harness that does what the car and the phone app do, and `tools/screens`, which draws the phone’s screens to PNG with Compose Desktop (see `tools/README.md`).
 
 ## Italiano
 
@@ -104,6 +122,12 @@ Music Assistant in auto, tramite [Gearslip](https://github.com/twinksoftware/Gea
 Xonos trasforma il telefono in un lettore di [Music Assistant](https://music-assistant.io) e porta la tua libreria nel lettore musicale di Gearslip, anche nella vista doppia accanto alla mappa. La musica suona sul telefono stesso, quindi arriva alle casse dell’auto via Bluetooth (o con l’audio USB di Gearslip), mai alle casse di casa.
 
 È anche il modo per aggirare Spotify, che a Gearslip non mostra la sua libreria: aggiungi Spotify a Music Assistant, e playlist, brani che ti piacciono, album e artisti sono in Xonos.
+
+Fuori dall’auto, Xonos è un lettore musicale anche sul telefono: tutta la libreria di Music Assistant, la ricerca, un lettore con il testo sincronizzato e la coda.
+
+<p align="center">
+  <img src="docs/home.jpg" width="200" alt="Home"> <img src="docs/album.jpg" width="200" alt="Album"> <img src="docs/player.jpg" width="200" alt="Lettore"> <img src="docs/lyrics.jpg" width="200" alt="Testo sincronizzato">
+</p>
 
 ### Come funziona
 
@@ -121,16 +145,25 @@ Xonos trasforma il telefono in un lettore di [Music Assistant](https://music-ass
 - **Telefonate e assistente vocale** mettono in pausa la musica, che poi riprende. Le indicazioni del navigatore la abbassano. Se il Bluetooth dell’auto si stacca, la musica si ferma invece di passare all’altoparlante del telefono.
 - **Senza campo** (una galleria) il telefono continua a suonare quello che ha già ricevuto, fino a una mezzo minuto, poi riprende da dove la musica sarebbe arrivata.
 
+### Sul telefono
+
+- **Home**: gli ascolti recenti e i consigli di Music Assistant (aggiunti di recente, artisti a caso, playlist preferite…), una riga ciascuno. Trascina in giù per aggiornare.
+- **Cerca** mentre scrivi, nella libreria e in tutti i servizi: prima il risultato migliore, poi brani, artisti, album, playlist, podcast, audiolibri, radio e generi.
+- **Libreria**: playlist, album, artisti, brani, brani preferiti, podcast, audiolibri, radio, generi e le cartelle dei servizi, in ordine dalla A alla Z, per data di aggiunta o per ultimo ascolto. Gli elenchi lunghi si caricano mentre scorri.
+- **Album, playlist, artisti, podcast**: copertina grande con i suoi colori sullo sfondo, play e casuale, il cuore e i brani; toccandone uno si parte da lì. Il menu ⋮ mette un brano subito dopo, lo aggiunge alla coda, o apre il suo album o il suo artista.
+- **Il lettore**: il mini-lettore sopra le schede, e a schermo intero con i colori della copertina, la barra per spostarsi, casuale e ripeti, il cuore, il **testo sincronizzato** (tocca una riga per andarci) e **la coda**. I testi vengono dai file stessi (un file `.lrc` accanto al brano, o il tag del testo) o dai servizi di testi di Music Assistant, come LRCLIB.
+- Quello che fai partire dal telefono suona sul telefono, e l’auto lo mostra allo stesso modo: è lo stesso lettore con la stessa coda.
+
 ### Installazione
 
 1. Dalla pagina [Releases](../../releases) scarica `Xonos.apk` sul telefono e installalo. Android chiede di consentire l’installazione di app sconosciute; Play Protect può avvisare che l’app non è nota.
-2. Apri Xonos sul telefono, scegli in cima la lingua (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: finché non la scegli è l’inglese) e inserisci:
+2. Apri Xonos sul telefono: la prima volta mostra le impostazioni. Scegli in cima la lingua (English, Italiano, Español, Deutsch, Français, Português, Ελληνικά, Русский, 简体中文: finché non la scegli è l’inglese) e inserisci:
    - l’indirizzo di casa di Music Assistant, per esempio `http://homeassistant.local:8095` (il componente aggiuntivo di Home Assistant) oppure `http://192.168.1.10:8095`;
    - l’indirizzo da fuori casa (vedi sotto);
    - un token di accesso a lungo termine (in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine);
    - se vuoi, il nome del telefono tra i lettori di Music Assistant.
-   Premi “Salva e prova la connessione”: controlla sia l’API sia l’audio.
-3. Premi “Consenti in background”, così Android non ferma la musica a schermo spento.
+   Premi “Salva e prova la connessione”: controlla sia l’API sia l’audio. Poi “Vai alla tua musica”.
+3. Premi “Consenti in background”, così Android non ferma la musica a schermo spento. Le impostazioni stanno dietro l’ingranaggio, nella Home e nella Libreria.
 4. In auto apri Gearslip: Xonos compare tra le app musicali.
 
 Per ricevere gli aggiornamenti in automatico, aggiungi `https://github.com/SirioNero/Music-Assistant-on-Gearslip` a [Obtainium](https://github.com/ImranR98/Obtainium). Ogni release ha il nome della versione dell’app (`v0.1.N`), così Obtainium capisce quando c’è un aggiornamento.
@@ -158,7 +191,7 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 
 ### Limiti
 
-- Il lettore del telefono è privato: le altre app di Music Assistant e Home Assistant non lo offrono come destinazione. La musica la fai partire da Xonos, in auto.
+- Il lettore del telefono è privato: le altre app di Music Assistant e Home Assistant non lo offrono come destinazione. La musica la fai partire da Xonos, sul telefono o in auto.
 - L’audio usa Sendspin senza la sua cifratura, una modalità che Music Assistant accetta di serie; la connessione è comunque autenticata dal token, e cifrata quando l’indirizzo è `https://`.
 - Un telefono, una coda: se cambi il nome del lettore, Music Assistant tiene lo stesso lettore e la sua coda.
 
@@ -186,6 +219,11 @@ Segnalazioni e pull request sono benvenute, soprattutto da chi prova Xonos in au
 | `playback/BrowseTree.kt` | Il menu come voci di Media3 per Gearslip |
 | `playback/ResourceLabels.kt` | Le scritte del menu, nella lingua scelta sul telefono |
 | `playback/Artwork.kt` | Le copertine passate a Gearslip |
-| `phone/SettingsActivity.kt` | La schermata di configurazione sul telefono |
-| `Language.kt` | Le lingue dell’app, e i problemi detti in quella scelta |
+| `phone/MainActivity.kt`, `phone/ControllerLink.kt` | L’app sul telefono, e il lettore che comanda |
+| `phone/model/` | Cosa mostra e fa l’app del telefono, senza Android: schermate, caricamenti, ricerca, riproduzione, testi, impostazioni |
+| `phone/ui/` | Le schermate del telefono, con Compose e Material 3 |
+| `data/Lyrics.kt` | I testi sincronizzati (LRC) e semplici |
+| `Language.kt`, `Texts.kt` | Le lingue dell’app, e i problemi detti in quella scelta |
 | `res/values*/strings.xml` | Tutti i testi, in inglese (`values`) e in ogni lingua (`values-it`, `values-es`…) |
+
+In `tools/` c’è ciò che serve per provare Xonos senza telefono: un Music Assistant di prova in Docker, un banco di prova sulla JVM che fa ciò che fanno l’auto e l’app del telefono, e `tools/screens`, che disegna in PNG le schermate del telefono con Compose Desktop (vedi `tools/README.md`).
