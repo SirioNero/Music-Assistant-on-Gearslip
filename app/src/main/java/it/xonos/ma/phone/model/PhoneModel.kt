@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import it.xonos.ma.data.Account
 import it.xonos.ma.data.Connection
 import it.xonos.ma.data.Library
 import it.xonos.ma.data.Lyrics
@@ -64,6 +65,10 @@ class PhoneModel(
     private val settings: Settings,
     /** Le ultime schermate caricate, da mostrare subito alla prossima apertura. */
     private val cache: ScreenCache,
+    /** Chi cerca Music Assistant nella rete (per le impostazioni). */
+    val finder: ServerFinder,
+    /** Il nome del token di Xonos in Music Assistant, per esempio "Xonos (Pixel 8)". */
+    private val deviceName: String,
     /** La coda del telefono in Music Assistant (l'id del lettore). */
     private val queueId: () -> String,
     /** Vero quando il telefono è un lettore di Music Assistant: solo allora si può suonare. */
@@ -137,7 +142,14 @@ class PhoneModel(
     /** Le impostazioni con i valori salvati. */
     fun settingsPage(): SettingsPage {
         val config = settings.load()
-        return SettingsPage(config.homeUrl, config.remoteUrl, config.token, settings.playerName)
+        return SettingsPage(config.homeUrl, config.remoteUrl, config.token, settings.playerName, settings.username)
+    }
+
+    /** Un server trovato nella rete: i suoi indirizzi vanno nel modulo. */
+    fun choose(page: SettingsPage, server: FoundServer) {
+        page.home = server.url
+        server.remoteUrl?.let { page.remote = it }
+        page.setupNeeded = false
     }
 
     /** Apre un elemento: album, playlist, artista, podcast, genere o cartella; il resto lo suona. */
@@ -619,6 +631,8 @@ class PhoneModel(
 
     // ---------- Testi ----------
 
+    private val account = Account(repo)
+
     private val lyrics = object : LinkedHashMap<String, LyricsState>(16, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, LyricsState>?) = size > LYRICS_KEPT
     }
@@ -641,25 +655,79 @@ class PhoneModel(
 
     // ---------- Impostazioni ----------
 
-    /** Salva le impostazioni, ricollega Xonos e prova ogni indirizzo. */
+    /**
+     * Salva le impostazioni, ricollega Xonos e prova ogni indirizzo. Con nome utente e password
+     * prima si accede (al primo indirizzo che risponde) e Music Assistant dà a Xonos un token suo.
+     */
     fun save(page: SettingsPage) {
-        val config = Settings.Config(
-            homeUrl = Settings.normalizeUrl(page.home),
-            remoteUrl = Settings.normalizeUrl(page.remote),
-            token = page.token.trim(),
-        )
-        page.home = config.homeUrl
-        page.remote = config.remoteUrl
-        page.token = config.token
-        // Un altro server: le schermate salvate sono dell'altro.
-        if (config != settings.load()) scope.launch(Dispatchers.IO) { cache.clear() }
-        settings.save(config)
+        tidy(page)
+        if (page.useToken || page.password.isEmpty()) return finish(page)
+        signIn(page) { url -> account.login(url, page.username, page.password, deviceName) }
+    }
+
+    /** Un Music Assistant appena installato: crea il primo account (l'amministratore) ed entra. */
+    fun createAccount(page: SettingsPage) {
+        tidy(page)
+        page.passwordShort = page.password.length < MIN_PASSWORD
+        if (page.passwordShort || page.username.length < 2) return
+        signIn(page) { url -> account.createFirst(url, page.username, page.password, deviceName) }
+    }
+
+    private fun tidy(page: SettingsPage) {
+        page.home = Settings.normalizeUrl(page.home)
+        page.remote = Settings.normalizeUrl(page.remote)
+        page.token = page.token.trim()
+        page.username = page.username.trim()
         settings.playerName = page.name
         page.name = settings.playerName
-        repo.reconnect()
         page.results = emptyList()
         page.tried = true
-        if (!config.isComplete) return
+        page.passwordShort = false
+    }
+
+    /** Accede con [how] al primo indirizzo che risponde; poi salva il token e prova la connessione. */
+    private fun signIn(page: SettingsPage, how: suspend (String) -> Account.Login) {
+        val places = listOf(ConnectionCheck.Place.HOME to page.home, ConnectionCheck.Place.AWAY to page.remote).filter { it.second.isNotBlank() }
+        if (places.isEmpty() || page.username.isEmpty()) return
+        page.checking = true
+        scope.launch {
+            var failure: ConnectionCheck.Result? = null
+            for ((place, url) in places) {
+                try {
+                    val login = how(url)
+                    page.token = login.token
+                    page.password = ""
+                    page.setupNeeded = false
+                    settings.username = login.user
+                    page.signedIn = login.user
+                    finish(page)
+                    return@launch
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    failure = ConnectionCheck.Result.Failed(place, e)
+                    val problem = (e as? MaException)?.problem
+                    if (problem == Problem.SETUP_REQUIRED) page.setupNeeded = true
+                    // Il server ha risposto (password sbagliata, nessun account...): l'altro indirizzo è lo stesso server.
+                    if (problem in ANSWERED) break
+                }
+            }
+            page.results = listOfNotNull(failure)
+            page.checking = false
+        }
+    }
+
+    private fun finish(page: SettingsPage) {
+        val config = Settings.Config(homeUrl = page.home, remoteUrl = page.remote, token = page.token)
+        // Un altro server: le schermate salvate sono dell'altro.
+        if (config.urls != settings.load().urls) scope.launch(Dispatchers.IO) { cache.clear() }
+        settings.save(config)
+        repo.reconnect()
+        page.results = emptyList()
+        if (!config.isComplete) {
+            page.checking = false
+            return
+        }
         page.checking = true
         scope.launch {
             val check = ConnectionCheck(repo)
@@ -723,6 +791,12 @@ class PhoneModel(
         const val SHELVES_CACHE = "shelves"
 
         val TRACK_LIKE = setOf("track", "podcast_episode", "audiobook")
+
+        /** La password più corta che Music Assistant accetta per un account nuovo. */
+        const val MIN_PASSWORD = 8
+
+        /** Problemi che vengono dal server stesso: provare l'altro indirizzo non cambierebbe niente. */
+        private val ANSWERED = setOf(Problem.BAD_LOGIN, Problem.SETUP_REQUIRED, Problem.REFUSED, Problem.DENIED, Problem.TOO_OLD)
     }
 }
 

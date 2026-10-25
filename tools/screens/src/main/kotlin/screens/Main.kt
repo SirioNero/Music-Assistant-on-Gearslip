@@ -17,6 +17,8 @@ import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.phone.model.ArtistPage
 import it.xonos.ma.phone.model.ConnectionCheck
+import it.xonos.ma.phone.model.FixedFinder
+import it.xonos.ma.phone.model.FoundServer
 import it.xonos.ma.phone.model.HomePage
 import it.xonos.ma.phone.model.ItemPage
 import it.xonos.ma.phone.model.LibraryPage
@@ -124,7 +126,17 @@ private fun shoot(file: File, lang: String, scene: Scene) {
     val repo = MaRepository(settings)
     repo.acquire()
     if (scene.configured) runBlocking { withTimeout(10_000) { repo.connection.first { it is Connection.Connected } } }
-    val model = PhoneModel(repo, Library(repo), settings, ScreenCache(null), { "xonos-screens" }, MutableStateFlow(true), CoroutineScope(SupervisorJob() + Dispatchers.Default))
+    val model = PhoneModel(
+        repo,
+        Library(repo),
+        settings,
+        ScreenCache(null),
+        FixedFinder(FOUND),
+        "Xonos (schermate)",
+        { "xonos-screens" },
+        MutableStateFlow(true),
+        CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    )
     scene.setUp(model)
     val host = FakeHost(Language.of(if (lang == "zh") "zh-CN" else lang))
     val composeScene = ImageComposeScene(WIDTH, HEIGHT, Density(DENSITY)) { XonosScreen(model, FakeLink(scene.now), host) }
@@ -143,6 +155,12 @@ private fun shoot(file: File, lang: String, scene: Scene) {
 }
 
 private const val SETTLE_NS = 2_500_000_000L
+
+/** I Music Assistant "trovati nella rete" del benvenuto e delle impostazioni. */
+private val FOUND = listOf(
+    FoundServer("casa", "Music Assistant", "2.10.8", "http://192.168.1.20:8095", "https://musica.example.org"),
+    FoundServer("studio", "Music Assistant (studio)", "2.11.0", "http://192.168.1.31:8095", null),
+)
 
 /** Cosa risponde il Music Assistant finto: il brano che suona e il suo testo; il resto è vuoto. */
 private fun answer(command: String, args: JSONObject): Any? = when (command) {

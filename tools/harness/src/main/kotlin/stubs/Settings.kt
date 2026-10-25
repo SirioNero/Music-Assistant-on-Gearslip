@@ -23,6 +23,8 @@ class Settings {
 
     var language: Language = Language.of(System.getenv("LANG_XONOS"))
 
+    var username: String? = null
+
     var playerName: String = DEFAULT_NAME
         set(value) {
             field = value.trim().ifEmpty { DEFAULT_NAME }

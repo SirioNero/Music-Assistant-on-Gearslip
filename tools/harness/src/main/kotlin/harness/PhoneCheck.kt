@@ -2,11 +2,15 @@ package harness
 
 import it.xonos.ma.data.Connection
 import it.xonos.ma.data.Library
+import it.xonos.ma.data.MaException
 import it.xonos.ma.data.MaRepository
+import it.xonos.ma.data.Problem
 import it.xonos.ma.data.QueueState
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.phone.model.ArtistPage
+import it.xonos.ma.phone.model.ConnectionCheck
+import it.xonos.ma.phone.model.FixedFinder
 import it.xonos.ma.phone.model.HomePage
 import it.xonos.ma.phone.model.ItemPage
 import it.xonos.ma.phone.model.LibraryPage
@@ -66,7 +70,7 @@ fun main(): Unit = runBlocking {
     val main = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
     // Le schermate salvate vanno in una cartella temporanea: alla fine le legge una seconda app senza server.
     val cache = ScreenCache(Files.createTempDirectory("xonos-cache").toFile())
-    val model = PhoneModel(repo, library, settings, cache, { playerId }, ready, CoroutineScope(SupervisorJob() + main))
+    val model = PhoneModel(repo, library, settings, cache, FixedFinder(), "Xonos (prova)", { playerId }, ready, CoroutineScope(SupervisorJob() + main))
     var failures = 0
 
     fun check(label: String, ok: Boolean, detail: String = "") {
@@ -273,7 +277,17 @@ fun main(): Unit = runBlocking {
     val offlineSettings = Settings().also { it.save(Settings.Config("http://127.0.0.1:1", "", "x")) }
     val offlineRepo = MaRepository(offlineSettings)
     offlineRepo.acquire()
-    val offline = PhoneModel(offlineRepo, Library(offlineRepo), offlineSettings, cache, { playerId }, MutableStateFlow(false), CoroutineScope(SupervisorJob() + main))
+    val offline = PhoneModel(
+        offlineRepo,
+        Library(offlineRepo),
+        offlineSettings,
+        cache,
+        FixedFinder(),
+        "Xonos (prova)",
+        { playerId },
+        MutableStateFlow(false),
+        CoroutineScope(SupervisorJob() + main),
+    )
     val offlineHome = offline.page as HomePage
     val shownAt = System.nanoTime()
     offline.start(offlineHome)
@@ -307,6 +321,25 @@ fun main(): Unit = runBlocking {
     settingsPage.remote = ""
     model.save(settingsPage)
     withTimeout(15_000) { repo.connection.first { it is Connection.Connected } }
+
+    // ---------- Accesso con nome utente e password ----------
+    val login = model.settingsPage()
+    login.useToken = false
+    login.username = System.getenv("MA_USER") ?: "prova"
+    login.password = "sbagliata"
+    model.save(login)
+    withTimeoutOrNull(30_000) { while (login.checking || login.results.isEmpty()) delay(100) }
+    val refused = (login.results.firstOrNull() as? ConnectionCheck.Result.Failed)?.error as? MaException
+    check("Accesso: password sbagliata", refused?.problem == Problem.BAD_LOGIN && settings.load().token == token, "${refused?.problem}")
+    login.password = System.getenv("MA_PASSWORD") ?: "prova-xonos"
+    model.save(login)
+    withTimeoutOrNull(30_000) { while (login.checking || login.results.isEmpty()) delay(100) }
+    check(
+        "Accesso: nome utente e password",
+        login.results.any { it is ConnectionCheck.Result.Ok } && settings.load().token != token && settings.username == login.username && login.password.isEmpty(),
+        login.results.joinToString(),
+    )
+    withTimeout(15_000) { repo.connection.first { it is Connection.Connected && it.server.admin } }
 
     repo.command("player_queues/stop") { put("queue_id", playerId) }
     delay(500)

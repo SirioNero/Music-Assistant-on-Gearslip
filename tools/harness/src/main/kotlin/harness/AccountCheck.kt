@@ -1,13 +1,24 @@
 package harness
 
 import it.xonos.ma.data.Account
+import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaException
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.Problem
+import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
-import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
+import it.xonos.ma.phone.model.ConnectionCheck
+import it.xonos.ma.phone.model.FixedFinder
+import it.xonos.ma.phone.model.PhoneModel
 import java.util.Base64
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONObject
 
 /**
  * L'accesso con nome utente e password ([Account]) contro Music Assistant: utente giusto e
@@ -68,10 +79,46 @@ fun main(): Unit = runBlocking {
     val fresh = System.getenv("NEW_URL")
     if (fresh != null) {
         check("Server nuovo: serve il primo account", problemOf { account.login(fresh, "chiunque", "qualsiasi-password", "Xonos") } == Problem.SETUP_REQUIRED)
-        check("Server nuovo: password corta", problemOf { account.createFirst(fresh, "primo", "corta", "Xonos") } == Problem.REFUSED)
-        val first = account.createFirst(fresh, "primo", "primo-xonos", "Xonos (primo)")
-        check("Server nuovo: primo account amministratore", first.role == "admin" && claims(first.token).optBoolean("is_long_lived"), first.user)
+        check("Server nuovo: password corta rifiutata dal server", problemOf { account.createFirst(fresh, "primo", "corta", "Xonos") } == Problem.REFUSED)
+
+        // Come dallo schermo del benvenuto: si prova ad accedere, si scopre che non ci sono account, si crea il primo.
+        val freshSettings = Settings().also { it.save(Settings.Config(fresh, "", "")) }
+        val freshRepo = MaRepository(freshSettings)
+        freshRepo.acquire()
+        val model = PhoneModel(
+            freshRepo,
+            Library(freshRepo),
+            freshSettings,
+            ScreenCache(null),
+            FixedFinder(),
+            "Xonos (prova)",
+            { "xonos-accountcheck" },
+            MutableStateFlow(false),
+            CoroutineScope(SupervisorJob() + Dispatchers.Default),
+        )
+        val page = model.settingsPage()
+        page.useToken = false
+        page.username = "primo"
+        page.password = "primo-xonos"
+        suspend fun settle() = withTimeoutOrNull(30_000) { while (page.checking) delay(50) }
+        model.save(page)
+        delay(100)
+        settle()
+        check("Schermo: propone di creare il primo account", page.setupNeeded, page.results.joinToString())
+        page.password = "corta"
+        model.createAccount(page)
+        check("Schermo: password troppo corta", page.passwordShort && !page.checking)
+        page.password = "primo-xonos"
+        model.createAccount(page)
+        delay(100)
+        settle()
+        check(
+            "Schermo: primo account creato, token salvato e connessione provata",
+            page.results.any { it is ConnectionCheck.Result.Ok } && freshSettings.username == "primo" && freshSettings.load().token.isNotEmpty() && !page.setupNeeded,
+            page.results.joinToString(),
+        )
         check("Server nuovo: poi si entra", account.login(fresh, "primo", "primo-xonos", "Xonos").role == "admin")
+        freshRepo.release()
     }
 
     println(if (failures == 0) "\nTutto bene" else "\n$failures prove non riuscite")

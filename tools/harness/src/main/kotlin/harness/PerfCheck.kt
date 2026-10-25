@@ -7,6 +7,7 @@ import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.data.objects
+import it.xonos.ma.phone.model.FixedFinder
 import it.xonos.ma.phone.model.HomePage
 import it.xonos.ma.phone.model.ItemPage
 import it.xonos.ma.phone.model.LibraryPage
@@ -83,7 +84,7 @@ fun main(): Unit = runBlocking {
         )
     }
 
-    val model = PhoneModel(repo, library, settings, ScreenCache(null), { "xonos-perf" }, MutableStateFlow(true), scope)
+    val model = PhoneModel(repo, library, settings, ScreenCache(null), FixedFinder(), "Xonos (prova)", { "xonos-perf" }, MutableStateFlow(true), scope)
 
     val home = model.page as HomePage
     scope.launch { model.start(home) }

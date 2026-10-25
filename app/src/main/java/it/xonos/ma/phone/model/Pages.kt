@@ -151,12 +151,31 @@ class SearchPage : Page() {
 /** I risultati di una ricerca: il migliore e poi tutti, per tipo ("tracks", "artists", ...). */
 data class SearchResults(val query: String, val best: MaItem?, val byType: Map<String, List<MaItem>>)
 
-/** Le impostazioni: indirizzi, token, nome del lettore, e le prove della connessione. */
-class SettingsPage(home: String, remote: String, token: String, name: String) : Page() {
+/**
+ * Le impostazioni: indirizzi, accesso (nome utente e password, o il token), nome del lettore, e
+ * le prove della connessione.
+ */
+class SettingsPage(home: String, remote: String, token: String, name: String, signedIn: String?) : Page() {
     var home by mutableStateOf(home)
     var remote by mutableStateOf(remote)
     var token by mutableStateOf(token)
     var name by mutableStateOf(name)
+    var username by mutableStateOf(signedIn.orEmpty())
+
+    /** Non si salva mai: serve solo per farsi dare il token. */
+    var password by mutableStateOf("")
+
+    /** Chi ha fatto l'accesso l'ultima volta (null: si è usato un token copiato). */
+    var signedIn by mutableStateOf(signedIn)
+
+    /** Accedere con un token copiato da Music Assistant invece che con nome utente e password. */
+    var useToken by mutableStateOf(token.isNotBlank() && signedIn == null)
+
+    /** Il server non ha ancora account: si propone di creare il primo. */
+    var setupNeeded by mutableStateOf(false)
+
+    /** La password per il nuovo account è troppo corta. */
+    var passwordShort by mutableStateOf(false)
     var checking by mutableStateOf(false)
 
     /** Vero dopo il primo "Salva": da lì si dice se manca qualcosa. */

@@ -24,6 +24,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,12 +49,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import it.xonos.ma.Language
 import it.xonos.ma.R
 import it.xonos.ma.phone.model.ConnectionCheck
 import it.xonos.ma.phone.model.PhoneModel
 import it.xonos.ma.phone.model.SettingsPage
+import kotlinx.coroutines.delay
 
 /** Il primo avvio: le impostazioni da sole, finché Xonos non sa a quale Music Assistant collegarsi. */
 @Composable
@@ -60,8 +66,9 @@ internal fun Onboarding(model: PhoneModel, host: Host, onDone: () -> Unit) {
 }
 
 /**
- * Le impostazioni: lingua, indirizzi, token, nome del lettore, la prova della connessione,
- * la batteria e come si usa in auto.
+ * Le impostazioni: lingua, i Music Assistant trovati nella rete, indirizzi, accesso (nome utente
+ * e password, o un token), nome del lettore, la prova della connessione, la batteria e come si
+ * usa in auto. Su un Music Assistant appena installato propone di creare il primo account.
  */
 @Composable
 internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, onboarding: Boolean, onDone: () -> Unit) {
@@ -89,10 +96,27 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
         }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             LanguagePicker(host)
+            FoundServers(page, model)
             Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri, "field_home")
             Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri, "field_remote")
-            TokenField(page)
+            SignInChoice(page)
+            if (page.useToken) {
+                TokenField(page)
+            } else {
+                Field(
+                    page.username,
+                    { page.username = it },
+                    R.string.label_username,
+                    null,
+                    "",
+                    KeyboardType.Text,
+                    "field_username",
+                    help = page.signedIn?.let { stringResource(R.string.signed_in_as, it) } ?: stringResource(R.string.help_username),
+                )
+                PasswordField(page)
+            }
             Field(page.name, { page.name = it }, R.string.label_name, R.string.help_name, stringResource(R.string.hint_name), KeyboardType.Text, "field_name")
+            val signIn = !page.useToken && page.password.isNotEmpty()
             Button(
                 onClick = {
                     focus.clearFocus()
@@ -105,12 +129,41 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
                     CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
                     Spacer(Modifier.width(12.dp))
                 }
-                Text(stringResource(if (page.checking) R.string.test_running else R.string.save))
+                Text(stringResource(if (page.checking) R.string.test_running else if (signIn) R.string.sign_in else R.string.save))
             }
-            if (!page.checking && page.results.isEmpty() && page.tried && !model.configured) {
-                Text(stringResource(R.string.test_incomplete), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            val incomplete = when {
+                page.useToken -> !model.configured
+                else -> page.username.isEmpty() || (page.password.isEmpty() && !model.configured)
+            }
+            if (!page.checking && page.results.isEmpty() && page.tried && incomplete) {
+                Text(
+                    stringResource(if (page.useToken) R.string.test_incomplete else R.string.test_incomplete_login),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            if (page.passwordShort) {
+                Text(stringResource(R.string.password_short), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
             }
             page.results.forEach { result -> CheckLine(result, host) }
+            if (page.setupNeeded) {
+                InfoCard(
+                    XIcons.Artist,
+                    stringResource(R.string.setup_needed),
+                    {
+                        Button(
+                            onClick = {
+                                focus.clearFocus()
+                                model.createAccount(page)
+                            },
+                            enabled = !page.checking,
+                            modifier = Modifier.testTag("create_account"),
+                        ) {
+                            Text(stringResource(R.string.create_account))
+                        }
+                    },
+                )
+            }
             if (onboarding && page.results.any { it is ConnectionCheck.Result.Ok }) {
                 FilledTonalButton(onClick = onDone, modifier = Modifier.testTag("onboarding_done").fillMaxWidth().height(52.dp)) { Text(stringResource(R.string.onboarding_done)) }
             }
@@ -133,13 +186,22 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
 }
 
 @Composable
-private fun Field(value: String, onChange: (String) -> Unit, label: Int, help: Int, hint: String, keyboard: KeyboardType, tag: String) {
+private fun Field(
+    value: String,
+    onChange: (String) -> Unit,
+    label: Int,
+    helpId: Int?,
+    hint: String,
+    keyboard: KeyboardType,
+    tag: String,
+    help: String? = helpId?.let { stringResource(it) },
+) {
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
         label = { Text(stringResource(label)) },
-        placeholder = { Text(hint) },
-        supportingText = { Text(stringResource(help)) },
+        placeholder = { if (hint.isNotEmpty()) Text(hint) },
+        supportingText = help?.let { { Text(it) } },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboard),
         modifier = Modifier.testTag(tag).fillMaxWidth(),
@@ -166,6 +228,110 @@ private fun TokenField(page: SettingsPage) {
         modifier = Modifier.testTag("field_token").fillMaxWidth(),
     )
 }
+
+/**
+ * I Music Assistant che si annunciano nella rete (mDNS): toccandone uno, i suoi indirizzi vanno
+ * nel modulo. Si cerca solo mentre questa schermata è aperta.
+ */
+@Composable
+private fun FoundServers(page: SettingsPage, model: PhoneModel) {
+    DisposableEffect(model) {
+        model.finder.start()
+        onDispose { model.finder.stop() }
+    }
+    val servers by model.finder.servers.collectAsState()
+    val searching by model.finder.searching.collectAsState()
+    // Dopo qualche secondo senza risultati si dice che non c'è niente, invece di girare per sempre.
+    var waited by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(SEARCH_WAIT_MS)
+        waited = true
+    }
+    if (servers.isEmpty() && !searching) return
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.discover_title), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+        for (server in servers) {
+            val chosen = page.home.trimEnd('/') == server.url
+            Surface(
+                onClick = { model.choose(page, server) },
+                color = if (chosen) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.testTag("server").fillMaxWidth(),
+            ) {
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(XIcons.Server, null, tint = MaterialTheme.colorScheme.primary)
+                    Spacer(Modifier.width(16.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(server.name, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            "${server.url.removePrefix("http://")} · ${server.version}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    if (chosen) Icon(XIcons.Check, null, tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+        }
+        if (servers.isEmpty()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (!waited) {
+                    CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(12.dp))
+                }
+                Text(
+                    stringResource(if (waited) R.string.discover_none else R.string.discover_searching),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/** Come si entra: con nome utente e password (Xonos si fa dare un token) o con un token copiato. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SignInChoice(page: SettingsPage) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterChip(
+            selected = !page.useToken,
+            onClick = { page.useToken = false },
+            label = { Text(stringResource(R.string.login_password)) },
+            modifier = Modifier.testTag("login_password"),
+        )
+        FilterChip(
+            selected = page.useToken,
+            onClick = { page.useToken = true },
+            label = { Text(stringResource(R.string.login_token)) },
+            modifier = Modifier.testTag("login_token"),
+        )
+    }
+}
+
+@Composable
+private fun PasswordField(page: SettingsPage) {
+    var visible by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = page.password,
+        onValueChange = { page.password = it },
+        label = { Text(stringResource(R.string.label_password)) },
+        supportingText = { Text(stringResource(R.string.help_password)) },
+        singleLine = true,
+        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(if (visible) XIcons.Hidden else XIcons.Visible, stringResource(if (visible) R.string.hide_password else R.string.show_password))
+            }
+        },
+        modifier = Modifier.testTag("field_password").fillMaxWidth(),
+    )
+}
+
+private const val SEARCH_WAIT_MS = 6_000L
 
 /** La lingua dell'app (e del menu in auto), ciascuna scritta nella sua lingua. */
 @OptIn(ExperimentalMaterial3Api::class)

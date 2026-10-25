@@ -24,6 +24,8 @@ object Xonos {
     val packageName: String get() = args.getString("targetAppId") ?: "it.xonos.ma"
     val url: String get() = args.getString("xonosUrl") ?: "http://10.0.2.2:8095"
     val token: String get() = args.getString("xonosToken").orEmpty()
+    val username: String get() = args.getString("xonosUser") ?: "prova"
+    val password: String get() = args.getString("xonosPassword") ?: "prova-xonos"
 
     /** "none" (nessuna compilazione: come appena installata) e "partial" (con il Baseline Profile). */
     val modes: List<String> get() = (args.getString("xonosModes") ?: "none").split(',').map { it.trim() }.filter { it.isNotEmpty() }
@@ -90,7 +92,15 @@ private fun MacrobenchmarkScope.connectIfNeeded() {
     device.wait(Until.hasObject(By.res(Pattern.compile("field_home|home"))), 30_000)
     val home = device.findObject(By.res("field_home")) ?: return
     home.text = Xonos.url
-    waitFor("field_token").text = Xonos.token
+    val username = device.findObject(By.res("field_username"))
+    if (username != null && Xonos.token.isEmpty()) {
+        // Come farebbe una persona: nome utente e password, e Xonos si fa dare il token.
+        username.text = Xonos.username
+        waitFor("field_password").text = Xonos.password
+    } else {
+        device.findObject(By.res("login_token"))?.click()
+        waitFor("field_token").text = Xonos.token
+    }
     scrollToVisible("save").click()
     scrollToVisible("onboarding_done", 60_000).click()
 }

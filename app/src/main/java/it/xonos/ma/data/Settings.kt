@@ -38,6 +38,13 @@ class Settings(context: Context) {
             prefs.edit().putString(KEY_LANGUAGE, value.tag).apply()
         }
 
+    /** Chi ha fatto l'accesso con nome utente e password (null se il token è stato copiato a mano). */
+    var username: String?
+        get() = prefs.getString(KEY_USER, null)?.ifBlank { null }
+        set(value) {
+            prefs.edit().putString(KEY_USER, value).apply()
+        }
+
     /** Il nome con cui il telefono compare in Music Assistant. */
     var playerName: String
         get() = prefs.getString(KEY_NAME, null)?.trim()?.ifEmpty { null } ?: DEFAULT_NAME
@@ -89,6 +96,7 @@ class Settings(context: Context) {
         private const val KEY_MUTED = "muted"
         private const val KEY_ART = "art_key"
         private const val KEY_LANGUAGE = "language"
+        private const val KEY_USER = "username"
 
         const val DEFAULT_NAME = "Xonos"
 

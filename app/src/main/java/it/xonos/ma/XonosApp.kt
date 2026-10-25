@@ -1,6 +1,7 @@
 package it.xonos.ma
 
 import android.app.Application
+import android.os.Build
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -10,6 +11,7 @@ import it.xonos.ma.data.Library
 import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
+import it.xonos.ma.phone.NsdFinder
 import it.xonos.ma.phone.model.PhoneModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +28,17 @@ class XonosApp : Application(), SingletonImageLoader.Factory {
 
     /** Lo stato dell'app sul telefono: vive quanto l'app, così resta uguale se lo schermo ruota o cambia lingua. */
     val phone: PhoneModel by lazy {
-        PhoneModel(repo, library, settings, ScreenCache(File(cacheDir, "screens")), { settings.playerId }, playerReady, MainScope())
+        PhoneModel(
+            repo,
+            library,
+            settings,
+            ScreenCache(File(cacheDir, "screens")),
+            NsdFinder(this),
+            "Xonos (${Build.MODEL})",
+            { settings.playerId },
+            playerReady,
+            MainScope(),
+        )
     }
 
     /** Le copertine sullo schermo del telefono, con la stessa connessione dell'API (ma un limite di tempo). */
