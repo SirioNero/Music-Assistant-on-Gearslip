@@ -28,6 +28,7 @@ MA_TOKEN=... LANG_XONOS=it QUERIES="vasco,podcast morning" build/install/harness
 | `PerfCheckKt` | Tempi e blocchi del thread "principale" del `PhoneModel`: collegamento, Home, libreria, una playlist lunga (`PLAYLIST`) |
 | `AccountCheckKt` | Accesso con nome utente e password (`MA_USER`, `MA_PASSWORD`), il token che Xonos si fa dare, un ospite, il primo account di un MA vuoto (`NEW_URL`) |
 | `PlayersCheckKt` | "Suona su": il telefono e una cassa finta (Sendspin con un altro `product_name`, che MA mostra come Universal Player dopo ~15 s). La coda passa alla cassa e torna dallo stesso punto, comandi e volume della cassa, "suona" va al lettore scelto, lo schermo torna al telefono se questo suona da sé |
+| `LatencyCheckKt` | Quanto passa da play e da avanti al primo suono, e quanto ne pesa Music Assistant e quanto il telefono (`LEAD_MS`, `BUFFER_MS`; `SOURCE=slow` per una sorgente alla velocità della musica, come Spotify Soloist) |
 | `ServicesCheckKt` | I servizi di MA con il servizio finto `xonos_test`: elenco, icone, flusso (modulo con errore, accesso "nel browser", fine), opzioni, pulsante, riconfigura, rimozione; poi lo stesso dal `PhoneModel` (anche la fine ricavata al ritorno nell'app) e la lingua dei moduli |
 
 `MA_URL` (predefinito `http://127.0.0.1:8095`) e `MA_TOKEN` indicano il server.
@@ -85,7 +86,8 @@ Poi:
 - `xonos_test/` è un servizio finto che il Dockerfile copia tra quelli di MA: un flusso con un modulo
   (tutti i tipi di campo, un errore se l'account è "errore", la fine anticipata se è "abort"), un
   accesso "nel browser" che passa da `podcasts.py` (`/oauth` rimanda al callback del flusso), e
-  opzioni con un pulsante. Serve a `ServicesCheckKt`.
+  opzioni con un pulsante. Serve a `ServicesCheckKt`. `podcasts.py` ha anche `/slow/<n>.flac`, un
+  file mandato alla velocità della musica (per `LatencyCheckKt`).
 - `analyze_audio.py opus pcm` (dentro il container, che ha PyAV) decodifica i pacchetti salvati da
   `CaptureCheckKt` e misura quanto è pulito il suono: le tracce di prova sono sinusoidi.
 

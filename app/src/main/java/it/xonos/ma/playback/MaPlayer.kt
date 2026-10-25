@@ -95,6 +95,10 @@ class MaPlayer(
     private class Expectation(val test: (QueueState?) -> Boolean, val future: SettableFuture<Void?>)
     private val expectations = mutableListOf<Expectation>()
 
+    // Il salto in attesa di partire (vedi [gathered]).
+    private var pendingSkip: SettableFuture<Void?>? = null
+    private var skipJob: Job? = null
+
     private val listener: (String, String?, Any?) -> Unit = { event, objectId, data ->
         if (objectId == queueId) handler.post { onEvent(event, data) }
     }
@@ -390,9 +394,13 @@ class MaPlayer(
         val target = stateStart + mediaItemIndex
         return when (seekCommand) {
             Player.COMMAND_SEEK_TO_NEXT, Player.COMMAND_SEEK_TO_NEXT_MEDIA_ITEM ->
-                command("player_queues/next") { it?.currentIndex != index }
+                if (mediaItemIndex == C.INDEX_UNSET) command("player_queues/next") { it?.currentIndex != index } else gathered(target)
             Player.COMMAND_SEEK_TO_PREVIOUS, Player.COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM ->
-                if (target == index) seekWithin(0) else command("player_queues/previous") { it?.currentIndex != index }
+                when {
+                    target == index -> seekWithin(0)
+                    mediaItemIndex == C.INDEX_UNSET -> command("player_queues/previous") { it?.currentIndex != index }
+                    else -> gathered(target)
+                }
             Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM -> seekWithin(positionMs)
             else ->
                 if (target == index) {
@@ -404,6 +412,27 @@ class MaPlayer(
                     }) { it?.currentIndex == target }
                 }
         }
+    }
+
+    /**
+     * Avanti e indietro premuti in fretta (anche dall'auto) diventano un salto solo, al brano dove ci
+     * si ferma. Ogni salto fa partire un flusso nuovo in Music Assistant: con Spotify Soloist o Tidal
+     * se ne può avere uno alla volta, e una raffica finiva in "limite di flussi raggiunto". Intanto
+     * Media3 mostra già il brano scelto.
+     */
+    private fun gathered(target: Int): ListenableFuture<*> {
+        // Il salto di prima confluisce in questo.
+        pendingSkip?.set(null)
+        val future = SettableFuture.create<Void?>()
+        pendingSkip = future
+        skipJob?.cancel()
+        skipJob = scope.launch {
+            delay(SKIP_GATHER_MS)
+            if (pendingSkip === future) pendingSkip = null
+            val sent = command("player_queues/play_index", args = { put("index", target) }) { it?.currentIndex == target }
+            sent.addListener({ future.set(null) }, { handler.post(it) })
+        }
+        return future
     }
 
     private fun seekWithin(positionMs: Long): ListenableFuture<*> {
@@ -548,6 +577,9 @@ class MaPlayer(
         private const val POSITION_TOLERANCE_MS = 1_500L
         private const val WINDOW_DEBOUNCE_MS = 150L
         private const val EXPECT_TIMEOUT_MS = 3_000L
+
+        /** Quanto si aspetta un altro avanti o indietro prima di saltare davvero (vedi [gathered]). */
+        private const val SKIP_GATHER_MS = 400L
         private const val PLAY_SETTLE_MS = 4_000L
         private const val READY_TIMEOUT_MS = 20_000L
         private const val RECENT_PLAY_MS = 30_000L

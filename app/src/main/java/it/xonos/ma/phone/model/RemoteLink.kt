@@ -55,6 +55,10 @@ class RemoteLink internal constructor(
     private val favorites = mutableMapOf<String, Boolean>()
     private var windowJob: Job? = null
 
+    /** Il brano verso cui si sta saltando: lo schermo lo mostra subito, Music Assistant ci arriva dopo. */
+    private var pendingIndex: Int? = null
+    private var skipJob: Job? = null
+
     private val listener: (String, String?, Any?) -> Unit = { event, objectId, data ->
         if (objectId == device.id) onEvent(event, data)
     }
@@ -108,6 +112,7 @@ class RemoteLink internal constructor(
             elapsedMs = (q.elapsedSec * 1000).toLong()
             elapsedAt = clock()
             val index = q.currentIndex
+            if (index != null && index == pendingIndex) pendingIndex = null
             old == null || old.items != q.items || old.shuffle != q.shuffle ||
                 (index != null && (index < windowStart || index >= windowStart + window.size - AHEAD_MARGIN))
         }
@@ -143,10 +148,11 @@ class RemoteLink internal constructor(
 
     private fun build(): NowPlaying? {
         val q = queue ?: return null
-        val current = q.current ?: return null
         if (q.items == 0) return null
+        val pending = pendingIndex?.let { it - windowStart }?.takeIf { it in window.indices }
+        val current = pending?.let { window[it] } ?: q.current ?: return null
         val duration = current.durationSec * 1000L
-        val index = q.currentIndex?.let { it - windowStart }?.takeIf { it in window.indices } ?: -1
+        val index = pending ?: q.currentIndex?.let { it - windowStart }?.takeIf { it in window.indices } ?: -1
         val radio = current.mediaType == "radio"
         return NowPlaying(
             title = if (radio) q.streamTitle ?: current.title else current.title,
@@ -175,6 +181,7 @@ class RemoteLink internal constructor(
 
     override fun positionMs(): Long = synchronized(lock) {
         val q = queue ?: return 0
+        if (pendingIndex != null) return 0
         val duration = (q.current?.durationSec ?: 0) * 1000L
         val now = if (q.playing) elapsedMs + (clock() - elapsedAt) else elapsedMs
         if (duration > 0) min(now, duration) else now
@@ -196,9 +203,45 @@ class RemoteLink internal constructor(
 
     override fun playPause() = send("play_pause")
 
-    override fun next() = send("next")
+    override fun next() = skipBy(1)
 
-    override fun previous() = send("previous")
+    override fun previous() {
+        // Dopo i primi secondi "indietro" ricomincia il brano.
+        if (synchronized(lock) { pendingIndex == null } && positionMs() > RESTART_MS) return send("previous")
+        skipBy(-1)
+    }
+
+    /**
+     * Avanti e indietro premuti in fretta diventano un salto solo, al brano dove ci si ferma: ogni
+     * salto fa partire un flusso nuovo, e con Spotify Soloist o Tidal se ne può avere uno alla volta.
+     */
+    private fun skipBy(step: Int) {
+        val target = synchronized(lock) {
+            val q = queue ?: return
+            val base = pendingIndex ?: q.currentIndex ?: return
+            (base + step).coerceIn(0, max(0, q.items - 1)).also { pendingIndex = it }
+        }
+        publish()
+        jumpTo(target, SKIP_GATHER_MS)
+    }
+
+    private fun jumpTo(target: Int, waitMs: Long) {
+        skipJob?.cancel()
+        skipJob = scope.launch {
+            delay(waitMs)
+            try {
+                devices.command("play_index", device.id) { put("index", target) }
+                // Se Music Assistant non ci arriva, lo schermo torna a quello che dice lui.
+                delay(PENDING_TIMEOUT_MS)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Come sotto.
+            }
+            synchronized(lock) { if (pendingIndex == target) pendingIndex = null }
+            publish()
+        }
+    }
 
     override fun seekTo(positionMs: Long) {
         val seconds = (positionMs.coerceAtLeast(0) / 1000).toInt()
@@ -241,8 +284,9 @@ class RemoteLink internal constructor(
     }
 
     override fun skipTo(index: Int) {
-        val target = synchronized(lock) { windowStart } + index
-        send("play_index") { put("index", target) }
+        val target = synchronized(lock) { (windowStart + index).also { pendingIndex = it } }
+        publish()
+        jumpTo(target, 0)
     }
 
     fun setVolume(level: Int) {
@@ -263,5 +307,8 @@ class RemoteLink internal constructor(
         const val AHEAD = 60
         const val AHEAD_MARGIN = 10
         const val WINDOW_DEBOUNCE_MS = 300L
+        const val SKIP_GATHER_MS = 400L
+        const val PENDING_TIMEOUT_MS = 8_000L
+        const val RESTART_MS = 3_000L
     }
 }

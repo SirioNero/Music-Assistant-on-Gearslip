@@ -165,9 +165,11 @@ class PlaybackService : MediaLibraryService() {
             manufacturer = Build.MANUFACTURER.replaceFirstChar { it.titlecase() },
             softwareVersion = "Xonos ${BuildConfig.VERSION_NAME}",
             formats = formats,
-            // In rete mobile un margine più largo: meglio mezzo secondo in più all'avvio che un buco in galleria.
-            leadTimeMs = if (metered) 1_500 else 800,
-            minBufferMs = if (metered) 800 else 300,
+            // Il margine si paga a ogni play e a ogni salto (misurato: con 800 ms la musica partiva 0,65 s
+            // dopo, con 1500 ms 1,3 s dopo). Le gallerie non le copre questo ma l'audio che il server manda
+            // in anticipo durante il brano: il margine resta piccolo, un po' più largo in rete mobile.
+            leadTimeMs = if (metered) 600 else 300,
+            minBufferMs = if (metered) 400 else 150,
             volume = settings.volume,
             muted = settings.muted,
         )

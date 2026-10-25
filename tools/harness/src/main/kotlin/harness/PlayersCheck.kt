@@ -128,11 +128,20 @@ private fun checks(): Unit = runBlocking {
     val shown = remote.nowPlaying.value
     check("Lo schermo mostra la cassa", shown?.title == moved?.current?.title && shown?.playing == true && remote.positionMs() > 0, "${shown?.title} ${remote.positionMs()} ms, coda ${shown?.queue?.size}")
 
-    val index = queue(speaker.id)?.currentIndex
+    // Due "avanti" di fila: lo schermo mostra subito il brano d'arrivo, e Music Assistant fa un salto solo.
+    val index = queue(speaker.id)?.currentIndex ?: 0
+    val expected = devices.items(speaker.id, index + 2, 1).firstOrNull()?.title
+    val streams = room.outputs.size
     remote.next()
-    until { queue(speaker.id)?.currentIndex == (index ?: 0) + 1 }
-    until { remote.nowPlaying.value?.title == queue(speaker.id)?.current?.title }
-    check("Avanti sulla cassa", queue(speaker.id)?.currentIndex == (index ?: 0) + 1 && remote.nowPlaying.value?.title == queue(speaker.id)?.current?.title, "${remote.nowPlaying.value?.title}")
+    remote.next()
+    check("Due avanti: lo schermo mostra subito il brano d'arrivo", remote.nowPlaying.value?.title == expected && remote.positionMs() == 0L, "${remote.nowPlaying.value?.title} (atteso $expected)")
+    until { queue(speaker.id)?.currentIndex == index + 2 }
+    delay(1_500)
+    check(
+        "Due avanti: un salto solo",
+        queue(speaker.id)?.currentIndex == index + 2 && remote.nowPlaying.value?.title == expected && room.outputs.size - streams <= 1,
+        "brano ${queue(speaker.id)?.currentIndex}, flussi nuovi ${room.outputs.size - streams}",
+    )
     remote.playPause()
     until { queue(speaker.id)?.playing == false }
     check("Pausa sulla cassa", queue(speaker.id)?.playing == false && until(5_000) { remote.nowPlaying.value?.playing == false })

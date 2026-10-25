@@ -138,6 +138,24 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `send_ahead` della specifica nuova: con 13 byte Opus diventa rumore.
 - Il server tiene al massimo 30 s di audio in anticipo per lettore (`max_duration_us` in aiosendspin,
   fisso). Più di così si può avere solo cambiando Music Assistant/aiosendspin.
+- Il primo suono arriva circa `required_lead_time_ms` − 150 ms dopo l'inizio del flusso (misurato:
+  800 → 0,65 s, 1500 → 1,3 s, 300 → subito). Xonos chiede 300 ms in Wi-Fi e 600 in rete mobile: il
+  margine si paga a ogni play e a ogni salto, le gallerie le copre l'anticipo che il server manda dopo.
+
+### Avvio e limiti dei servizi (misurati con `LatencyCheckKt`)
+
+- Prima di far partire un brano MA aspetta audio nel suo buffer: 2 s di solito, 5 con la
+  normalizzazione dinamica, 8 con la dissolvenza incrociata; per le sorgenti "realtime" (Spotify
+  Soloist) 1 s, 2 con la normalizzazione dinamica, 5 all'inizio di un brano sotto il minuto. Con una
+  sorgente che arriva alla velocità della musica (`/slow/<n>.flac` del finto server) il play aspetta
+  6–7 s e ogni avanti 3–4 s; con un file locale il play 0,1 s, ma ogni avanti costa sempre ~1 s.
+- `max_concurrent_streams` per servizio: Spotify con librespot 3, con Soloist 1, Tidal 1, YouTube Music
+  3, gli altri servizi in streaming 5, file e server propri senza limite. Con 1 non c'è il precarico del
+  brano dopo, e una raffica di salti finiva in "has reached its limit of 1 simultaneous streams":
+  Xonos raccoglie avanti/indietro premuti in fretta in un salto solo (`MaPlayer.gathered`, `RemoteLink`).
+- Spotify in MA ha due motori: librespot (parte prima, 3 flussi, ma va solo con gli account creati
+  prima di dicembre 2024) e Soloist (quello ufficiale: tutti gli account Premium, un flusso, audio alla
+  velocità della musica). Si sceglie riconfigurando il servizio.
 
 ## Gearslip: cosa conta
 
