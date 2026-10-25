@@ -11,7 +11,7 @@ class Library(private val repo: MaRepository) {
 
     private suspend fun items(command: String, timeoutMs: Long = 30_000, fill: JSONObject.() -> Unit = {}): List<MaItem> {
         val result = repo.command(command, timeoutMs, fill) as? JSONArray ?: return emptyList()
-        return result.objects().mapNotNull(MaItem::from)
+        return traced("Xonos.items") { result.objects().mapNotNull(MaItem::from) }
     }
 
     /**
@@ -157,8 +157,10 @@ class Library(private val repo: MaRepository) {
             put("limit", limit)
         } as? JSONObject ?: return emptyMap()
         // Lo stesso podcast o brano può arrivare da più servizi: resta il primo, che è il più pertinente.
-        return SEARCH_TYPES.associateWith { key -> dedupe(result.optJSONArray(key).objects().mapNotNull(MaItem::from)) }
-            .filterValues { it.isNotEmpty() }
+        return traced("Xonos.items") {
+            SEARCH_TYPES.associateWith { key -> dedupe(result.optJSONArray(key).objects().mapNotNull(MaItem::from)) }
+                .filterValues { it.isNotEmpty() }
+        }
     }
 
     suspend fun item(uri: String): MaItem? =

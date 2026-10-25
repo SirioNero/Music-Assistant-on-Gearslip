@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import coil3.SingletonImageLoader
@@ -18,6 +19,11 @@ import coil3.toBitmap
 
 @Composable
 internal fun PlatformBackHandler(enabled: Boolean, onBack: () -> Unit) = Unit
+
+@Composable
+internal fun PlatformReportReady(ready: () -> Boolean) = Unit
+
+internal fun Modifier.automationIds(): Modifier = this
 
 @Composable
 internal fun rememberArtworkPixels(url: String?): IntArray? {

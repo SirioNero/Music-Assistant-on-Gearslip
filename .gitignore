@@ -8,3 +8,6 @@ captures/
 # Le chiavi di firma non vanno mai nel repository.
 *.keystore
 *.jks
+
+# Python
+__pycache__/

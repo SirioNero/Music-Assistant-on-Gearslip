@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,7 +63,7 @@ internal fun ItemScreen(page: ItemPage, model: PhoneModel, player: PlayerLink, h
     // Nei podcast l'ordine è quello delle puntate, non un "da qui in poi".
     val numbered = item.mediaType == "album"
     Box(Modifier.fillMaxSize()) {
-        LazyColumn(state = state, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
+        LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
             item(key = "header") {
                 Header(
                     title = item.name,
@@ -123,7 +124,7 @@ internal fun ArtistScreen(page: ArtistPage, model: PhoneModel, host: Host) {
     val topTitle = stringResource(R.string.top_tracks)
     val allTitle = stringResource(R.string.all_tracks)
     Box(Modifier.fillMaxSize()) {
-        LazyColumn(state = state, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
+        LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
             item(key = "header") {
                 Header(artist.name, model.image(artist.image, LARGE_ART), "artist", listOf(kindName("artist")), coverSize = 196.dp)
                 PlayBar(
@@ -174,7 +175,7 @@ internal fun ArtistScreen(page: ArtistPage, model: PhoneModel, host: Host) {
 internal fun ListScreen(page: ListPage, model: PhoneModel, host: Host) {
     val state = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
-        LazyColumn(state = state, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp)) {
+        LazyColumn(state = state, modifier = Modifier.fillMaxSize().testTag("item_list"), contentPadding = PaddingValues(bottom = 24.dp)) {
             item(key = "header") {
                 Column(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 16.dp, end = 16.dp, top = 64.dp, bottom = 4.dp)) {
                     Text(page.title, style = MaterialTheme.typography.headlineMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)

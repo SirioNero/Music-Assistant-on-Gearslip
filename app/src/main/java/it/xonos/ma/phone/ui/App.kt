@@ -79,7 +79,7 @@ fun XonosScreen(model: PhoneModel, player: PlayerLink, host: Host) {
         // Finché non c'è un indirizzo e il token, si comincia dalle impostazioni.
         var configured by remember { mutableStateOf(model.configured) }
         // Anche il lettore e il benvenuto, che stanno fuori dallo Scaffold, scrivono con i colori del tema.
-        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onBackground) {
+        Surface(Modifier.fillMaxSize().automationIds(), color = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onBackground) {
             if (!configured) {
                 Onboarding(model, host) { configured = model.configured }
                 return@Surface

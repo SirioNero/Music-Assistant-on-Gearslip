@@ -114,7 +114,7 @@ class MaClient(private val http: OkHttpClient) {
     private val listener = object : WebSocketListener() {
         override fun onMessage(webSocket: WebSocket, text: String) {
             try {
-                handle(JSONObject(text))
+                handle(traced("Xonos.json") { JSONObject(text) })
             } catch (e: Exception) {
                 Log.w(TAG, "Messaggio non valido da Music Assistant", e)
             }

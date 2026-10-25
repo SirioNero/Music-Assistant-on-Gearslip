@@ -1,0 +1,111 @@
+name: Misure
+
+# Misura Xonos su un emulatore Android, con il Music Assistant di prova in Docker sullo stesso runner
+# (l'emulatore lo vede a 10.0.2.2): avvio, scorrimento, lettore, playlist lunga (baselineprofile/).
+# Volendo genera anche il Baseline Profile. I risultati (tabella, JSON, log, profilo) finiscono nel
+# riferimento nascosto refs/xonos/measure, come le schermate:
+#   git fetch origin refs/xonos/measure && git archive FETCH_HEAD | tar -x -C <cartella>
+# Parte a mano, o con un push su un ramo claude/** il cui messaggio contiene [misure]
+# ([profilo] per generare anche il Baseline Profile).
+
+on:
+  push:
+    branches: ["claude/**"]
+  workflow_dispatch:
+    inputs:
+      generate:
+        description: "Genera il Baseline Profile"
+        type: boolean
+        default: false
+      modes:
+        description: "Compilazioni (none, partial, full): vuoto = none, più partial se c'è il profilo"
+        type: string
+        default: ""
+      class:
+        description: "Solo questa classe di misure (es. it.xonos.ma.baselineprofile.StartupBenchmark)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measure-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  measure:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[misure]') || contains(github.event.head_commit.message, '[profilo]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      GENERATE: ${{ inputs.generate || contains(github.event.head_commit.message, '[profilo]') }}
+      MODES: ${{ inputs.modes }}
+      CLASS: ${{ inputs.class }}
+      OUT: ${{ github.workspace }}/measure-out
+      WORK: ${{ github.workspace }}/../matest
+    steps:
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+
+      - name: Prepara Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      # L'emulatore vuole KVM.
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Music Assistant di prova
+        run: sh tools/measure/prepare_ma.sh
+
+      # Prima di accendere l'emulatore: se non compila lo si sa subito.
+      - name: Compila app e misure
+        run: gradle :app:assembleBenchmarkRelease :baselineprofile:assembleBenchmarkRelease --stacktrace
+
+      - name: Misura sull'emulatore
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 4
+          ram-size: 4096M
+          disk-size: 8G
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-boot-anim -camera-back none -camera-front none
+          script: bash tools/measure/run.sh
+
+      - name: Riassumi
+        if: always()
+        run: |
+          mkdir -p "$OUT"
+          python3 tools/measure/summary.py "$OUT" "Misure di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})" > "$OUT/summary.md"
+          cat "$OUT/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          [ -f "$OUT/check.txt" ] && { echo; echo '```'; cat "$OUT/check.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          docker logs ma > "$OUT/ma.log" 2>&1 || true
+          # Le tracce Perfetto sono grandi: restano solo le prime due di ogni misura.
+          find "$OUT" -name '*.perfetto-trace' | sort | awk -F'_iter' '{ n[$1]++; if (n[$1] > 2) print }' | xargs -r rm -f
+
+      - name: Pubblica in refs/xonos/measure
+        if: always()
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd "$OUT"
+          git init -q
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Misure di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/xonos/measure

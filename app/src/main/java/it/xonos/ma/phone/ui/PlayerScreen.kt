@@ -49,17 +49,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -74,9 +75,9 @@ import it.xonos.ma.phone.model.PhoneModel
 import it.xonos.ma.phone.model.PlayerLink
 import it.xonos.ma.phone.model.PlayerPanel
 import it.xonos.ma.phone.model.Repeat
-import kotlinx.coroutines.delay
 import kotlin.math.max
 import kotlin.math.min
+import kotlinx.coroutines.delay
 
 /** La posizione nel brano, aggiornata spesso mentre suona (per la barra e i testi). */
 @Composable
@@ -101,7 +102,7 @@ internal fun MiniPlayer(now: NowPlaying, player: PlayerLink, model: PhoneModel) 
         onClick = { model.playerOpen = true },
         color = backdrop,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+        modifier = Modifier.testTag("mini_player").fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
     ) {
         Column {
             Row(Modifier.padding(start = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -150,7 +151,7 @@ internal fun PlayerScreen(now: NowPlaying, player: PlayerLink, model: PhoneModel
     val position = rememberPosition(player, now)
     val problem by player.problem.collectAsState()
     Box(
-        Modifier.fillMaxSize()
+        Modifier.testTag("player").fillMaxSize()
             .background(Brush.verticalGradient(listOf(backdrop, backdrop.copy(alpha = 0.55f).compositeOver(background), background)))
             // Il lettore copre tutto: i tocchi non devono arrivare alle schermate sotto.
             .pointerInput(Unit) { detectTapGestures() },

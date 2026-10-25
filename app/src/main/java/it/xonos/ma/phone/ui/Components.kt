@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -87,7 +88,7 @@ internal fun Cover(
 internal fun ItemCard(item: MaItem, model: PhoneModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val artist = item.mediaType == "artist"
     Column(
-        modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(6.dp),
+        modifier.testTag("card").clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(6.dp),
         horizontalAlignment = if (artist) Alignment.CenterHorizontally else Alignment.Start,
     ) {
         Cover(model.image(item.image, SMALL_ART), item.mediaType, Modifier.fillMaxWidth().aspectRatio(1f), coverShape(item.mediaType, 10.dp), 40.dp)
@@ -130,7 +131,7 @@ internal fun CardRow(
     onClick: (Int, MaItem) -> Unit,
 ) {
     SectionTitle(title, subtitle, onSeeAll)
-    LazyRow(contentPadding = PaddingValues(horizontal = 10.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+    LazyRow(Modifier.testTag("row"), contentPadding = PaddingValues(horizontal = 10.dp), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         itemsIndexed(items, key = { i, item -> "$i|${item.uri}" }) { i, item ->
             ItemCard(item, model, { onClick(i, item) }, Modifier.width(148.dp))
         }
@@ -166,7 +167,7 @@ internal fun ItemRow(
     showAlbum: Boolean = true,
 ) {
     Row(
-        modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+        modifier.testTag("item_row").fillMaxWidth().clickable(onClick = onClick).padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val accent = MaterialTheme.colorScheme.primary

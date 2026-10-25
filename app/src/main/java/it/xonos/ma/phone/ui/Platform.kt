@@ -1,12 +1,17 @@
 package it.xonos.ma.phone.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import coil3.SingletonImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -20,6 +25,17 @@ import coil3.toBitmap
 /** Il tasto (o il gesto) indietro di Android. */
 @Composable
 internal fun PlatformBackHandler(enabled: Boolean, onBack: () -> Unit) = BackHandler(enabled, onBack)
+
+/**
+ * Dice ad Android che la prima schermata è completa (con i dati, non solo disegnata): è il
+ * "tempo fino alla schermata piena" che misurano le prove di avvio.
+ */
+@Composable
+internal fun PlatformReportReady(ready: () -> Boolean) = ReportDrawnWhen(ready)
+
+/** I testTag diventano gli id che vedono le prove automatiche (UiAutomator, nel modulo baselineprofile). */
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun Modifier.automationIds(): Modifier = semantics { testTagsAsResourceId = true }
 
 /** I pixel di una copertina rimpicciolita, per prenderne il colore; null finché non ci sono. */
 @Composable

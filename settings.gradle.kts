@@ -16,3 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Xonos"
 include(":app")
+// Il Baseline Profile dell'app e le misure di avvio e scorrimento (si eseguono su un emulatore, vedi tools/measure).
+include(":baselineprofile")

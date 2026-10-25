@@ -19,8 +19,8 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.xonos.ma.R
@@ -108,7 +109,7 @@ private fun ShelfItems(list: ShelfList, model: PhoneModel, host: Host) {
             columns = GridCells.Adaptive(150.dp),
             state = state,
             contentPadding = PaddingValues(start = 10.dp, end = 10.dp, bottom = 16.dp),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().testTag("library_list"),
         ) {
             itemsIndexed(list.items, key = { i, item -> "$i|${item.uri}" }) { _, item ->
                 ItemCard(item, model, { model.open(item) })
@@ -118,7 +119,7 @@ private fun ShelfItems(list: ShelfList, model: PhoneModel, host: Host) {
     } else {
         val state = rememberLazyListState()
         LoadMoreWhenNear(state, list, model)
-        LazyColumn(state = state, contentPadding = PaddingValues(bottom = 16.dp), modifier = Modifier.fillMaxSize()) {
+        LazyColumn(state = state, contentPadding = PaddingValues(bottom = 16.dp), modifier = Modifier.fillMaxSize().testTag("library_list")) {
             itemsIndexed(list.items, key = { i, item -> "$i|${item.uri}" }) { i, item ->
                 ItemRow(item, model, { model.play(list.items, i, null) })
             }

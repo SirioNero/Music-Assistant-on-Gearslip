@@ -46,7 +46,7 @@ class MA:
         fut = asyncio.get_running_loop().create_future()
         self.pending[mid] = fut
         await self.ws.send(json.dumps({"message_id": mid, "command": command, "args": args}))
-        return await asyncio.wait_for(fut, 30)
+        return await asyncio.wait_for(fut, float(os.environ.get("MA_TIMEOUT", "30")))
 
 def token():
     """Il token di accesso a lungo termine, dalla variabile MA_TOKEN."""

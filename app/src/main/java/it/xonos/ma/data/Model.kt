@@ -1,5 +1,6 @@
 package it.xonos.ma.data
 
+import android.os.Trace
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -286,4 +287,17 @@ fun JSONObject.str(key: String): String? =
 fun JSONArray?.objects(): List<JSONObject> {
     if (this == null) return emptyList()
     return (0 until length()).mapNotNull { optJSONObject(it) }
+}
+
+/**
+ * Un lavoro con il suo nome nelle tracce di sistema (Perfetto), con "@main" se gira sul thread
+ * principale: così le misure dicono quanto costa e dove.
+ */
+internal inline fun <T> traced(name: String, block: () -> T): T {
+    Trace.beginSection(if (Thread.currentThread().name == "main") "$name@main" else name)
+    try {
+        return block()
+    } finally {
+        Trace.endSection()
+    }
 }

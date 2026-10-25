@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -88,17 +89,17 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
         }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             LanguagePicker(host)
-            Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri)
-            Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri)
+            Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri, "field_home")
+            Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri, "field_remote")
             TokenField(page)
-            Field(page.name, { page.name = it }, R.string.label_name, R.string.help_name, stringResource(R.string.hint_name), KeyboardType.Text)
+            Field(page.name, { page.name = it }, R.string.label_name, R.string.help_name, stringResource(R.string.hint_name), KeyboardType.Text, "field_name")
             Button(
                 onClick = {
                     focus.clearFocus()
                     model.save(page)
                 },
                 enabled = !page.checking,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
+                modifier = Modifier.testTag("save").fillMaxWidth().height(52.dp),
             ) {
                 if (page.checking) {
                     CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
@@ -111,7 +112,7 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
             }
             page.results.forEach { result -> CheckLine(result, host) }
             if (onboarding && page.results.any { it is ConnectionCheck.Result.Ok }) {
-                FilledTonalButton(onClick = onDone, modifier = Modifier.fillMaxWidth().height(52.dp)) { Text(stringResource(R.string.onboarding_done)) }
+                FilledTonalButton(onClick = onDone, modifier = Modifier.testTag("onboarding_done").fillMaxWidth().height(52.dp)) { Text(stringResource(R.string.onboarding_done)) }
             }
             Spacer(Modifier.height(4.dp))
             val restricted = host.batteryRestricted
@@ -132,7 +133,7 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
 }
 
 @Composable
-private fun Field(value: String, onChange: (String) -> Unit, label: Int, help: Int, hint: String, keyboard: KeyboardType) {
+private fun Field(value: String, onChange: (String) -> Unit, label: Int, help: Int, hint: String, keyboard: KeyboardType, tag: String) {
     OutlinedTextField(
         value = value,
         onValueChange = onChange,
@@ -141,7 +142,7 @@ private fun Field(value: String, onChange: (String) -> Unit, label: Int, help: I
         supportingText = { Text(stringResource(help)) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = keyboard),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.testTag(tag).fillMaxWidth(),
     )
 }
 
@@ -162,7 +163,7 @@ private fun TokenField(page: SettingsPage) {
                 Icon(if (visible) XIcons.Hidden else XIcons.Visible, stringResource(if (visible) R.string.hide_token else R.string.show_token))
             }
         },
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.testTag("field_token").fillMaxWidth(),
     )
 }
 

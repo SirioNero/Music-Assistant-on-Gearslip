@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import it.xonos.ma.R
@@ -44,6 +45,8 @@ import it.xonos.ma.phone.model.value
 internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
     val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val pull = rememberPullToRefreshState()
+    // La Home è pronta quando si sa cosa mostrare: gli ascolti recenti e le righe di "Per te".
+    PlatformReportReady { page.recent !is Load.Loading && page.rows !is Load.Loading }
     PullToRefreshBox(
         isRefreshing = page.refreshing,
         onRefresh = { model.refresh(page) },
@@ -52,7 +55,7 @@ internal fun HomeScreen(page: HomePage, model: PhoneModel, host: Host) {
             PullToRefreshDefaults.Indicator(pull, page.refreshing, Modifier.align(Alignment.TopCenter).padding(top = top))
         },
     ) {
-        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = top, bottom = 24.dp)) {
+        LazyColumn(Modifier.fillMaxSize().testTag("home"), contentPadding = PaddingValues(top = top, bottom = 24.dp)) {
             item(key = "header") {
                 Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))

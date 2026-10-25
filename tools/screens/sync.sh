@@ -15,8 +15,8 @@ mkdir -p "$DST/phone/ui"
 for f in "$SRC"/phone/ui/*.kt; do
   [ "$(basename "$f")" = Platform.kt ] || cp "$f" "$DST/phone/ui/"
 done
-# I sostituti di Log, LruCache e Settings sono quelli del banco di prova.
-mkdir -p "$DST/stubs/android/util"
-cp "$HERE/../harness/src/main/kotlin/android/util/"*.kt "$DST/stubs/android/util/"
+# I sostituti di Log, Trace, LruCache e Settings sono quelli del banco di prova.
+mkdir -p "$DST/stubs"
+cp -r "$HERE/../harness/src/main/kotlin/android" "$DST/stubs/"
 cp "$HERE/../harness/src/main/kotlin/stubs/Settings.kt" "$DST/stubs/"
 python3 "$HERE/gen_r.py" "$HERE/../../app/src/main/res" "$HERE/src/main/kotlin/generated"

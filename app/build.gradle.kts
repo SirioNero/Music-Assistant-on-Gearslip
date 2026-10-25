@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("androidx.baselineprofile")
 }
 
 // Su GitHub ogni compilazione ha un numero crescente: così ogni APK nuovo si installa sopra il precedente.
@@ -46,7 +47,9 @@ android {
         }
         getByName("release") {
             isMinifyEnabled = false
-            if (hasXonosKey) signingConfig = signingConfigs.getByName("xonos")
+            // Senza la chiave di Xonos (le misure su GitHub, chi compila per sé) l'APK si firma con
+            // quella di debug, così si installa lo stesso; le release si pubblicano solo con la chiave.
+            signingConfig = signingConfigs.getByName(if (hasXonosKey) "xonos" else "debug")
         }
     }
 
@@ -72,7 +75,15 @@ kotlin {
     }
 }
 
+// Il profilo generato (vedi baselineprofile/) sta in src/main/generated/baselineProfiles.
+baselineProfile {
+    mergeIntoMain = true
+}
+
 dependencies {
+    baselineProfile(project(":baselineprofile"))
+    // Installa il Baseline Profile anche quando l'APK non arriva dal Play Store (Obtainium).
+    implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.media3:media3-session:1.11.1")
     implementation("androidx.media3:media3-common:1.11.1")
     implementation("androidx.core:core-ktx:1.13.1")

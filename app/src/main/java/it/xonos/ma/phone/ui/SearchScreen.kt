@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -92,7 +93,7 @@ private fun SearchField(query: String, onChange: (String) -> Unit) {
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.testTag("search_field").fillMaxWidth(),
                 )
             }
             if (query.isNotEmpty()) {
@@ -154,7 +155,7 @@ private fun TopResult(item: MaItem, model: PhoneModel) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainer,
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(16.dp)).clickable { model.open(item) },
+        modifier = Modifier.testTag("top_result").fillMaxWidth().padding(horizontal = 16.dp).clip(RoundedCornerShape(16.dp)).clickable { model.open(item) },
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Cover(model.image(item.image, SMALL_ART), item.mediaType, Modifier.size(88.dp), coverShape(item.mediaType, 10.dp), 36.dp)
