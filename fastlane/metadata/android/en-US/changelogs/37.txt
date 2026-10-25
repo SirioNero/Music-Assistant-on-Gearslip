@@ -1,0 +1,1 @@
+Music starts faster when you press play. Quick next/previous presses become one skip, so Spotify (Soloist) and Tidal no longer hit their one-stream limit. Xonos is now free software under the AGPL-3.0.

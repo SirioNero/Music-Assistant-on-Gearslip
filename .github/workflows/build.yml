@@ -4,7 +4,7 @@ on:
   push:
     branches: ["**"]
     # Appunti, README e strumenti di prova non cambiano l'app: non serve compilarla.
-    paths-ignore: ["**.md", "tools/**"]
+    paths-ignore: ["**.md", "tools/**", "fastlane/**"]
   pull_request:
   workflow_dispatch:
 
@@ -110,6 +110,25 @@ jobs:
             echo "::notice title=Release::L'app non è cambiata: niente release."
           fi
 
+      # La versione è scritta in app/build.gradle.kts e va alzata a ogni pubblicazione: la release ha il tag
+      # v<versionName>, lo stesso da cui compila F-Droid. Se il tag c'è già, l'app cambiata non si pubblica.
+      - name: Leggi la versione
+        if: env.SIGNED == 'true' && env.APP_CHANGED != 'false' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          VERSION=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)
+          CODE=$(sed -n 's/^ *versionCode = \([0-9]*\)/\1/p' app/build.gradle.kts)
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "::error title=Versione::La release v$VERSION c'è già: alza versionCode e versionName in app/build.gradle.kts."
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          # Le note della release: quelle per F-Droid di questa versione, in inglese e in italiano.
+          for LANG in en-US it-IT; do
+            NOTE="fastlane/metadata/android/$LANG/changelogs/$CODE.txt"
+            [ -f "$NOTE" ] && { cat "$NOTE"; echo; } >> notes.md
+          done
+          echo "Installa Xonos.apk sul telefono; in auto la trovi tra le app musicali di Gearslip." >> notes.md
+
       # Solo il ramo main pubblica una release: gli altri rami si compilano per controllo.
       - name: Rinomina l'APK
         if: env.SIGNED == 'true' && env.APP_CHANGED != 'false' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -122,7 +141,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           # Il tag è la versione dell'app (versionName in app/build.gradle.kts): Obtainium li confronta.
-          tag_name: v0.1.${{ github.run_number }}
-          name: Xonos 0.1.${{ github.run_number }}
-          body: Installa Xonos.apk sul telefono; in auto la trovi tra le app musicali di Gearslip.
+          tag_name: v${{ env.VERSION }}
+          name: Xonos ${{ env.VERSION }}
+          body_path: notes.md
           files: apk/*.apk

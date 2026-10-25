@@ -7,14 +7,13 @@ plugins {
     id("androidx.baselineprofile")
 }
 
-// Su GitHub ogni compilazione ha un numero crescente: così ogni APK nuovo si installa sopra il precedente.
-val buildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
-
 // La chiave di firma NON sta nel repository: la compilazione su GitHub la ricrea dal secret XONOS_KEYSTORE.
-// Senza chiave (per esempio chi contribuisce, o una build sul proprio computer) si usa la chiave di debug di Android.
+// Senza chiave la release non è firmata (F-Droid la firma da sé); con XONOS_DEBUG_SIGNING=true (le misure
+// sull'emulatore) si firma con la chiave di debug di Android, così si installa lo stesso.
 val xonosKeystore = file("xonos.keystore")
 val hasXonosKey = xonosKeystore.exists()
 val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "xonos-android"
+val debugSigning = System.getenv("XONOS_DEBUG_SIGNING") == "true"
 
 android {
     namespace = "it.xonos.ma"
@@ -24,9 +23,10 @@ android {
         applicationId = "it.xonos.ma"
         minSdk = 26
         targetSdk = 34
-        versionCode = buildNumber
-        // Deve restare uguale al tag della release (v0.1.N nel workflow), che Obtainium confronta con l'app installata.
-        versionName = "0.1.$buildNumber"
+        // Si alzano entrambi a ogni pubblicazione in main: la release prende il tag v<versionName>, che
+        // Obtainium confronta con l'app installata, e F-Droid compila da quel tag.
+        versionCode = 37
+        versionName = "0.1.37"
     }
 
     signingConfigs {
@@ -51,9 +51,11 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Senza la chiave di Xonos (le misure su GitHub, chi compila per sé) l'APK si firma con
-            // quella di debug, così si installa lo stesso; le release si pubblicano solo con la chiave.
-            signingConfig = signingConfigs.getByName(if (hasXonosKey) "xonos" else "debug")
+            // Le release si pubblicano solo con la chiave di Xonos; senza, l'APK resta non firmato (vedi sopra).
+            when {
+                hasXonosKey -> signingConfig = signingConfigs.getByName("xonos")
+                debugSigning -> signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 
@@ -70,6 +72,12 @@ android {
     lint {
         abortOnError = false
         checkReleaseBuilds = false
+    }
+
+    // L'elenco delle librerie che AGP mette nell'APK è cifrato per Google: F-Droid non lo accetta.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
     }
 }
 

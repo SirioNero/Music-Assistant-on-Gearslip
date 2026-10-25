@@ -1,0 +1,28 @@
+Categories:
+  - Multimedia
+  - Online Media Player
+License: AGPL-3.0-or-later
+AuthorName: SirioNero
+SourceCode: https://github.com/SirioNero/Music-Assistant-on-Gearslip
+IssueTracker: https://github.com/SirioNero/Music-Assistant-on-Gearslip/issues
+Changelog: https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases
+
+AutoName: Xonos
+
+RepoType: git
+Repo: https://github.com/SirioNero/Music-Assistant-on-Gearslip.git
+
+Builds:
+  - versionName: 0.1.37
+    versionCode: 37
+    commit: v0.1.37
+    subdir: app
+    gradle:
+      - yes
+    rm:
+      - tools
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v
+CurrentVersion: 0.1.37
+CurrentVersionCode: 37

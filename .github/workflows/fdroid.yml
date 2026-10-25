@@ -1,0 +1,69 @@
+name: Come F-Droid
+
+# Compila l'app come la compila F-Droid (senza chiave di firma e senza tools/, che la ricetta toglie) e la
+# controlla con i suoi strumenti: la ricetta (tools/fdroid), l'APK non firmato con la versione scritta nel
+# sorgente, nessuna libreria non libera.
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "app/**"
+      - "baselineprofile/**"
+      - "*.gradle.kts"
+      - "gradle/**"
+      - "gradle.properties"
+      - "fastlane/**"
+      - "tools/fdroid/**"
+      - ".github/workflows/fdroid.yml"
+  workflow_dispatch:
+
+jobs:
+  fdroid:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+
+      - name: Prepara Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      - name: Compila come F-Droid
+        run: |
+          cp -r tools/fdroid /tmp/ricetta
+          rm -rf tools
+          gradle :app:assembleRelease --no-daemon
+
+      - name: Controlla l'APK
+        run: |
+          APK=app/build/outputs/apk/release/app-release-unsigned.apk
+          if [ ! -f "$APK" ]; then
+            echo "::error title=APK::Senza chiave la release deve restare non firmata (F-Droid la firma da sé)."
+            exit 1
+          fi
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
+          "$BT/aapt" dump badging "$APK" | head -n 1
+          CODE=$(sed -n 's/^ *versionCode = \([0-9]*\)/\1/p' app/build.gradle.kts)
+          "$BT/aapt" dump badging "$APK" | head -n 1 | grep -q "versionCode='$CODE'" \
+            || { echo "::error title=Versione::L'APK non ha la versione del sorgente ($CODE)."; exit 1; }
+          echo "APK=$APK" >> "$GITHUB_ENV"
+
+      - name: Ricetta e scanner di F-Droid
+        run: |
+          pip install -q fdroidserver
+          mkdir -p /tmp/fdroiddata/metadata /tmp/fdroiddata/config
+          cp /tmp/ricetta/it.xonos.ma.yml /tmp/fdroiddata/metadata/
+          echo "repo_url: https://example.org/repo" > /tmp/fdroiddata/config.yml
+          # Le categorie valide sono quelle di fdroiddata (senza le icone, che qui non servono).
+          curl -sSf https://gitlab.com/fdroid/fdroiddata/-/raw/master/config/categories.yml | sed '/^  icon:/d' > /tmp/fdroiddata/config/categories.yml
+          APK_PATH="$PWD/$APK"
+          cd /tmp/fdroiddata
+          fdroid lint it.xonos.ma
+          fdroid scanner --refresh --exit-code "$APK_PATH"

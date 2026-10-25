@@ -44,6 +44,8 @@ jobs:
       CLASS: ${{ inputs.class }}
       OUT: ${{ github.workspace }}/measure-out
       WORK: ${{ github.workspace }}/../matest
+      # Senza la chiave di Xonos l'app da misurare si firma con quella di debug, per installarla sull'emulatore.
+      XONOS_DEBUG_SIGNING: "true"
     steps:
       - name: Scarica il repository
         uses: actions/checkout@v5

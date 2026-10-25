@@ -30,9 +30,23 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `curl https://api.github.com/repos/SirioNero/Music-Assistant-on-Gearslip/actions/runs?branch=...`
   (senza token: `gh` qui non è autenticato). Gli errori di compilazione finiscono anche in
   un'annotazione del check run. Non si può leggere l'elenco dei secret.
-- Release: solo da `main`, solo se l'app è cambiata, solo con la chiave. Tag `v0.1.<run_number>`,
-  file `Xonos.apk`. La chiave è nel secret `XONOS_KEYSTORE`: è quella di Plancia (alias `plancia`,
-  password `plancia-android`); il workflow prova da sé le password `xonos-android` e `plancia-android`.
+- Release: solo da `main`, solo se l'app è cambiata, solo con la chiave. File `Xonos.apk`, tag
+  `v<versionName>`. La versione è scritta in `app/build.gradle.kts` e **va alzata a mano a ogni
+  pubblicazione** che cambia l'app: `versionCode` +1 e `versionName` = `0.1.<versionCode>` (fino alla
+  v0.1.36 il numero era quello del workflow; la prima scritta nel sorgente è la 37). Insieme si scrivono
+  le note `fastlane/metadata/android/{en-US,it-IT}/changelogs/<versionCode>.txt` (massimo 500 caratteri),
+  che diventano anche il testo della release. Se il tag c'è già il workflow si ferma con un errore.
+- La chiave è nel secret `XONOS_KEYSTORE`: è quella di Plancia (alias `plancia`, password
+  `plancia-android`); il workflow prova da sé le password `xonos-android` e `plancia-android`. Senza
+  chiave la release resta non firmata (come la vuole F-Droid); con `XONOS_DEBUG_SIGNING=true` (le
+  misure) si firma con la chiave di debug.
+- Licenza AGPL-3.0-or-later (`LICENSE`). Tutte le librerie sono Apache 2.0, compatibili. F-Droid: testi,
+  icona e schermate in `fastlane/metadata/android/` (inglese e italiano), ricetta da proporre a
+  fdroiddata in `tools/fdroid/it.xonos.ma.yml` (toglie `tools/` prima di compilare: le prove usano un
+  mirror di Maven Central che lo scanner di F-Droid non accetta), workflow "Come F-Droid" che compila
+  senza chiave e passa ricetta e APK a `fdroid lint` e `fdroid scanner`. `dependenciesInfo` è spento
+  (F-Droid rifiuta quel blocco). F-Droid firma con la sua chiave: senza build riproducibili chi passa
+  da GitHub/Obtainium a F-Droid (o viceversa) deve disinstallare.
 - Strumenti: AGP 8.11.1, Kotlin 2.2.0, Gradle 8.14.3, compileSdk 36, targetSdk 34, minSdk 26,
   Media3 1.11.1, OkHttp 4.12.0, coroutines 1.10.2, Compose 1.9.4, Material 3 1.4.0, activity-compose
   1.10.1, Coil 3.3.0 (con coil-svg per le icone dei servizi), profileinstaller 1.4.1. Pacchetto `it.xonos.ma`.

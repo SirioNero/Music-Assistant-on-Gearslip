@@ -89,7 +89,11 @@ Home Assistant Cloud (Nabu Casa) only reaches Home Assistant, not Music Assistan
 
 Every push builds the app on GitHub Actions. On the `main` branch, if the `XONOS_KEYSTORE` secret (the signing key, base64-encoded) is set, it also publishes a release with the APK; other branches and pull requests are built only as a check. Plancia’s key works too: set the same value as `PLANCIA_KEYSTORE` and the workflow reads its alias. If the key has its own password, put it in `XONOS_KEYSTORE_PASSWORD`.
 
-Locally: open the folder in Android Studio and press Run. Without `app/xonos.keystore`, the app is signed with your computer’s debug key.
+The version lives in `app/build.gradle.kts` (`versionCode` and `versionName`) and goes up with every release: the release is tagged `v<versionName>`, and the notes come from `fastlane/metadata/android/*/changelogs/<versionCode>.txt`. If the tag already exists, the workflow refuses to publish.
+
+Locally: open the folder in Android Studio and press Run (the debug build is signed with your computer’s debug key). A release build without `app/xonos.keystore` is left unsigned, as F-Droid wants it.
+
+The F-Droid recipe is in `tools/fdroid/it.xonos.ma.yml`, and the store texts and pictures in `fastlane/`. The “Come F-Droid” workflow builds the app the way F-Droid does and checks it with F-Droid’s own tools.
 
 ### Contributing
 
@@ -117,6 +121,10 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `res/values*/strings.xml` | Every text, in English (`values`) and in each language (`values-it`, `values-es`…) |
 
 `tools/` has what’s needed to check Xonos without a phone: a test Music Assistant in Docker, a JVM harness that does what the car and the phone app do, and `tools/screens`, which draws the phone’s screens to PNG with Compose Desktop (see `tools/README.md`).
+
+### License
+
+Xonos is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3 or (at your option) any later version. See [LICENSE](LICENSE).
 
 ## Italiano
 
@@ -205,7 +213,11 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 
 Ogni push compila l’app su GitHub Actions. Sul ramo `main`, se è configurato il secret `XONOS_KEYSTORE` (la chiave di firma in base64), pubblica anche una release con l’APK; gli altri rami e le pull request vengono compilati solo per controllo. Va bene anche la chiave di Plancia: metti lo stesso valore come `PLANCIA_KEYSTORE` e il workflow ne legge l’alias. Se la chiave ha una password sua, mettila in `XONOS_KEYSTORE_PASSWORD`.
 
-In locale: apri la cartella in Android Studio e premi Run. Senza `app/xonos.keystore` l’app viene firmata con la chiave di debug del proprio computer.
+La versione sta in `app/build.gradle.kts` (`versionCode` e `versionName`) e si alza a ogni release: la release ha il tag `v<versionName>`, e le note vengono da `fastlane/metadata/android/*/changelogs/<versionCode>.txt`. Se il tag c’è già, il workflow non pubblica.
+
+In locale: apri la cartella in Android Studio e premi Run (la versione di debug si firma con la chiave di debug del proprio computer). Una release senza `app/xonos.keystore` resta non firmata, come la vuole F-Droid.
+
+La ricetta per F-Droid sta in `tools/fdroid/it.xonos.ma.yml`, testi e immagini per lo store in `fastlane/`. Il workflow “Come F-Droid” compila l’app come la compila F-Droid e la controlla con i suoi strumenti.
 
 ### Contribuire
 
@@ -233,3 +245,7 @@ Segnalazioni e pull request sono benvenute, soprattutto da chi prova Xonos in au
 | `res/values*/strings.xml` | Tutti i testi, in inglese (`values`) e in ogni lingua (`values-it`, `values-es`…) |
 
 In `tools/` c’è ciò che serve per provare Xonos senza telefono: un Music Assistant di prova in Docker, un banco di prova sulla JVM che fa ciò che fanno l’auto e l’app del telefono, e `tools/screens`, che disegna in PNG le schermate del telefono con Compose Desktop (vedi `tools/README.md`).
+
+### Licenza
+
+Xonos è software libero: puoi ridistribuirlo e modificarlo secondo i termini della GNU Affero General Public License, versione 3 o (a tua scelta) successiva. Vedi [LICENSE](LICENSE).
