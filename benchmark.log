@@ -1,0 +1,102 @@
+
+> Configure project :app
+Passing custom test runner argument android.testInstrumentationRunnerArguments.xonosToken from gradle.properties or command line is not compatible with configuration caching. Please specify this argument using android gradle dsl.
+Passing custom test runner argument android.testInstrumentationRunnerArguments.androidx.benchmark.enabledRules from gradle.properties or command line is not compatible with configuration caching. Please specify this argument using android gradle dsl.
+Passing custom test runner argument android.testInstrumentationRunnerArguments.xonosModes from gradle.properties or command line is not compatible with configuration caching. Please specify this argument using android gradle dsl.
+Passing custom test runner argument android.testInstrumentationRunnerArguments.xonosUrl from gradle.properties or command line is not compatible with configuration caching. Please specify this argument using android gradle dsl.
+
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkReleaseBuild UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseArtProfile UP-TO-DATE
+> Task :app:desugarBenchmarkReleaseFileDependencies UP-TO-DATE
+> Task :app:buildKotlinToolingMetadata UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateBenchmarkReleaseBuildConfig UP-TO-DATE
+> Task :app:checkBenchmarkReleaseAarMetadata UP-TO-DATE
+> Task :app:generateBenchmarkReleaseResValues UP-TO-DATE
+> Task :app:mapBenchmarkReleaseSourceSetPaths UP-TO-DATE
+> Task :app:generateBenchmarkReleaseResources UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseResources UP-TO-DATE
+> Task :app:packageBenchmarkReleaseResources UP-TO-DATE
+> Task :app:parseBenchmarkReleaseLocalResources UP-TO-DATE
+> Task :app:createBenchmarkReleaseCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksBenchmarkRelease UP-TO-DATE
+> Task :app:processBenchmarkReleaseMainManifest UP-TO-DATE
+> Task :app:processBenchmarkReleaseManifest UP-TO-DATE
+> Task :app:processBenchmarkReleaseManifestForPackage UP-TO-DATE
+> Task :app:processBenchmarkReleaseResources UP-TO-DATE
+> Task :app:compileBenchmarkReleaseKotlin UP-TO-DATE
+> Task :app:javaPreCompileBenchmarkRelease UP-TO-DATE
+> Task :app:compileBenchmarkReleaseJavaWithJavac UP-TO-DATE
+> Task :app:dexBuilderBenchmarkRelease UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseGlobalSynthetics UP-TO-DATE
+> Task :app:checkBenchmarkReleaseDuplicateClasses UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseStartupProfile UP-TO-DATE
+> Task :app:mergeExtDexBenchmarkRelease UP-TO-DATE
+> Task :app:mergeDexBenchmarkRelease UP-TO-DATE
+> Task :app:compileBenchmarkReleaseArtProfile UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseShaders UP-TO-DATE
+> Task :app:compileBenchmarkReleaseShaders NO-SOURCE
+> Task :app:generateBenchmarkReleaseAssets UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseAssets UP-TO-DATE
+> Task :app:compressBenchmarkReleaseAssets UP-TO-DATE
+> Task :app:extractBenchmarkReleaseVersionControlInfo UP-TO-DATE
+> Task :app:processBenchmarkReleaseJavaRes UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseJavaResource UP-TO-DATE
+> Task :app:optimizeBenchmarkReleaseResources UP-TO-DATE
+> Task :app:collectBenchmarkReleaseDependencies UP-TO-DATE
+> Task :app:sdkBenchmarkReleaseDependencyData UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseJniLibFolders UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseNativeLibs UP-TO-DATE
+> Task :app:stripBenchmarkReleaseDebugSymbols UP-TO-DATE
+> Task :app:validateSigningBenchmarkRelease UP-TO-DATE
+> Task :app:writeBenchmarkReleaseAppMetadata UP-TO-DATE
+> Task :app:writeBenchmarkReleaseSigningConfigVersions UP-TO-DATE
+> Task :app:packageBenchmarkRelease UP-TO-DATE
+> Task :app:createBenchmarkReleaseApkListingFileRedirect UP-TO-DATE
+> Task :baselineprofile:preBuild UP-TO-DATE
+> Task :baselineprofile:preBenchmarkReleaseBuild UP-TO-DATE
+> Task :baselineprofile:checkTestedAppObfuscationBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :baselineprofile:checkBenchmarkReleaseAarMetadata UP-TO-DATE
+> Task :baselineprofile:generateBenchmarkReleaseResValues UP-TO-DATE
+> Task :baselineprofile:mapBenchmarkReleaseSourceSetPaths UP-TO-DATE
+> Task :baselineprofile:generateBenchmarkReleaseResources UP-TO-DATE
+> Task :baselineprofile:mergeBenchmarkReleaseResources UP-TO-DATE
+> Task :baselineprofile:processBenchmarkReleaseManifest UP-TO-DATE
+> Task :baselineprofile:processBenchmarkReleaseResources UP-TO-DATE
+> Task :baselineprofile:compileBenchmarkReleaseKotlin UP-TO-DATE
+> Task :baselineprofile:javaPreCompileBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:compileBenchmarkReleaseJavaWithJavac NO-SOURCE
+> Task :baselineprofile:mergeBenchmarkReleaseShaders UP-TO-DATE
+> Task :baselineprofile:compileBenchmarkReleaseShaders NO-SOURCE
+> Task :baselineprofile:generateBenchmarkReleaseAssets UP-TO-DATE
+> Task :baselineprofile:mergeBenchmarkReleaseAssets UP-TO-DATE
+> Task :baselineprofile:compressBenchmarkReleaseAssets UP-TO-DATE
+> Task :baselineprofile:desugarBenchmarkReleaseFileDependencies UP-TO-DATE
+> Task :baselineprofile:dexBuilderBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:mergeBenchmarkReleaseGlobalSynthetics UP-TO-DATE
+> Task :baselineprofile:processBenchmarkReleaseJavaRes UP-TO-DATE
+> Task :baselineprofile:mergeBenchmarkReleaseJavaResource UP-TO-DATE
+> Task :baselineprofile:checkBenchmarkReleaseDuplicateClasses UP-TO-DATE
+> Task :baselineprofile:mergeExtDexBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:mergeLibDexBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:mergeProjectDexBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:mergeBenchmarkReleaseJniLibFolders UP-TO-DATE
+> Task :baselineprofile:mergeBenchmarkReleaseNativeLibs UP-TO-DATE
+> Task :baselineprofile:stripBenchmarkReleaseDebugSymbols UP-TO-DATE
+> Task :baselineprofile:validateSigningBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:writeBenchmarkReleaseSigningConfigVersions UP-TO-DATE
+> Task :baselineprofile:packageBenchmarkRelease UP-TO-DATE
+> Task :baselineprofile:createBenchmarkReleaseApkListingFileRedirect UP-TO-DATE
+[EmulatorConsole]: Failed to start Emulator console for 5554
+
+> Task :baselineprofile:connectedBenchmarkReleaseAndroidTest
+Starting 1 tests on emulator-5554 - 14
+
+emulator-5554 - 14 Tests 0/1 completed. (0 skipped) (0 failed)
+Finished 1 tests on emulator-5554 - 14
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__reactivecircus_android-emulator-runner-1792941630066.json
+
+BUILD SUCCESSFUL in 3m 57s
+74 actionable tasks: 1 executed, 73 up-to-date

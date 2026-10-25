@@ -1,0 +1,7 @@
+Arresti dell'app: 0
+Flussi audio aperti: 2
+Avvii dell'audio: 2
+10-25 15:21:10.401  6330  6384 I Xonos   : Stream opus 48000 Hz, 2 canali
+10-25 15:21:11.019  6330  6384 D Xonos   : Avvio a 431 ms dal momento giusto
+10-25 15:21:23.630  6733  6804 I Xonos   : Stream opus 48000 Hz, 2 canali
+10-25 15:21:23.748  6733  6804 D Xonos   : Avvio a 76 ms dal momento giusto

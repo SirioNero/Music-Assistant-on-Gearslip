@@ -1,0 +1,84 @@
+INFO: Constructing runner from config.
+INFO: Configuring Android Instrumentation driver: android_instrumentation_runtime {
+  instrumentation_info {
+    app_package: "it.xonos.ma"
+    test_package: "it.xonos.ma.baselineprofile"
+    test_runner_class: "androidx.test.runner.AndroidJUnitRunner"
+  }
+  instrumentation_args {
+    args_map {
+      key: "additionalTestOutputDir"
+      value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+    }
+    args_map {
+      key: "androidx.benchmark.enabledRules"
+      value: "Macrobenchmark"
+    }
+    args_map {
+      key: "androidx.benchmark.skipOnEmulator"
+      value: "true"
+    }
+    args_map {
+      key: "androidx.benchmark.suppressErrors"
+      value: "EMULATOR,LOW-BATTERY"
+    }
+    args_map {
+      key: "androidx.benchmark.targetPackageName"
+      value: "it.xonos.ma"
+    }
+    args_map {
+      key: "class"
+      value: "it.xonos.ma.baselineprofile.PlaylistBenchmark"
+    }
+    args_map {
+      key: "targetAppId"
+      value: "it.xonos.ma"
+    }
+    args_map {
+      key: "xonosModes"
+      value: "none"
+    }
+    args_map {
+      key: "xonosToken"
+      value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJPNWFISFFiUzhtNTF1NjVSUlZwYXFadTNWdWF4c2JoYzdNMnFJejdmd2g4IiwianRpIjoieWlLMGZPTGZmc3lkOHh5UzdOZlprblNreWZzekhCeXF6U2VWZ01MQmhBMCIsImlhdCI6MTc5Mjk0MTI4OSwiZXhwIjoxODI0NDc3Mjg5LCJ1c2VybmFtZSI6InByb3ZhIiwicm9sZSI6ImFkbWluIiwidG9rZW5fbmFtZSI6IlByb3ZhIFhvbm9zIiwiaXNfbG9uZ19saXZlZCI6dHJ1ZX0.mh-WejxbjO5jpq77xNqjTceV7YU5vpo4RNuV7tfyrg0"
+    }
+    args_map {
+      key: "xonosUrl"
+      value: "http://10.0.2.2:8095"
+    }
+  }
+}
+am_instrument_timeout: 31536000
+
+INFO: Configuring AndroidTestApkInstallerPlugin: apks_to_install {
+  apk_paths: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/app/build/outputs/apk/benchmarkRelease/app-benchmarkRelease.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+apks_to_install {
+  apk_paths: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/apk/benchmarkRelease/baselineprofile-benchmarkRelease.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+
+INFO: No installables found in test fixture. Nothing to install.
+INFO: Installing [/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/app/build/outputs/apk/benchmarkRelease/app-benchmarkRelease.apk] on device emulator-5554.
+INFO: Installing [/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/apk/benchmarkRelease/baselineprofile-benchmarkRelease.apk] on device emulator-5554.
+INFO: Start logcat streaming.
+INFO: Running Android Instrumentation driver.
+INFO: Copying files from device to host: /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/it.xonos.ma.baselineprofile-benchmarkData.json to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/it.xonos.ma.baselineprofile-benchmarkData.json
+INFO: Copying files from device to host: /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace
+INFO: Copying /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/it.xonos.ma.baselineprofile-benchmarkData.json to /home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/it.xonos.ma.baselineprofile-benchmarkData.json
+INFO: Stop logcat streaming.
+INFO: Uninstalling it.xonos.ma for device emulator-5554.
+INFO: Uninstalling it.xonos.ma.baselineprofile for device emulator-5554.
+INFO: Execute it.xonos.ma.baselineprofile.PlaylistBenchmark.open[none]: PASSED

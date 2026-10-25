@@ -1,0 +1,849 @@
+# proto-message: google.testing.platform.proto.api.core.TestSuiteResult
+# 2026-10-25T15:24:25.110785527Z:
+test_suite_meta_data {
+  scheduled_test_case_count: 1
+  device {
+    id: "emulator-5554"
+    friendly_name: "primary"
+  }
+}
+test_status: PASSED
+test_result {
+  test_case {
+    test_class: "PlaylistBenchmark"
+    test_package: "it.xonos.ma.baselineprofile"
+    test_method: "open[none]"
+    start_time {
+      seconds: 1792941657
+      nanos: 665000000
+    }
+    end_time {
+      seconds: 1792941862
+      nanos: 81000000
+    }
+    device {
+      id: "emulator-5554"
+      friendly_name: "primary"
+    }
+  }
+  test_status: PASSED
+  output_artifact {
+    label {
+      label: "additionaltestoutput.benchmark.message"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/additionaltestoutput.benchmark.message_it.xonos.ma.baselineprofile.PlaylistBenchmark.open[none].txt"
+    }
+  }
+  output_artifact {
+    label {
+      label: "additionaltestoutput.benchmark.trace"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+    }
+  }
+  output_artifact {
+    label {
+      label: "additionaltestoutput.benchmark.trace"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+    }
+  }
+  output_artifact {
+    label {
+      label: "additionaltestoutput.benchmark.trace"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/connected_android_test_additional_output/benchmarkRelease/connected/emulator-5554 - 14/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+    }
+  }
+  output_artifact {
+    label {
+      label: "logcat"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/androidTest-results/connected/benchmarkRelease/emulator-5554 - 14/logcat-it.xonos.ma.baselineprofile.PlaylistBenchmark-open[none].txt"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/androidTest-results/connected/benchmarkRelease/emulator-5554 - 14/device-info.pb"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info.meminfo"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/androidTest-results/connected/benchmarkRelease/emulator-5554 - 14/meminfo"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info.cpuinfo"
+      namespace: "android"
+    }
+    source_path {
+      path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/androidTest-results/connected/benchmarkRelease/emulator-5554 - 14/cpuinfo"
+    }
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+  }
+  details {
+    key: "EMULATOR_frame_count_median"
+    value: "392.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_min"
+    value: "371.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_stddev"
+    value: "44.83674088661366"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p50"
+    value: "76.7490445"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p90"
+    value: "138.84318350000004"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p95"
+    value: "154.32489984999998"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p99"
+    value: "214.94281274999895"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p50"
+    value: "93.6148985"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p90"
+    value: "185.65811150000008"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p95"
+    value: "214.21867225"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p99"
+    value: "286.5832820499998"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_median"
+    value: "162744.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_min"
+    value: "132257.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_stddev"
+    value: "24427.372194596235"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_median"
+    value: "256016.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_min"
+    value: "229876.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_stddev"
+    value: "20260.514109962758"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_median"
+    value: "114604.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_min"
+    value: "114296.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_stddev"
+    value: "314.0191076988787"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_median"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_min"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_stddev"
+    value: "1.1547005383792517"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_median"
+    value: "129.556928"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_min"
+    value: "126.879455"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_stddev"
+    value: "15.684387443788061"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_median"
+    value: "12.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_min"
+    value: "6.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_stddev"
+    value: "7.023769168568492"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_median"
+    value: "2059.930734"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_min"
+    value: "1756.63629"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_stddev"
+    value: "649.3793811932097"
+  }
+  details {
+    key: "android.studio.display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "android.studio.v3display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v3display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+  }
+  details {
+    key: "EMULATOR_frame_count_median"
+    value: "392.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_min"
+    value: "371.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_stddev"
+    value: "44.83674088661366"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p50"
+    value: "76.7490445"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p90"
+    value: "138.84318350000004"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p95"
+    value: "154.32489984999998"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p99"
+    value: "214.94281274999895"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p50"
+    value: "93.6148985"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p90"
+    value: "185.65811150000008"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p95"
+    value: "214.21867225"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p99"
+    value: "286.5832820499998"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_median"
+    value: "162744.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_min"
+    value: "132257.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_stddev"
+    value: "24427.372194596235"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_median"
+    value: "256016.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_min"
+    value: "229876.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_stddev"
+    value: "20260.514109962758"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_median"
+    value: "114604.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_min"
+    value: "114296.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_stddev"
+    value: "314.0191076988787"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_median"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_min"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_stddev"
+    value: "1.1547005383792517"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_median"
+    value: "129.556928"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_min"
+    value: "126.879455"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_stddev"
+    value: "15.684387443788061"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_median"
+    value: "12.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_min"
+    value: "6.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_stddev"
+    value: "7.023769168568492"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_median"
+    value: "2059.930734"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_min"
+    value: "1756.63629"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_stddev"
+    value: "649.3793811932097"
+  }
+  details {
+    key: "android.studio.display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "android.studio.v3display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v3display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+  }
+  details {
+    key: "EMULATOR_frame_count_median"
+    value: "392.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_min"
+    value: "371.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_stddev"
+    value: "44.83674088661366"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p50"
+    value: "76.7490445"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p90"
+    value: "138.84318350000004"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p95"
+    value: "154.32489984999998"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p99"
+    value: "214.94281274999895"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p50"
+    value: "93.6148985"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p90"
+    value: "185.65811150000008"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p95"
+    value: "214.21867225"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p99"
+    value: "286.5832820499998"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_median"
+    value: "162744.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_min"
+    value: "132257.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_stddev"
+    value: "24427.372194596235"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_median"
+    value: "256016.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_min"
+    value: "229876.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_stddev"
+    value: "20260.514109962758"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_median"
+    value: "114604.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_min"
+    value: "114296.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_stddev"
+    value: "314.0191076988787"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_median"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_min"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_stddev"
+    value: "1.1547005383792517"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_median"
+    value: "129.556928"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_min"
+    value: "126.879455"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_stddev"
+    value: "15.684387443788061"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_median"
+    value: "12.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_min"
+    value: "6.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_stddev"
+    value: "7.023769168568492"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_median"
+    value: "2059.930734"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_min"
+    value: "1756.63629"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_stddev"
+    value: "649.3793811932097"
+  }
+  details {
+    key: "android.studio.display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "android.studio.v3display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v3display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace"
+  }
+  details {
+    key: "additionalTestOutputFile_PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace"
+  }
+  details {
+    key: "EMULATOR_frame_count_median"
+    value: "392.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_min"
+    value: "371.0"
+  }
+  details {
+    key: "EMULATOR_frame_count_stddev"
+    value: "44.83674088661366"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p50"
+    value: "76.7490445"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p90"
+    value: "138.84318350000004"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p95"
+    value: "154.32489984999998"
+  }
+  details {
+    key: "EMULATOR_frame_duration_cpu_millis_p99"
+    value: "214.94281274999895"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p50"
+    value: "93.6148985"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p90"
+    value: "185.65811150000008"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p95"
+    value: "214.21867225"
+  }
+  details {
+    key: "EMULATOR_frame_overrun_millis_p99"
+    value: "286.5832820499998"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_median"
+    value: "162744.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_min"
+    value: "132257.0"
+  }
+  details {
+    key: "EMULATOR_memory_heap_size_max_kb_stddev"
+    value: "24427.372194596235"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_median"
+    value: "256016.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_min"
+    value: "229876.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_anon_max_kb_stddev"
+    value: "20260.514109962758"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_median"
+    value: "114604.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_min"
+    value: "114296.0"
+  }
+  details {
+    key: "EMULATOR_memory_rss_file_max_kb_stddev"
+    value: "314.0191076988787"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_median"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_min"
+    value: "1.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_count_stddev"
+    value: "1.1547005383792517"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_median"
+    value: "129.556928"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_min"
+    value: "126.879455"
+  }
+  details {
+    key: "EMULATOR_xonos.items@main_sum_millis_stddev"
+    value: "15.684387443788061"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_count_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_median"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_min"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.items_sum_millis_stddev"
+    value: "0.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_median"
+    value: "12.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_min"
+    value: "6.0"
+  }
+  details {
+    key: "EMULATOR_xonos.json_count_stddev"
+    value: "7.023769168568492"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_median"
+    value: "2059.930734"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_min"
+    value: "1756.63629"
+  }
+  details {
+    key: "EMULATOR_xonos.json_sum_millis_stddev"
+    value: "649.3793811932097"
+  }
+  details {
+    key: "android.studio.display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v2display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+  details {
+    key: "android.studio.v3display.benchmark"
+    value: "NOTE: Your device is running a version of ART where method tracing is known to\naffect performance measurement after trace capture, so method tracing is\noff by default.\n\nTo use method tracing, either flash this device, use a different device, or\nenable method tracing with MicrobenchmarkConfig / instrumentation argument, and\nonly run one test at a time.\n\nFor more information, see https://issuetracker.google.com/issues/316174880\nDelay to await runtime image flush\nWARNING: Running on Emulator\nBenchmark is running on an emulator, which is not representative of\nreal user devices. Use a physical device to benchmark. Emulator\nbenchmark improvements might not carry over to a real user\'s\nexperience (or even regress real device performance).\n\nPlaylistBenchmark_open[none]\nXonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nXonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nframeCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)\nmemoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nmemoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\nframeDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9\nframeOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6\nTraces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)\n"
+  }
+  details {
+    key: "android.studio.v3display.benchmark.outputDirPath"
+    value: "/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output"
+  }
+}
+output_artifact {
+  label {
+    label: "test-results.log"
+    namespace: "com.google.testing.platform.runtime.android.driver.AndroidInstrumentationDriver"
+  }
+  source_path {
+    path: "/home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/baselineprofile/build/outputs/androidTest-results/connected/benchmarkRelease/emulator-5554 - 14/testlog/test-results.log"
+  }
+  type: TEST_DATA
+  mime_type: "text/plain"
+}

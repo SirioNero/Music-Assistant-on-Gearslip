@@ -1,0 +1,30 @@
+NOTE: Your device is running a version of ART where method tracing is known to
+affect performance measurement after trace capture, so method tracing is
+off by default.
+
+To use method tracing, either flash this device, use a different device, or
+enable method tracing with MicrobenchmarkConfig / instrumentation argument, and
+only run one test at a time.
+
+For more information, see https://issuetracker.google.com/issues/316174880
+Delay to await runtime image flush
+WARNING: Running on Emulator
+Benchmark is running on an emulator, which is not representative of
+real user devices. Use a physical device to benchmark. Emulator
+benchmark improvements might not carry over to a real user's
+experience (or even regress real device performance).
+
+PlaylistBenchmark_open[none]
+Xonos.items@mainCount   [min       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median       1.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       3.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+Xonos.items@mainSumMs   [min     126.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median     129.6](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     155.3](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+Xonos.itemsCount        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+Xonos.itemsSumMs        [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+Xonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [median      12.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max      20.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+Xonos.jsonSumMs         [min   1,756.6](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median   2,059.9](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max   3,001.9](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+frameCount              [min     371.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace),   [median     392.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max     457.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace)
+memoryHeapSizeMaxKb     [min 132,257.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 162,744.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 180,561.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)
+memoryRssAnonMaxKb      [min 229,876.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 256,016.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 269,760.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)
+memoryRssFileMaxKb      [min 114,296.0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace),   [median 114,604.0](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace),   [max 114,924.0](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)
+frameDurationCpuMs      P50       76.7,   P90      138.8,   P95      154.3,   P99      214.9
+frameOverrunMs          P50       93.6,   P90      185.7,   P95      214.2,   P99      286.6
+Traces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-25-15-22-03.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-25-15-23-10.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-25-15-24-14.perfetto-trace)

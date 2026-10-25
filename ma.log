@@ -1,0 +1,294 @@
+[32m2026-10-25 15:14:42.159 INFO (MainThread) [music_assistant] Starting Music Assistant Server (7e32cc50ed6c40e884b15b488e8f2295) version 0.0.0 - HA add-on: False - Safe mode: False[0m
+[32m2026-10-25 15:14:42.190 INFO (MainThread) [music_assistant.cache] Initializing cache controller...[0m
+[32m2026-10-25 15:14:42.214 INFO (MainThread) [ffmpeg] Detected ffmpeg version 7.1 with libsoxr support[0m
+[33m2026-10-25 15:14:42.217 WARNING (MainThread) [music_assistant.streams] 
+
+################################################################################
+Started streamserver on 10.1.0.241:8097
+This is the IP address that is communicated to players.
+If this is incorrect, audio will not play!
+See the documentation for how to configure the publish IP for the Streamserver
+in Settings --> System --> Streams
+################################################################################
+[0m
+[32m2026-10-25 15:14:42.324 INFO (MainThread) [music_assistant.auth] Generated new JWT secret key[0m
+[32m2026-10-25 15:14:42.325 INFO (MainThread) [music_assistant.auth] Authentication manager initialized (providers=1)[0m
+[33m2026-10-25 15:14:42.327 WARNING (MainThread) [music_assistant.webserver] 
+
+################################################################################
+###                           SETUP REQUIRED                                 ###
+################################################################################
+
+Music Assistant is running in setup mode.
+Please complete the setup by visiting:
+
+    http://10.1.0.241:8095/setup
+
+################################################################################
+[0m
+[32m2026-10-25 15:14:43.585 INFO (MainThread) [music_assistant] Loaded metadata provider LRCLIB[0m
+[32m2026-10-25 15:14:43.588 INFO (MainThread) [music_assistant] Loaded audio_analysis provider Loudness Analysis[0m
+[32m2026-10-25 15:14:43.590 INFO (MainThread) [music_assistant] Loaded metadata provider fanart.tv[0m
+[32m2026-10-25 15:14:43.591 INFO (MainThread) [music_assistant] Loaded metadata provider iTunes Artwork[0m
+[32m2026-10-25 15:14:43.592 INFO (MainThread) [music_assistant] Loaded metadata provider Cover Art Archive[0m
+[32m2026-10-25 15:14:43.593 INFO (MainThread) [music_assistant] Loaded plugin provider Library Recommendations[0m
+[32m2026-10-25 15:14:43.642 INFO (MainThread) [music_assistant] Loaded metadata provider MusicBrainz[0m
+[32m2026-10-25 15:14:43.642 INFO (MainThread) [music_assistant.musicbrainz] MusicBrainz recommendations: scanning 3 days before/after today[0m
+[32m2026-10-25 15:14:43.653 INFO (MainThread) [music_assistant] Loaded metadata provider Playlist Metadata[0m
+[32m2026-10-25 15:14:43.661 INFO (MainThread) [music_assistant] Loaded music provider Music Assistant[0m
+[32m2026-10-25 15:14:43.663 INFO (MainThread) [music_assistant] Loaded plugin provider Endless Mix Playlists[0m
+[32m2026-10-25 15:14:43.663 INFO (MainThread) [music_assistant] Loaded player provider Sync Group Player[0m
+[32m2026-10-25 15:14:43.666 INFO (MainThread) [music_assistant] Loaded metadata provider The Audio DB[0m
+[32m2026-10-25 15:14:43.666 INFO (MainThread) [music_assistant] Loaded player provider Universal Player[0m
+[32m2026-10-25 15:14:43.668 INFO (MainThread) [music_assistant] Loaded metadata provider Wikipedia[0m
+[32m2026-10-25 15:14:44.725 INFO (MainThread) [music_assistant] Loaded player provider Sendspin[0m
+[33m2026-10-25 15:14:44.791 WARNING (MainThread) [music_assistant] Error loading provider(instance) Sendspin Source: Failed to install package soxr==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 952, in load_provider_config
+    await self._load_provider(dep_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package soxr==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[32m2026-10-25 15:14:44.828 INFO (MainThread) [music_assistant] Loaded plugin provider Party[0m
+[32m2026-10-25 15:14:44.832 INFO (MainThread) [music_assistant] Loaded metadata provider Last.fm[0m
+[32m2026-10-25 15:14:44.836 INFO (MainThread) [music_assistant] Loaded music provider Ambient Sounds[0m
+[33m2026-10-25 15:14:44.897 WARNING (MainThread) [music_assistant] Error loading provider(instance) DLNA: Failed to install package async-upnp-client==0.48.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package async-upnp-client==0.48.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[33m2026-10-25 15:14:44.899 WARNING (MainThread) [music_assistant] Error loading provider(instance) Chromecast: Failed to install package PyChromecast==14.0.10
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package PyChromecast==14.0.10
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[33m2026-10-25 15:14:44.913 WARNING (MainThread) [music_assistant] Error loading provider(instance) AirPlay: Failed to install package pyatv==0.18.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package pyatv==0.18.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[33m2026-10-25 15:14:44.914 WARNING (MainThread) [music_assistant] Error loading provider(instance) Smart Fades: Failed to install package beat-this==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package beat-this==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[32m2026-10-25 15:14:44.915 INFO (MainThread) [root] shutdown requested![0m
+[32m2026-10-25 15:14:44.915 INFO (MainThread) [music_assistant] Stop called, cleaning up...[0m
+[32m2026-10-25 15:14:47.097 INFO (MainThread) [music_assistant] Starting Music Assistant Server (7e32cc50ed6c40e884b15b488e8f2295) version 0.0.0 - HA add-on: False - Safe mode: False[0m
+[32m2026-10-25 15:14:47.129 INFO (MainThread) [music_assistant.cache] Initializing cache controller...[0m
+[32m2026-10-25 15:14:47.154 INFO (MainThread) [ffmpeg] Detected ffmpeg version 7.1 with libsoxr support[0m
+[33m2026-10-25 15:14:47.158 WARNING (MainThread) [music_assistant.streams] 
+
+################################################################################
+Started streamserver on 10.1.0.241:8097
+This is the IP address that is communicated to players.
+If this is incorrect, audio will not play!
+See the documentation for how to configure the publish IP for the Streamserver
+in Settings --> System --> Streams
+################################################################################
+[0m
+[32m2026-10-25 15:14:47.192 INFO (MainThread) [music_assistant.auth] Authentication manager initialized (providers=1)[0m
+[33m2026-10-25 15:14:47.194 WARNING (MainThread) [music_assistant.webserver] 
+
+################################################################################
+###                           SETUP REQUIRED                                 ###
+################################################################################
+
+Music Assistant is running in setup mode.
+Please complete the setup by visiting:
+
+    http://10.1.0.241:8095/setup
+
+################################################################################
+[0m
+[32m2026-10-25 15:14:48.395 INFO (MainThread) [music_assistant] Loaded metadata provider LRCLIB[0m
+[32m2026-10-25 15:14:48.399 INFO (MainThread) [music_assistant] Loaded audio_analysis provider Loudness Analysis[0m
+[32m2026-10-25 15:14:48.401 INFO (MainThread) [music_assistant] Loaded metadata provider fanart.tv[0m
+[32m2026-10-25 15:14:48.402 INFO (MainThread) [music_assistant] Loaded metadata provider iTunes Artwork[0m
+[32m2026-10-25 15:14:48.404 INFO (MainThread) [music_assistant] Loaded metadata provider Cover Art Archive[0m
+[32m2026-10-25 15:14:48.404 INFO (MainThread) [music_assistant] Loaded plugin provider Library Recommendations[0m
+[32m2026-10-25 15:14:48.462 INFO (MainThread) [music_assistant] Loaded metadata provider MusicBrainz[0m
+[32m2026-10-25 15:14:48.462 INFO (MainThread) [music_assistant.musicbrainz] MusicBrainz recommendations: scanning 3 days before/after today[0m
+[32m2026-10-25 15:14:48.471 INFO (MainThread) [music_assistant] Loaded metadata provider Playlist Metadata[0m
+[32m2026-10-25 15:14:48.477 INFO (MainThread) [music_assistant] Loaded music provider Music Assistant[0m
+[32m2026-10-25 15:14:48.479 INFO (MainThread) [music_assistant] Loaded plugin provider Endless Mix Playlists[0m
+[32m2026-10-25 15:14:48.480 INFO (MainThread) [music_assistant] Loaded player provider Sync Group Player[0m
+[32m2026-10-25 15:14:48.482 INFO (MainThread) [music_assistant] Loaded metadata provider The Audio DB[0m
+[32m2026-10-25 15:14:48.482 INFO (MainThread) [music_assistant] Loaded player provider Universal Player[0m
+[32m2026-10-25 15:14:48.484 INFO (MainThread) [music_assistant] Loaded metadata provider Wikipedia[0m
+[32m2026-10-25 15:14:49.547 INFO (MainThread) [music_assistant] Loaded player provider Sendspin[0m
+[33m2026-10-25 15:14:49.613 WARNING (MainThread) [music_assistant] Error loading provider(instance) Sendspin Source: Failed to install package soxr==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 952, in load_provider_config
+    await self._load_provider(dep_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package soxr==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[32m2026-10-25 15:14:49.667 INFO (MainThread) [music_assistant] Loaded plugin provider Party[0m
+[32m2026-10-25 15:14:49.684 INFO (MainThread) [music_assistant] Loaded metadata provider Last.fm[0m
+[32m2026-10-25 15:14:49.688 INFO (MainThread) [music_assistant] Loaded music provider Ambient Sounds[0m
+[33m2026-10-25 15:14:49.724 WARNING (MainThread) [music_assistant] Error loading provider(instance) DLNA: Failed to install package async-upnp-client==0.48.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package async-upnp-client==0.48.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[33m2026-10-25 15:14:49.746 WARNING (MainThread) [music_assistant] Error loading provider(instance) Smart Fades: Failed to install package beat-this==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package beat-this==1.1.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[32m2026-10-25 15:14:49.749 INFO (MainThread) [music_assistant.auth] Migrated existing playlog entries to first user: O5aHHQbS8m51u65RRVpaqZu3Vuaxsbhc7M2qIz7fwh8[0m
+[33m2026-10-25 15:14:49.771 WARNING (MainThread) [music_assistant] Error loading provider(instance) AirPlay: Failed to install package pyatv==0.18.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package pyatv==0.18.0
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[32m2026-10-25 15:14:49.774 INFO (MainThread) [music_assistant.webserver] First admin user created: prova[0m
+[33m2026-10-25 15:14:49.775 WARNING (MainThread) [music_assistant] Error loading provider(instance) Chromecast: Failed to install package PyChromecast==14.0.10
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 989, in load_provider
+    await self.load_provider_config(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 909, in load_provider_config
+    await self._load_provider(prov_conf)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/mass.py", line 1354, in _load_provider
+    prov_mod = await load_provider_module(domain, prov_manifest.requirements)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1451, in load_provider_module
+    await install_package(requirement)
+  File "/usr/local/lib/python3.14/site-packages/music_assistant/helpers/util.py", line 1359, in install_package
+    raise RuntimeError(msg)
+RuntimeError: Failed to install package PyChromecast==14.0.10
+error: No virtual environment found; run `uv venv` to create an environment, or pass `--system` to install into a non-virtual environment
+[0m
+[32m2026-10-25 15:14:49.789 INFO (MainThread) [music_assistant.webserver] WebSocket client authenticated as prova[0m
+[32m2026-10-25 15:14:49.791 INFO (MainThread) [music_assistant.auth] Created long-lived token 'Prova Xonos' for user 'prova'[0m
+[32m2026-10-25 15:14:49.792 INFO (MainThread) [music_assistant.controllers.config.controller] Onboarding completed[0m
+[32m2026-10-25 15:14:49.816 INFO (MainThread) [music_assistant] Loaded music provider Filesystem (local disk)[0m
+[32m2026-10-25 15:14:49.825 INFO (MainThread) [music_assistant] Loaded music provider Filesystem (local disk) [music2][0m
+[32m2026-10-25 15:14:49.863 INFO (MainThread) [music_assistant] Loaded music provider iTunes Podcast Search[0m
+[32m2026-10-25 15:14:49.879 INFO (MainThread) [music_assistant] Loaded music provider Podcast RSS Feed[0m
+[32m2026-10-25 15:14:49.935 INFO (MainThread) [music_assistant.Filesystem (local disk) [music2]] Found 721 changed/new items to process for Filesystem (local disk) [music2][0m
+[32m2026-10-25 15:14:50.079 INFO (MainThread) [music_assistant.webserver] WebSocket client authenticated as prova[0m
+[32m2026-10-25 15:14:55.253 INFO (MainThread) [music_assistant.Filesystem (local disk)] Found 14 changed/new items to process for Filesystem (local disk) [music][0m
+[32m2026-10-25 15:14:55.422 INFO (MainThread) [music_assistant.Filesystem (local disk) [music2]] Found 0 changed/new items to process for Filesystem (local disk) [music2][0m
+[32m2026-10-25 15:14:55.425 INFO (MainThread) [music_assistant.Filesystem (local disk)] Found 0 changed/new items to process for Filesystem (local disk) [music][0m
+[32m2026-10-25 15:14:55.446 INFO (MainThread) [music_assistant.music.genre] Genre mapping scan completed: 14 items mapped (0.0s)[0m
+[32m2026-10-25 15:15:09.684 INFO (MainThread) [music_assistant.Last.fm] Building Last.fm recommendations[0m
+[32m2026-10-25 15:15:09.685 INFO (MainThread) [music_assistant.Last.fm] Last.fm recommendations built (0 folders)[0m
+[32m2026-10-25 15:15:48.480 INFO (MainThread) [music_assistant.Music Assistant] Playlist migration completed with 0 errors[0m
+[32m2026-10-25 15:21:03.051 INFO (MainThread) [music_assistant.webserver] WebSocket client authenticated as prova[0m
+[32m2026-10-25 15:21:03.387 INFO (MainThread) [music_assistant.webserver] WebSocket client authenticated as prova[0m
+[33m2026-10-25 15:21:03.627 WARNING (MainThread) [aiosendspin.server.connection.unknown-127.0.0.1] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.16): connected unencrypted (transition mode)[0m
+[33m2026-10-25 15:21:03.628 WARNING (MainThread) [aiosendspin.server.connection.xonos-c0a342c98069] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.16): client/hello declared player supported_commands, superseded by client/state[0m
+[33m2026-10-25 15:21:03.789 WARNING (MainThread) [aiosendspin.server.client.xonos-c0a342c98069] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.16): client/state used the legacy top-level 'state' field[0m
+[32m2026-10-25 15:21:03.794 INFO (MainThread) [music_assistant.players] Player (type player) registered: xonos-c0a342c98069/Xonos[0m
+[33m2026-10-25 15:21:04.373 WARNING (MainThread) [music_assistant.music.recommendations] Error while fetching recommendation items for itunes_podcasts/itunes-top-podcasts: Field "feed" of type Optional[TopPodcastsResults] in TopPodcastsResponse has invalid value {'results': [{'artistName': 'Fedez e Luis Sal', 'id': '638998575', 'name': 'Muschio Selvaggio', 'genres': []}, {'artistName': 'Matteo Bordone', 'id': '778556088', 'name': 'Tienimi Bordone', 'genres': []}, {'artistName': 'Il Post', 'id': '997716933', 'name': 'Morning', 'genres': []}, {'artistName': 'Internazionale', 'id': '449615312', 'name': 'Il Mondo', 'genres': []}, {'artistName': 'Rick DuFer', 'id': '597072740', 'name': 'Daily Cogito', 'genres': []}]}[0m
+[32m2026-10-25 15:21:09.961 INFO (MainThread) [music_assistant.player_queues] User prova requested playback.[0m
+[32m2026-10-25 15:21:09.964 INFO (MainThread) [music_assistant.player_queues.media_resolver] Fetching tracks to play for album Emozioni[0m
+[32m2026-10-25 15:21:10.035 INFO (MainThread) [music_assistant.Sendspin.xonos-c0a342c98069] Setting active output protocol on Xonos to Native[0m
+[32m2026-10-25 15:21:10.071 INFO (MainThread) [music_assistant.streams.audio] Start Queue Flow stream for Queue Xonos - crossfade: disabled [0m
+[32m2026-10-25 15:21:22.091 INFO (MainThread) [music_assistant.webserver] WebSocket client authenticated as prova[0m
+[33m2026-10-25 15:21:23.171 WARNING (MainThread) [aiosendspin.server.connection.unknown-127.0.0.1] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.16): connected unencrypted (transition mode)[0m
+[33m2026-10-25 15:21:23.172 WARNING (MainThread) [aiosendspin.server.connection.xonos-c0a342c98069] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.16): client/hello declared player supported_commands, superseded by client/state[0m
+[33m2026-10-25 15:21:23.777 WARNING (MainThread) [music_assistant.music.recommendations] Error while fetching recommendation items for itunes_podcasts/itunes-top-podcasts: Field "feed" of type Optional[TopPodcastsResults] in TopPodcastsResponse has invalid value {'results': [{'artistName': 'Fedez e Luis Sal', 'id': '638998575', 'name': 'Muschio Selvaggio', 'genres': []}, {'artistName': 'Matteo Bordone', 'id': '778556088', 'name': 'Tienimi Bordone', 'genres': []}, {'artistName': 'Il Post', 'id': '997716933', 'name': 'Morning', 'genres': []}, {'artistName': 'Internazionale', 'id': '449615312', 'name': 'Il Mondo', 'genres': []}, {'artistName': 'Rick DuFer', 'id': '597072740', 'name': 'Daily Cogito', 'genres': []}]}[0m
