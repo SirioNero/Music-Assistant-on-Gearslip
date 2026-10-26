@@ -607,7 +607,16 @@ class PhoneModel(
                     page.results = Load.Ready(SearchResults(query, Menu.bestMatches(rest, found, wanted).firstOrNull()?.second, found))
                 }
                 coroutineScope {
-                    val everywhere = async { library.search(rest) }
+                    // Un errore di una delle due ricerche non deve fermare l'altra.
+                    val everywhere = async {
+                        try {
+                            Result.success(library.search(rest))
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            Result.failure(e)
+                        }
+                    }
                     val own = try {
                         library.search(rest, libraryOnly = true)
                     } catch (e: CancellationException) {
@@ -615,8 +624,12 @@ class PhoneModel(
                     } catch (e: Exception) {
                         null
                     }
-                    if (!own.isNullOrEmpty() && !everywhere.isCompleted) show(own)
-                    show(everywhere.await())
+                    val shownOwn = !own.isNullOrEmpty() && !everywhere.isCompleted
+                    if (shownOwn) show(own!!)
+                    everywhere.await().fold(::show) { error ->
+                        // Se si vede già la libreria resta, con l'avviso.
+                        if (shownOwn) notice = Notice.Failed(error) else throw error
+                    }
                 }
             } catch (e: CancellationException) {
                 throw e
@@ -861,8 +874,8 @@ class PhoneModel(
         scope.launch {
             try {
                 library.removeFromLibrary(playlist)
-                val stack = stacks.getValue(tab)
-                if (stack.lastOrNull() === page) back()
+                // La sua pagina si chiude, anche se nel frattempo si è cambiata scheda.
+                stacks.values.firstOrNull { it.size > 1 && it.last() === page }?.let { it.removeAt(it.lastIndex) }
                 playlistsChanged(gone = playlist.uri)
                 notice = Notice.PlaylistDeleted
             } catch (e: CancellationException) {
