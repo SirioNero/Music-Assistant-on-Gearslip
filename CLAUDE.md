@@ -76,7 +76,9 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 | `playback/MaPlayer.kt` | SimpleBasePlayer che rispecchia la coda di MA |
 | `playback/Menu.kt` | Il menu e la ricerca, senza Media3 (si prova sulla JVM). Gli id dicono cosa fare: vedi il commento in testa |
 | `playback/BrowseTree.kt`, `ResourceLabels.kt` | Il menu come MediaItem; le sue scritte dalle risorse |
-| `playback/Artwork.kt` | Copertine servite a Gearslip come `content://` firmati |
+| `playback/Artwork.kt` | Copertine servite a Gearslip, alla notifica e al lettore come `content://` firmati; i file li tiene `data/ArtCache.kt` (una copertina chiesta da più parti insieme si scarica una volta sola) |
+| `data/SkipSender.kt` | Avanti, indietro e "salta a" mandati a MA uno alla volta, sempre verso l'ultimo brano chiesto; raccolti per 400 ms solo con i servizi a un flusso (`QueueItem.singleStream`) |
+| `data/PlaylistRemover.kt` | Toglie brani da una playlist: i tocchi vicini in un giro, il giro dopo solo quando il primo è applicato |
 | `data/Lyrics.kt` | Il testo di un brano: lettore LRC (più tempi per riga, offset, tag, parole a tempo) e testo semplice |
 | `data/Cache.kt` | `ScreenCache`: le ultime schermate (Home, prime pagine della Libreria) su disco, mostrate subito all'apertura |
 | `data/Account.kt` | Accesso con nome utente e password (auth/login, poi un token suo con auth/token/create), primo account (POST /setup) |
@@ -86,7 +88,7 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 | `phone/ControllerLink.kt` | `PlayerLink` dal MediaController: lo stesso `MaPlayer` che vede Gearslip |
 | `phone/model/` | `PhoneModel` (schede con pile di pagine, caricamenti, ricerca, suona/dopo/in coda, preferiti, testi, impostazioni, "Suona su"), `Pages.kt`, `Player.kt` (`NowPlaying`, `PlayerLink`), `ConnectionCheck.kt`, `Discovery.kt` (server trovati con mDNS), `ServicesModel.kt` e `ServicePages.kt` (i servizi), `RemoteLink.kt` (un lettore di MA comandato dallo schermo). Senza Android: si prova sulla JVM |
 | `phone/NsdFinder.kt` | Cerca Music Assistant nella rete con NsdManager (`_mass._tcp`) |
-| `phone/ui/` | Le schermate in Compose/Material 3. Tutto comune tranne `Platform.kt` (indietro, pixel della copertina, "schermata piena" per le misure, id per UiAutomator). `ServicesScreens.kt` disegna i moduli di MA dai campi; `Markdown.kt` i loro testi; `DevicesSheet.kt` "Suona su" |
+| `phone/ui/` | Le schermate in Compose/Material 3. Tutto comune tranne `Platform.kt` (indietro, pixel della copertina, "schermata piena" per le misure, id per UiAutomator). `ServicesScreens.kt` disegna i moduli di MA dai campi; `Markdown.kt` i loro testi; `DevicesSheet.kt` "Suona su"; `PlaylistSheet.kt` "Aggiungi a una playlist" |
 | `baselineprofile/` | Le prove sull'emulatore: avvio, scorrimento di Home e Libreria, lettore, playlist lunga; genera il Baseline Profile |
 | `Language.kt`, `Texts.kt` | Le lingue (senza Android); `wrap()` e `describe()`, che racconta un `Problem` nella lingua scelta |
 
@@ -102,7 +104,8 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `album_tracks` dà già i brani di tutti i servizi. `top_tracks` c'è dalla 2.10.
 - Generi (2.10+): `music/genres/library_items` con `hide_empty=true` e `content_type="music"`.
 - Episodi dei podcast: `provider_mappings[].url` è l'indirizzo diretto del file dell'episodio.
-- Immagini: `/imageproxy/<proxy_id>?size=256&fmt=jpg` (o 512), senza token.
+- Immagini: `/imageproxy/<proxy_id>?size=256&fmt=jpg` (o 512), senza token. Le misure accettate sono
+  solo 0, 80, 160, 256, 512 e 1024 (0 = originale): con le altre MA risponde 400.
 - `order_by` di `library_items`: `sort_name`, `sort_name_desc`, `timestamp_added_desc`,
   `last_played_desc`, `play_count_desc`, `year`. `search` filtra per nome.
 - Testi: `metadata/get_track_lyrics` (c'è dalla 2.7.5) vuole l'oggetto brano intero (quello di
@@ -137,6 +140,19 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `remove` in quel momento lascia in settings.json una voce senza `domain` e da lì `config/providers`
   risponde `'domain'` per sempre. `Services.remove` aspetta 3 s dal salvataggio e la fine del
   caricamento. Nel Docker di prova la voce rotta si toglie a mano da `data/settings.json` (MA fermo).
+- Playlist: `music/playlists/create_playlist` (`name`; senza servizio la crea "builtin", cioè di MA, che
+  accetta brani di tutti i servizi; di base solo brani). `add_playlist_tracks` (`db_playlist_id`, `uris`)
+  apre album e playlist nei loro brani, salta i doppioni e per la playlist di un servizio cerca lì lo
+  stesso brano; `remove_playlist_tracks` (`db_playlist_id`, `positions_to_remove`) vuole le posizioni
+  da 1, il campo `position` dei brani di `playlist_tracks`. Dalla 2.10 aggiunta e rimozione girano in
+  disparte (MA risponde prima di farle) e lo stato dei lavori (`tasks/get`) è solo per gli admin.
+  `playlist_tracks` passa da una cache che dopo una modifica può restare vecchia per più di 15 s:
+  `force_refresh: true` la salta. Nelle playlist di MA i brani hanno l'uri del loro servizio, non quello
+  della libreria. `is_editable` è nei risultati di `library_items`. Per cancellare una playlist:
+  `music/library/remove_item` (`media_type`, `library_item_id`); `music/playlists/remove` vuole `item_id`.
+- Coda: `player_queues/delete_item` (`item_id_or_index`), `move_item` (`queue_item_id`, `pos_shift`;
+  0 = in testa ai prossimi), `move_item_end`. Il brano in corso e quelli fino a `index_in_buffer` (già
+  mandati al lettore) non si toccano: `delete_item` lo ignora in silenzio, `move_item` dà errore.
 - Lettori: `players/all` dà anche `private` (i lettori delle app, come il telefono: non si offrono) e
   `hide_in_ui`; i lettori di tipo `protocol` non compaiono. Una cassa Sendspin che non è un'app diventa
   un Universal Player (`up...`) circa 15 s dopo. `player_queues/transfer` sposta coda, punto e casuale,
@@ -155,6 +171,14 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 - Il primo suono arriva circa `required_lead_time_ms` − 150 ms dopo l'inizio del flusso (misurato:
   800 → 0,65 s, 1500 → 1,3 s, 300 → subito). Xonos chiede 300 ms in Wi-Fi e 600 in rete mobile: il
   margine si paga a ogni play e a ogni salto, le gallerie le copre l'anticipo che il server manda dopo.
+- L'uscita del telefono ci mette di più ad aprirsi (sull'emulatore l'avvio era in ritardo di 1042, 652,
+  169 ms; con il Bluetooth si aggiunge il suo ritardo). Fino alla 0.1.37 l'audio in ritardo all'avvio si
+  saltava (l'inizio del brano tagliato): ora si suona tutto un po' dopo e si recupera piano (0,4%), e la
+  posizione mostrata è quella del server meno `AudioEngine.lateMs`. L'AudioTrack di suo parte solo con il
+  buffer pieno: da Android 12 Xonos gli fa bastare 40 ms (`setStartThresholdInFrames`) e mentre aspetta
+  i suoi tempi tiene in coda solo 50 ms di silenzio (`StartCheckKt` lo simula).
+- Il decoder Opus di MediaCodec con gli ingressi pieni aspetta che gli si prendano le uscite: prima si
+  prendono quelle, poi si riprova (fino alla 0.1.37 il pacchetto si buttava: un buco di 20 ms).
 
 ### Avvio e limiti dei servizi (misurati con `LatencyCheckKt`)
 
@@ -166,7 +190,8 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 - `max_concurrent_streams` per servizio: Spotify con librespot 3, con Soloist 1, Tidal 1, YouTube Music
   3, gli altri servizi in streaming 5, file e server propri senza limite. Con 1 non c'è il precarico del
   brano dopo, e una raffica di salti finiva in "has reached its limit of 1 simultaneous streams":
-  Xonos raccoglie avanti/indietro premuti in fretta in un salto solo (`MaPlayer.gathered`, `RemoteLink`).
+  con quei servizi Xonos raccoglie avanti/indietro premuti in fretta in un salto solo (`SkipSender`).
+  Due comandi insieme MA li esegue in parallelo e vince l'ultimo a finire: i salti vanno uno alla volta.
 - Spotify in MA ha due motori: librespot (parte prima, 3 flussi, ma va solo con gli account creati
   prima di dicembre 2024) e Soloist (quello ufficiale: tutti gli account Premium, un flusso, audio alla
   velocità della musica). Si sceglie riconfigurando il servizio.
@@ -191,12 +216,22 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   lettore passano dal MediaController del servizio: `MaPlayer` mette negli extra dei metadati uri, tipo,
   album e artista del brano (`MaPlayer.EXTRA_*`).
 - Le copertine sul telefono: indirizzi http dell'imageproxy con Coil (OkHttp dell'app, con timeout);
-  quelle del lettore sono i `content://` di `Artwork`. Il colore di fondo si calcola dai pixel della
+  quelle del lettore sono i `content://` di `Artwork`. Al cambio di brano la stessa copertina la chiedono
+  insieme notifica, mini-lettore (copertina e colore) e auto: fino alla 0.1.37 i download si pestavano
+  i piedi e una richiesta su tre restava senza (`ArtCheckKt`); ora c'è `ArtCache`. Il colore di fondo si calcola dai pixel della
   copertina (`backdropColor`). Le icone sono disegnate in `Icons.kt` (la libreria di icone pesa megabyte).
 - La Home si aggiorna trascinando in giù, e da sola riaprendo l'app se ha più di dieci minuti. Home e
   prime pagine della Libreria si mostrano subito da `ScreenCache`, poi si aggiornano.
 - Gli elenchi lunghi si convertono a pezzi mentre arrivano, fuori dal thread principale
   (`MaClient.items`): la "Playlist grande" di prova (2880 brani) è ~14 MB di JSON, come MaItem ~1 MB.
+  I pezzi (500) si mostrano subito (`onPart`): playlist e podcast con la rotella in fondo, l'artista prima
+  con la libreria e poi con ogni servizio. La ricerca mostra subito i risultati della sola libreria
+  (`library_only`), poi quelli di tutti i servizi. I testi: dopo 8 s "nessun testo", poi se arriva si mostra.
+- Playlist: "Aggiungi a una playlist" (brani, album, playlist; anche una nuova), "Togli" nelle playlist
+  modificabili della libreria, "Elimina" per quelle di MA. Dopo una modifica i brani si chiedono senza
+  cache per 10 minuti. Coda: "Suona dopo" e "Togli dalla coda" dai tre puntini dei brani in arrivo;
+  `MaPlayer` le riceve come modifiche di Media3 (`COMMAND_CHANGE_MEDIA_ITEMS`) e mette negli extra del
+  brano in corso da dove la coda si può cambiare (`EXTRA_EDITABLE_FROM`).
 - Impostazioni: i server trovati in rete, accesso con nome utente e password (o token), primo account.
   I servizi di MA solo per gli admin (Impostazioni, e la Home vuota).
 - "Suona su": `PhoneModel.remote` è il lettore di MA comandato dallo schermo (null: il telefono); "suona"
@@ -229,7 +264,8 @@ gesti e animazioni sono diversi).
 Nella sandbox: Docker Hub risponde 429, si usa `mirror.gcr.io` (vedi `tools/README.md`); se il lavoro
 si riavvia, il demone Docker si ferma e i container `ma` e `pods` vanno riavviati (`docker start`).
 Altre prove del banco: `ServicesCheckKt` (con il servizio finto `tools/ma-test/xonos_test`),
-`PlayersCheckKt` (una cassa finta), `AccountCheckKt`, `PerfCheckKt`.
+`PlayersCheckKt` (una cassa finta, anche la sua coda), `AccountCheckKt`, `PerfCheckKt`, `PlaylistCheckKt`,
+`SearchCheckKt`, `ArtCheckKt`, `StartCheckKt` (l'avvio dell'audio senza server).
 
 Le misure sull'emulatore: il workflow "Misure" parte con `[misure]` nel messaggio del commit (con
 `[profilo]` genera anche il Baseline Profile) o a mano; costruisce MA in Docker sul runner, l'app
@@ -251,7 +287,8 @@ i valori assoluti; le prove usano gli id dei testTag (`Modifier.automationIds()`
 Fatte: app sul telefono con grafica moderna (riproduzione, mini-lettore, libreria, ricerca), testi
 sincronizzati sul telefono, fluidità (R8, Baseline Profile, elenchi fuori dal thread principale, meno
 ricomposizioni, schermate salvate), server trovati in rete e accesso con nome utente e password,
-gestione dei servizi di MA per gli admin, "Suona su" con passaggio della coda. Studiato, in attesa
+gestione dei servizi di MA per gli admin, "Suona su" con passaggio della coda, playlist modificabili
+(aggiungi, togli, nuova, elimina) e coda modificabile (suona dopo, togli). Studiato, in attesa
 della scelta dell'utente: un server MA sul telefono stesso (Termux, proot dentro l'app, Chaquopy).
 Proposto, non fatto: cercare dal telefono con mDNS/SSDP le casse che MA non vede e suggerire il
 servizio da aggiungere. Ancora da fare:
@@ -262,5 +299,4 @@ servizio da aggiungere. Ancora da fare:
    per la musica dei server propri (Jellyfin, Plex, Subsonic) si può scaricando direttamente da lì.
 4. Offline: podcast e librerie proprie; per le playlist di Spotify, scaricare le copie dei brani
    presenti nella libreria propria dell'utente. Niente copie dai servizi in streaming.
-5. Coda e playlist. Già fatti: la coda nel lettore (si salta toccando), "suona dopo" e "in coda" dal
-   menu ⋮, le casse di casa ("Suona su"). Manca il modificare le playlist.
+5. Coda e playlist: fatto (vedi sopra). Si potrebbe aggiungere il riordino trascinando.
