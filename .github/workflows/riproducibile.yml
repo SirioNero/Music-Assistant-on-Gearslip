@@ -47,10 +47,14 @@ jobs:
       - name: Compila come F-Droid
         run: |
           rm -rf tools
-          GRADLEW=$(find / -name gradlew-fdroid -type f 2>/dev/null | head -n 1)
-          echo "gradlew-fdroid: $GRADLEW"
+          # Come gradlew-fdroid: la versione di Gradle scritta in gradle-wrapper.properties.
+          URL=$(sed -n 's/^distributionUrl=//p' gradle/wrapper/gradle-wrapper.properties | sed 's/\\:/:/g')
+          echo "Gradle: $URL"
+          curl -sSfL -o /tmp/gradle.zip "$URL"
+          unzip -q /tmp/gradle.zip -d /tmp/gradle
+          GRADLE=$(ls -d /tmp/gradle/gradle-*)/bin/gradle
           cd app
-          "$GRADLEW" assembleRelease --no-daemon
+          "$GRADLE" assembleRelease --no-daemon
 
       - name: Confronta con l'APK firmato della release
         run: |
