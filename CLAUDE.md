@@ -178,7 +178,9 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   buffer pieno: da Android 12 Xonos gli fa bastare 40 ms (`setStartThresholdInFrames`) e mentre aspetta
   i suoi tempi tiene in coda solo 50 ms di silenzio (`StartCheckKt` lo simula).
 - Il decoder Opus di MediaCodec con gli ingressi pieni aspetta che gli si prendano le uscite: prima si
-  prendono quelle, poi si riprova (fino alla 0.1.37 il pacchetto si buttava: un buco di 20 ms).
+  prendono quelle, poi si riprova (fino alla 0.1.37 il pacchetto si buttava: un buco di 20 ms, 18–26
+  volte per giro di misure). Con la correzione, sull'emulatore: nessun pacchetto buttato, avvii a 195,
+  −213 e −8 ms dal momento giusto, poi scarto medio 0 ms.
 
 ### Avvio e limiti dei servizi (misurati con `LatencyCheckKt`)
 
