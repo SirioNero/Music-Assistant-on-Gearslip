@@ -45,8 +45,14 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   fdroiddata in `tools/fdroid/it.xonos.ma.yml` (toglie `tools/` prima di compilare: le prove usano un
   mirror di Maven Central che lo scanner di F-Droid non accetta), workflow "Come F-Droid" che compila
   senza chiave e passa ricetta e APK a `fdroid lint` e `fdroid scanner`. `dependenciesInfo` è spento
-  (F-Droid rifiuta quel blocco). F-Droid firma con la sua chiave: senza build riproducibili chi passa
-  da GitHub/Obtainium a F-Droid (o viceversa) deve disinstallare.
+  (F-Droid rifiuta quel blocco). Build riproducibili: il workflow "Riproducibile" compila la release
+  come F-Droid (la loro immagine `fdroidserver:buildserver-trixie`, OpenJDK 21, Gradle del wrapper,
+  senza `tools/`) e la confronta byte per byte con l'APK della release tolta la firma: per la 0.1.38
+  identici. Così la ricetta ha `Binaries` e `AllowedAPKSigningKeys` (SHA-256 del certificato
+  `18ef3fc3…2c836`): F-Droid pubblica l'APK con la nostra firma e si passa da GitHub/Obtainium a F-Droid
+  senza disinstallare. Il modello delle richieste di fdroiddata vuole in `commit` l'hash completo e
+  chiede di decidere le build riproducibili prima dell'inclusione (dopo non si può). `apksigcopier`
+  di Debian non verifica gli APK firmati solo v2 (cerca `META-INF/MANIFEST.MF`).
 - Strumenti: AGP 8.11.1, Kotlin 2.2.0, Gradle 8.14.3, compileSdk 36, targetSdk 34, minSdk 26,
   Media3 1.11.1, OkHttp 4.12.0, coroutines 1.10.2, Compose 1.9.4, Material 3 1.4.0, activity-compose
   1.10.1, Coil 3.3.0 (con coil-svg per le icone dei servizi), profileinstaller 1.4.1. Pacchetto `it.xonos.ma`.

@@ -11,16 +11,19 @@ AutoName: Xonos
 
 RepoType: git
 Repo: https://github.com/SirioNero/Music-Assistant-on-Gearslip.git
+Binaries: https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases/download/v%v/Xonos.apk
 
 Builds:
   - versionName: 0.1.38
     versionCode: 38
-    commit: v0.1.38
+    commit: 58ae7dc422f79c08d5a888a2ec9e8e9de85060cc
     subdir: app
     gradle:
       - yes
     rm:
       - tools
+
+AllowedAPKSigningKeys: 18ef3fc3c712aaed5748015693adad3c273af4b333c31bd511ae57e31cb2c836
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v

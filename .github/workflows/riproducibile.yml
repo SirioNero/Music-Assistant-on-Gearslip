@@ -26,7 +26,7 @@ jobs:
       - name: Prepara come il buildserver di F-Droid
         run: |
           apt-get update -q
-          apt-get install -qy --no-install-recommends openjdk-21-jdk-headless git curl apksigcopier diffoscope-minimal unzip
+          apt-get install -qy --no-install-recommends openjdk-21-jdk-headless git curl unzip python3
           update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
           java -version
 
@@ -79,9 +79,7 @@ jobs:
             diff diff/a.txt diff/b.txt | head -n 80 || true
             exit 1
           fi
-          # Come lo controlla F-Droid: la firma della release copiata sull'APK compilato qui, poi verificata
-          # (con l'apksigner dell'SDK: quello di Debian vuole anche la firma v1, che con minSdk 26 non c'è).
-          export PATH="$ANDROID_HOME/build-tools/35.0.0:$PATH"
-          apksigner --version
-          apksigcopier compare signed.apk "$UNSIGNED"
+          # Quindi l'APK della release è questo più la sua firma: che la firma sia buona lo dice apksigner
+          # dell'SDK. (apksigcopier di Debian cerca anche la firma v1, che con minSdk 26 non c'è.)
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs signed.apk | grep -i "SHA-256"
           echo "Riproducibile: F-Droid può pubblicare l'APK con la firma della release v$VERSION."
