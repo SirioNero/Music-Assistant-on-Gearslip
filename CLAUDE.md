@@ -54,6 +54,16 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   F-Droid non la pubblica. Il modello delle richieste di fdroiddata vuole in `commit` l'hash completo e
   chiede di decidere le build riproducibili prima dell'inclusione (dopo non si può). `apksigcopier`
   di Debian non verifica gli APK firmati solo v2 (cerca `META-INF/MANIFEST.MF`).
+- La richiesta a fdroiddata (verificato il 26 ottobre 2026): l'Inclusion Policy vuole tre mesi di
+  sviluppo attivo, salvo utenti dimostrati o altre app dello stesso autore già su F-Droid (di SirioNero
+  non ce ne sono), e i manutentori chiudono in poche ore le richieste più giovani. Il repository è nato
+  il 24 ottobre 2026: non prima del 24 gennaio 2027. Il modello (`Default.md`) chiede anche cosa ha
+  l'app in più di quelle simili, e chiudono anche per questo: su F-Droid ci sono già MassDroid
+  (`net.asksakis.massdroidv2`, anche Android Auto e Sendspin) ed Ensemble (`com.collotsspot.ensemble`).
+  Contro il codice scritto con l'IA non c'è una regola (una proposta aperta, fdroid/admin#699,
+  incoraggia a dirlo). Se GitLab chiede telefono o carta per la CI non si danno: si lascia una nota
+  nella richiesta. Un connettore GitLab non c'è: o a mano, o un token GitLab nelle impostazioni
+  dell'ambiente.
 - Strumenti: AGP 8.11.1, Kotlin 2.2.0, Gradle 8.14.3, compileSdk 36, targetSdk 34, minSdk 26,
   Media3 1.11.1, OkHttp 4.12.0, coroutines 1.10.2, Compose 1.9.4, Material 3 1.4.0, activity-compose
   1.10.1, Coil 3.3.0 (con coil-svg per le icone dei servizi), profileinstaller 1.4.1. Pacchetto `it.xonos.ma`.
