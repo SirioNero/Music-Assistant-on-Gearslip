@@ -1,0 +1,11 @@
+WARNING: Running on Emulator
+Benchmark is running on an emulator, which is not representative of
+real user devices. Use a physical device to benchmark. Emulator
+benchmark improvements might not carry over to a real user's
+experience (or even regress real device performance).
+
+PlayerBenchmark_open[none]
+frameCount           [min  30.0](file://PlayerBenchmark_open_none__iter000_2026-10-26-01-16-39.perfetto-trace),   [median  35.0](file://PlayerBenchmark_open_none__iter002_2026-10-26-01-17-00.perfetto-trace),   [max  36.0](file://PlayerBenchmark_open_none__iter002_2026-10-26-01-17-00.perfetto-trace)
+frameDurationCpuMs   P50  107.5,   P90  141.8,   P95  155.1,   P99  267.4
+frameOverrunMs       P50  114.9,   P90  192.1,   P95  216.9,   P99  308.4
+Traces: Iteration [0](file://PlayerBenchmark_open_none__iter000_2026-10-26-01-16-39.perfetto-trace) [1](file://PlayerBenchmark_open_none__iter001_2026-10-26-01-16-49.perfetto-trace) [2](file://PlayerBenchmark_open_none__iter002_2026-10-26-01-17-00.perfetto-trace) [3](file://PlayerBenchmark_open_none__iter003_2026-10-26-01-17-11.perfetto-trace) [4](file://PlayerBenchmark_open_none__iter004_2026-10-26-01-17-22.perfetto-trace)

@@ -1,0 +1,20 @@
+WARNING: Running on Emulator
+Benchmark is running on an emulator, which is not representative of
+real user devices. Use a physical device to benchmark. Emulator
+benchmark improvements might not carry over to a real user's
+experience (or even regress real device performance).
+
+PlaylistBenchmark_open[partial]
+Xonos.items@mainCount   [min       0.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace)
+Xonos.items@mainSumMs   [min       0.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace)
+Xonos.itemsCount        [min       6.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [median       6.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max       8.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace)
+Xonos.itemsSumMs        [min      45.3](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace),   [median      62.4](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max      62.9](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace)
+Xonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [median       6.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max      16.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace)
+Xonos.jsonSumMs         [min     521.9](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [median     599.6](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max     691.5](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace)
+frameCount              [min     281.0](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace),   [median     342.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max     367.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace)
+memoryHeapSizeMaxKb     [min 103,332.0](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace),   [median 106,861.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max 110,558.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace)
+memoryRssAnonMaxKb      [min 184,868.0](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace),   [median 197,808.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max 203,264.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace)
+memoryRssFileMaxKb      [min  99,644.0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace),   [median  99,772.0](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace),   [max  99,900.0](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace)
+frameDurationCpuMs      P50       54.9,   P90       71.7,   P95       83.0,   P99      120.8
+frameOverrunMs          P50       60.8,   P90       84.0,   P95      100.4,   P99      148.4
+Traces: Iteration [0](file://PlaylistBenchmark_open_partial__iter000_2026-10-26-01-21-18.perfetto-trace) [1](file://PlaylistBenchmark_open_partial__iter001_2026-10-26-01-22-16.perfetto-trace) [2](file://PlaylistBenchmark_open_partial__iter002_2026-10-26-01-23-13.perfetto-trace)

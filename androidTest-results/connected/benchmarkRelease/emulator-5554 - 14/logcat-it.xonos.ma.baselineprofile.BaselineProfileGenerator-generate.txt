@@ -1,0 +1,47 @@
+10-26 00:56:24.936  6015  6038 I TestRunner: started: generate(it.xonos.ma.baselineprofile.BaselineProfileGenerator)
+10-26 00:56:24.952  6015  6038 W Benchmark: NOTE: Your device is running a version of ART where method tracing is known to
+10-26 00:56:24.952  6015  6038 W Benchmark: affect performance measurement after trace capture, so method tracing is
+10-26 00:56:24.952  6015  6038 W Benchmark: off by default.
+10-26 00:56:24.952  6015  6038 W Benchmark:
+10-26 00:56:24.952  6015  6038 W Benchmark: To use method tracing, either flash this device, use a different device, or
+10-26 00:56:24.952  6015  6038 W Benchmark: enable method tracing with MicrobenchmarkConfig / instrumentation argument, and
+10-26 00:56:24.952  6015  6038 W Benchmark: only run one test at a time.
+10-26 00:56:24.952  6015  6038 W Benchmark:
+10-26 00:56:24.952  6015  6038 W Benchmark: For more information, see https://issuetracker.google.com/issues/316174880
+10-26 00:56:24.953  6015  6038 D Benchmark: additionalTestOutputDir=/sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output
+10-26 00:56:24.954  6015  6038 E TestRunner: assumption failed: generate(it.xonos.ma.baselineprofile.BaselineProfileGenerator)
+10-26 00:56:24.955  6015  6038 E TestRunner: ----- begin exception -----
+10-26 00:56:24.955  6015  6038 E TestRunner: org.junit.AssumptionViolatedException: got: <false>, expected: is <true>
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.Assume.assumeThat(Assume.java:106)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.Assume.assumeTrue(Assume.java:50)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at androidx.benchmark.macro.junit4.BaselineProfileRule$apply$1.evaluate(BaselineProfileRule.kt:54)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at androidx.test.ext.junit.runners.AndroidJUnit4.run(AndroidJUnit4.java:162)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:128)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.Suite.runChild(Suite.java:27)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at org.junit.runner.JUnitCore.run(JUnitCore.java:115)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:68)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at androidx.test.internal.runner.TestExecutor.execute(TestExecutor.java:59)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at androidx.test.runner.AndroidJUnitRunner.onStart(AndroidJUnitRunner.java:463)
+10-26 00:56:24.955  6015  6038 E TestRunner: 	at android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2402)
+10-26 00:56:24.955  6015  6038 E TestRunner: ----- end exception -----
+10-26 00:56:24.957  6015  6038 I TestRunner: finished: generate(it.xonos.ma.baselineprofile.BaselineProfileGenerator)

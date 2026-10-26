@@ -1,0 +1,17 @@
+WARNING: Running on Emulator
+Benchmark is running on an emulator, which is not representative of
+real user devices. Use a physical device to benchmark. Emulator
+benchmark improvements might not carry over to a real user's
+experience (or even regress real device performance).
+
+LibraryScrollBenchmark_scroll[none]
+Xonos.items@mainCount   [min   0.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace),   [median   0.0](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max   0.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+Xonos.items@mainSumMs   [min   0.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace),   [median   0.0](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max   0.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+Xonos.itemsCount        [min   0.0](file://LibraryScrollBenchmark_scroll_none__iter003_2026-10-26-01-08-04.perfetto-trace),   [median   1.0](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max   7.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+Xonos.itemsSumMs        [min   0.0](file://LibraryScrollBenchmark_scroll_none__iter003_2026-10-26-01-08-04.perfetto-trace),   [median   0.4](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max  52.9](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+Xonos.jsonCount         [min   0.0](file://LibraryScrollBenchmark_scroll_none__iter003_2026-10-26-01-08-04.perfetto-trace),   [median   1.0](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max  15.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+Xonos.jsonSumMs         [min   0.0](file://LibraryScrollBenchmark_scroll_none__iter003_2026-10-26-01-08-04.perfetto-trace),   [median   2.1](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max  34.9](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+frameCount              [min 384.0](file://LibraryScrollBenchmark_scroll_none__iter003_2026-10-26-01-08-04.perfetto-trace),   [median 484.0](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace),   [max 618.0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace)
+frameDurationCpuMs      P50   59.1,   P90   81.8,   P95   96.6,   P99  111.3
+frameOverrunMs          P50   66.0,   P90  100.1,   P95  119.2,   P99  140.7
+Traces: Iteration [0](file://LibraryScrollBenchmark_scroll_none__iter000_2026-10-26-01-03-40.perfetto-trace) [1](file://LibraryScrollBenchmark_scroll_none__iter001_2026-10-26-01-05-08.perfetto-trace) [2](file://LibraryScrollBenchmark_scroll_none__iter002_2026-10-26-01-06-36.perfetto-trace) [3](file://LibraryScrollBenchmark_scroll_none__iter003_2026-10-26-01-08-04.perfetto-trace) [4](file://LibraryScrollBenchmark_scroll_none__iter004_2026-10-26-01-09-31.perfetto-trace)

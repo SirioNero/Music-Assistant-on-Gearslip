@@ -1,0 +1,20 @@
+WARNING: Running on Emulator
+Benchmark is running on an emulator, which is not representative of
+real user devices. Use a physical device to benchmark. Emulator
+benchmark improvements might not carry over to a real user's
+experience (or even regress real device performance).
+
+PlaylistBenchmark_open[none]
+Xonos.items@mainCount   [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+Xonos.items@mainSumMs   [min       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace),   [median       0.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max       0.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+Xonos.itemsCount        [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [median       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max       8.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+Xonos.itemsSumMs        [min      37.6](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [median      44.5](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max      69.3](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+Xonos.jsonCount         [min       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [median       6.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max      16.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+Xonos.jsonSumMs         [min     528.2](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [median     638.2](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max     807.6](file://PlaylistBenchmark_open_none__iter002_2026-10-26-01-20-45.perfetto-trace)
+frameCount              [min     254.0](file://PlaylistBenchmark_open_none__iter002_2026-10-26-01-20-45.perfetto-trace),   [median     315.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max     359.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+memoryHeapSizeMaxKb     [min 105,741.0](file://PlaylistBenchmark_open_none__iter002_2026-10-26-01-20-45.perfetto-trace),   [median 108,972.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max 137,637.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+memoryRssAnonMaxKb      [min 191,932.0](file://PlaylistBenchmark_open_none__iter002_2026-10-26-01-20-45.perfetto-trace),   [median 199,336.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max 227,968.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace)
+memoryRssFileMaxKb      [min  90,496.0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace),   [median  91,620.0](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace),   [max  91,812.0](file://PlaylistBenchmark_open_none__iter002_2026-10-26-01-20-45.perfetto-trace)
+frameDurationCpuMs      P50       56.3,   P90       70.6,   P95       86.9,   P99      123.2
+frameOverrunMs          P50       61.9,   P90       84.0,   P95      105.8,   P99      163.3
+Traces: Iteration [0](file://PlaylistBenchmark_open_none__iter000_2026-10-26-01-18-50.perfetto-trace) [1](file://PlaylistBenchmark_open_none__iter001_2026-10-26-01-19-48.perfetto-trace) [2](file://PlaylistBenchmark_open_none__iter002_2026-10-26-01-20-45.perfetto-trace)

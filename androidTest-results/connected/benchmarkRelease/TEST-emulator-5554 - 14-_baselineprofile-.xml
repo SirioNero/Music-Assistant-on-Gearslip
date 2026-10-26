@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="it.xonos.ma.baselineprofile.BaselineProfileGenerator" tests="11" failures="0" errors="0" skipped="1" time="1736.418" timestamp="2026-10-26T01:25:21" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 14" />
+    <property name="flavor" value="" />
+    <property name="project" value=":baselineprofile" />
+  </properties>
+  <testcase name="generate" classname="it.xonos.ma.baselineprofile.BaselineProfileGenerator" time="0.017">
+    <skipped />
+  </testcase>
+  <testcase name="scroll[none]" classname="it.xonos.ma.baselineprofile.HomeScrollBenchmark" time="195.39" />
+  <testcase name="scroll[partial]" classname="it.xonos.ma.baselineprofile.HomeScrollBenchmark" time="181.99" />
+  <testcase name="scroll[none]" classname="it.xonos.ma.baselineprofile.LibraryScrollBenchmark" time="413.658" />
+  <testcase name="scroll[partial]" classname="it.xonos.ma.baselineprofile.LibraryScrollBenchmark" time="413.621" />
+  <testcase name="open[none]" classname="it.xonos.ma.baselineprofile.PlayerBenchmark" time="54.834" />
+  <testcase name="open[partial]" classname="it.xonos.ma.baselineprofile.PlayerBenchmark" time="56.802" />
+  <testcase name="open[none]" classname="it.xonos.ma.baselineprofile.PlaylistBenchmark" time="147.788" />
+  <testcase name="open[partial]" classname="it.xonos.ma.baselineprofile.PlaylistBenchmark" time="147.403" />
+  <testcase name="startup[none]" classname="it.xonos.ma.baselineprofile.StartupBenchmark" time="57.098" />
+  <testcase name="startup[partial]" classname="it.xonos.ma.baselineprofile.StartupBenchmark" time="52.831" />
+</testsuite>

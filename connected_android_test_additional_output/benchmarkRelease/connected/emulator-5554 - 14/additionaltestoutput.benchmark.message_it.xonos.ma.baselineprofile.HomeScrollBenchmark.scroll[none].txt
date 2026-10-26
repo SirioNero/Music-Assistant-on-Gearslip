@@ -1,0 +1,21 @@
+NOTE: Your device is running a version of ART where method tracing is known to
+affect performance measurement after trace capture, so method tracing is
+off by default.
+
+To use method tracing, either flash this device, use a different device, or
+enable method tracing with MicrobenchmarkConfig / instrumentation argument, and
+only run one test at a time.
+
+For more information, see https://issuetracker.google.com/issues/316174880
+Delay to await runtime image flush
+WARNING: Running on Emulator
+Benchmark is running on an emulator, which is not representative of
+real user devices. Use a physical device to benchmark. Emulator
+benchmark improvements might not carry over to a real user's
+experience (or even regress real device performance).
+
+HomeScrollBenchmark_scroll[none]
+frameCount           [min 157.0](file://HomeScrollBenchmark_scroll_none__iter004_2026-10-26-00-59-36.perfetto-trace),   [median 237.0](file://HomeScrollBenchmark_scroll_none__iter002_2026-10-26-00-58-35.perfetto-trace),   [max 247.0](file://HomeScrollBenchmark_scroll_none__iter003_2026-10-26-00-59-10.perfetto-trace)
+frameDurationCpuMs   P50   13.6,   P90  109.4,   P95  119.9,   P99  174.8
+frameOverrunMs       P50   -1.0,   P90  138.8,   P95  153.3,   P99  233.5
+Traces: Iteration [0](file://HomeScrollBenchmark_scroll_none__iter000_2026-10-26-00-57-23.perfetto-trace) [1](file://HomeScrollBenchmark_scroll_none__iter001_2026-10-26-00-57-59.perfetto-trace) [2](file://HomeScrollBenchmark_scroll_none__iter002_2026-10-26-00-58-35.perfetto-trace) [3](file://HomeScrollBenchmark_scroll_none__iter003_2026-10-26-00-59-10.perfetto-trace) [4](file://HomeScrollBenchmark_scroll_none__iter004_2026-10-26-00-59-36.perfetto-trace)

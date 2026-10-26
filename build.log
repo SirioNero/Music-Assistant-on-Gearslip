@@ -1,0 +1,101 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preBenchmarkReleaseBuild UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseJniLibFolders
+> Task :app:mergeBenchmarkReleaseNativeLibs
+> Task :app:buildKotlinToolingMetadata
+
+> Task :app:stripBenchmarkReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so. Run with --info option to learn more.
+
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateBenchmarkReleaseBuildConfig
+> Task :app:extractBenchmarkReleaseNativeSymbolTables
+> Task :app:checkBenchmarkReleaseDuplicateClasses
+> Task :app:mergeBenchmarkReleaseNativeDebugMetadata NO-SOURCE
+> Task :app:generateBenchmarkReleaseResValues
+> Task :app:checkBenchmarkReleaseAarMetadata
+> Task :app:mapBenchmarkReleaseSourceSetPaths
+> Task :app:generateBenchmarkReleaseResources
+> Task :app:packageBenchmarkReleaseResources
+> Task :app:mergeBenchmarkReleaseResources
+> Task :app:createBenchmarkReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksBenchmarkRelease
+> Task :app:parseBenchmarkReleaseLocalResources
+> Task :app:processBenchmarkReleaseMainManifest
+> Task :app:processBenchmarkReleaseManifest
+> Task :app:processBenchmarkReleaseManifestForPackage
+> Task :app:javaPreCompileBenchmarkRelease
+> Task :app:extractProguardFiles
+> Task :app:mergeBenchmarkReleaseStartupProfile
+> Task :app:mergeBenchmarkReleaseShaders
+> Task :app:compileBenchmarkReleaseShaders NO-SOURCE
+> Task :app:generateBenchmarkReleaseAssets UP-TO-DATE
+> Task :app:mergeBenchmarkReleaseArtProfile
+> Task :app:mergeBenchmarkReleaseAssets
+> Task :app:compressBenchmarkReleaseAssets
+> Task :app:extractBenchmarkReleaseVersionControlInfo
+> Task :app:processBenchmarkReleaseResources
+> Task :app:validateSigningBenchmarkRelease
+> Task :app:writeBenchmarkReleaseAppMetadata
+> Task :app:writeBenchmarkReleaseSigningConfigVersions
+> Task :baselineprofile:preBuild UP-TO-DATE
+> Task :baselineprofile:preBenchmarkReleaseBuild UP-TO-DATE
+> Task :baselineprofile:checkTestedAppObfuscationBenchmarkRelease
+> Task :baselineprofile:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :baselineprofile:checkBenchmarkReleaseAarMetadata
+> Task :baselineprofile:generateBenchmarkReleaseResValues
+> Task :baselineprofile:mapBenchmarkReleaseSourceSetPaths
+> Task :baselineprofile:generateBenchmarkReleaseResources
+> Task :baselineprofile:mergeBenchmarkReleaseResources
+> Task :baselineprofile:processBenchmarkReleaseManifest
+> Task :baselineprofile:javaPreCompileBenchmarkRelease
+> Task :baselineprofile:mergeBenchmarkReleaseShaders
+> Task :baselineprofile:compileBenchmarkReleaseShaders NO-SOURCE
+> Task :baselineprofile:generateBenchmarkReleaseAssets UP-TO-DATE
+> Task :baselineprofile:processBenchmarkReleaseResources
+> Task :baselineprofile:mergeBenchmarkReleaseAssets
+> Task :baselineprofile:desugarBenchmarkReleaseFileDependencies
+> Task :baselineprofile:compressBenchmarkReleaseAssets
+> Task :baselineprofile:mergeBenchmarkReleaseJniLibFolders
+> Task :baselineprofile:checkBenchmarkReleaseDuplicateClasses
+> Task :baselineprofile:mergeBenchmarkReleaseNativeLibs
+> Task :baselineprofile:compileBenchmarkReleaseKotlin
+> Task :baselineprofile:compileBenchmarkReleaseJavaWithJavac NO-SOURCE
+> Task :baselineprofile:dexBuilderBenchmarkRelease
+> Task :baselineprofile:mergeBenchmarkReleaseGlobalSynthetics
+> Task :baselineprofile:processBenchmarkReleaseJavaRes
+> Task :app:compileBenchmarkReleaseKotlin
+> Task :baselineprofile:mergeLibDexBenchmarkRelease
+> Task :baselineprofile:mergeProjectDexBenchmarkRelease
+> Task :baselineprofile:mergeBenchmarkReleaseJavaResource
+> Task :baselineprofile:validateSigningBenchmarkRelease
+> Task :baselineprofile:writeBenchmarkReleaseSigningConfigVersions
+
+> Task :baselineprofile:stripBenchmarkReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libbenchmarkNative.so, libtracing_perfetto.so. Run with --info option to learn more.
+
+> Task :app:compileBenchmarkReleaseKotlin
+w: file:///home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/app/src/main/java/it/xonos/ma/playback/MaPlayer.kt:77:17 This property hides Java field 'field window: Timeline.Window' thus making it inaccessible.
+w: file:///home/runner/work/Music-Assistant-on-Gearslip/Music-Assistant-on-Gearslip/app/src/main/java/it/xonos/ma/playback/PlaybackService.kt:297:67 'constructor(p0: MediaSession): MediaSession.ConnectionResult.AcceptedResultBuilder' is deprecated. Deprecated in Java.
+
+> Task :baselineprofile:mergeExtDexBenchmarkRelease
+> Task :app:compileBenchmarkReleaseJavaWithJavac
+> Task :app:mergeBenchmarkReleaseGeneratedProguardFiles
+> Task :app:processBenchmarkReleaseJavaRes
+> Task :baselineprofile:packageBenchmarkRelease
+> Task :baselineprofile:createBenchmarkReleaseApkListingFileRedirect
+> Task :baselineprofile:assembleBenchmarkRelease
+> Task :app:mergeBenchmarkReleaseJavaResource
+> Task :app:expandBenchmarkReleaseArtProfileWildcards
+> Task :app:minifyBenchmarkReleaseWithR8
+> Task :app:convertShrunkResourcesToBinaryBenchmarkRelease
+> Task :app:optimizeBenchmarkReleaseResources
+> Task :app:compileBenchmarkReleaseArtProfile
+> Task :app:packageBenchmarkRelease
+> Task :app:createBenchmarkReleaseApkListingFileRedirect
+> Task :app:assembleBenchmarkRelease
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1792975872503.json
+
+BUILD SUCCESSFUL in 1m 42s
+72 actionable tasks: 72 executed

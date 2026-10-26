@@ -1,0 +1,1242 @@
+10-26 01:16:27.039  6015  6038 I TestRunner: started: open[none](it.xonos.ma.baselineprofile.PlayerBenchmark)
+10-26 01:16:27.043  6015  6038 D UiDevice: Turning on screen.
+10-26 01:16:27.044  1771  9467 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:27.048  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1328 [CONTEXT service_id=218 ]
+10-26 01:16:27.050  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 7 uptime_millis: 7 exec_start_elapsed_seconds: 1328 [CONTEXT service_id=218 ]
+10-26 01:16:27.061   553  1006 I ArtService: Job is not running
+10-26 01:16:27.101  6015  6038 D Benchmark: No processes for name it.xonos.ma, skipping kill
+10-26 01:16:27.101  6015  6038 D Benchmark: Clearing ART profiles for it.xonos.ma
+10-26 01:16:27.101  6015  6038 D Benchmark: Resetting profiles for it.xonos.ma
+10-26 01:16:27.103  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:27.112  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1328 [CONTEXT service_id=218 ]
+10-26 01:16:27.113  5075  9925 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1328 [CONTEXT service_id=218 ]
+10-26 01:16:27.151 10072 10072 I artd    : Starting artd
+10-26 01:16:27.151 10072 10072 I AidlLazyServiceRegistrar: Registering service artd
+10-26 01:16:27.155 10072 10072 I AidlLazyServiceRegistrar: Process has 1 (of 1 available) client(s) in use after notification artd has clients: 1
+10-26 01:16:27.172 10072 10077 I artd    : Running dex2oat: /apex/com.android.art/bin/art_exec --drop-capabilities --set-task-profile=Dex2OatBootComplete --set-priority=background --keep-fds=7:8:9:10:11 -- /apex/com.android.art/bin/dex2oat64 --zip-fd=7 --zip-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk --oat-fd=8 --oat-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex --output-vdex-fd=9 --swap-fd=10 --class-loader-context=PCL[] --classpath-dir=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q== --input-vdex-fd=11 --instruction-set=x86_64 --instruction-set-features=default --instruction-set-variant=x86_64 --compiler-filter=verify --compilation-reason=cmdline --compact-dex-level=none --max-image-block-size=524288 --resolve-startup-const-strings=true --generate-mini-debug-info --runtime-arg -Xtarget-sdk-version:34 --runtime-arg -Xhidden-api-policy:enabled --runtime-arg -Xms64m --runtime-arg -Xmx512m --comments=app-version-name:0.1.37,app-version-code:37,art-version:340818082
+10-26 01:16:27.172 10072 10077 I artd    : Opened FDs: 7:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk 8:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex.6jPnkL.tmp 9:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.vdex.idpbkP.tmp 10:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex.swap.y6sT0e.tmp 11:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.vdex
+10-26 01:16:27.184 10080 10080 W dex2oat64: Unexpected CPU variant for x86: x86_64.
+10-26 01:16:27.184 10080 10080 W dex2oat64: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+10-26 01:16:27.185 10080 10080 W dex2oat64: Mismatch between dex2oat instruction set features to use (ISA: X86_64 Feature string: -ssse3,-sse4.1,-sse4.2,-avx,-avx2,-popcnt) and those from CPP defines (ISA: X86_64 Feature string: ssse3,sse4.1,sse4.2,-avx,-avx2,popcnt) for the command line:
+10-26 01:16:27.185 10080 10080 W dex2oat64: /apex/com.android.art/bin/dex2oat64 --zip-fd=7 --zip-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk --oat-fd=8 --oat-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex --output-vdex-fd=9 --swap-fd=10 --class-loader-context=PCL[] --classpath-dir=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q== --input-vdex-fd=11 --instruction-set=x86_64 --instruction-set-features=default --instruction-set-variant=x86_64 --compiler-filter=verify --compilation-reason=cmdline --compact-dex-level=none --max-image-block-size=524288 --resolve-startup-const-strings=true --generate-mini-debug-info --runtime-arg -Xtarget-sdk-version:34 --runtime-arg -Xhidden-api-policy:enabled --runtime-arg -Xms64m --runtime-arg -Xmx512m --comments=app-version-name:0.1.37,app-version-code:37,art-version:340818082
+10-26 01:16:27.185 10080 10080 I dex2oat64: /apex/com.android.art/bin/dex2oat64 --output-vdex-fd=9 --class-loader-context=PCL[] --classpath-dir=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q== --input-vdex-fd=11 --compiler-filter=verify --compilation-reason=cmdline --compact-dex-level=none --max-image-block-size=524288 --resolve-startup-const-strings=true --generate-mini-debug-info --comments=app-version-name:0.1.37,app-version-code:37,art-version:340818082
+10-26 01:16:27.190 10080 10080 I dex2oat64: Using CollectorTypeCC GC.
+10-26 01:16:27.233 10080 10080 I dex2oat64: dex2oat took 48.929ms (44.951ms cpu) (threads: 4) arena alloc=0B (0B) java alloc=1358KB (1390640B) native alloc=1380KB (1414080B) free=987KB (1010928B)
+10-26 01:16:27.238 10072 10077 I artd    : dex2oat returned code 0
+10-26 01:16:27.240   553  2305 I ArtService: Dexopt result: [packageName = it.xonos.ma] DexContainerFileDexoptResult{dexContainerFile=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk, primaryAbi=true, abi=x86_64, actualCompilerFilter=verify, status=PERFORMED, dex2oatWallTimeMillis=66, dex2oatCpuTimeMillis=40, sizeBytes=4438920, sizeBeforeBytes=15804856}
+10-26 01:16:27.256  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:27.270  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.272  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.306  6015  6038 D Benchmark: Profile Installer - Skip File Operation: WRITE_SKIP_FILE
+10-26 01:16:27.315   553  1006 I ActivityManager: Broadcasting: Intent { act=androidx.profileinstaller.action.SKIP_FILE flg=0x400000 cmp=it.xonos.ma/androidx.profileinstaller.ProfileInstallReceiver (has extras) }
+10-26 01:16:27.319   364   364 D Zygote  : Forked child process 10136
+10-26 01:16:27.322 10136 10136 I it.xonos.ma: Using CollectorTypeCC GC.
+10-26 01:16:27.322 10136 10136 W it.xonos.ma: Unexpected CPU variant for x86: x86_64.
+10-26 01:16:27.322 10136 10136 W it.xonos.ma: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+10-26 01:16:27.346   440   451 I adbd    : jdwp connection from 10136
+10-26 01:16:27.349 10136 10136 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10192; state: ENABLED
+10-26 01:16:27.350 10136 10136 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10192; state: ENABLED
+10-26 01:16:27.356 10136 10136 D nativeloader: Configuring clns-6 for other apk /data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/lib/x86_64:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/it.xonos.ma
+10-26 01:16:27.358 10136 10136 V GraphicsEnvironment: Currently set values for:
+10-26 01:16:27.358 10136 10136 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+10-26 01:16:27.358 10136 10136 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+10-26 01:16:27.358 10136 10136 V GraphicsEnvironment: ANGLE GameManagerService for it.xonos.ma: false
+10-26 01:16:27.358 10136 10136 V GraphicsEnvironment: it.xonos.ma is not listed in per-application setting
+10-26 01:16:27.358 10136 10136 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+10-26 01:16:27.361 10136 10136 D ProfileInstaller: RESULT_INSTALL_SKIP_FILE_SUCCESS
+10-26 01:16:27.361   553   572 I ActivityManager: Broadcast completed: result=10
+10-26 01:16:27.379  6015  6038 D Benchmark: Killing process it.xonos.ma
+10-26 01:16:27.390  6015  6038 D Benchmark: Force-stopping process it.xonos.ma
+10-26 01:16:27.391  1771  9778 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:27.403  5075  9925 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.406  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.413  1147  1147 D CarrierSvcBindHelper: onHandleForceStop: [it.xonos.ma]
+10-26 01:16:27.414  1147  1147 D CarrierSvcBindHelper: No carrier app for: 0
+10-26 01:16:27.419   364   364 I Zygote  : Process 10136 exited due to signal 9 (Killed)
+10-26 01:16:27.446  6015  6038 I System.out: startserver
+10-26 01:16:27.450  1771  6661 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:27.464  6015  6038 I System.out: Started, processId 10187
+10-26 01:16:27.467   363 10188 I resolv  : GetAddrInfoHandler::run: {100 100 100 983140 10193 0}
+10-26 01:16:27.467  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.468  5075  9925 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.469  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 8 uptime_millis: 8 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.475  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.483  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.490  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.497  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.504  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.513  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.521  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.528  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.533 10187 10187 I perfetto:       http_server.cc:67 [HTTP] Starting HTTP server on 127.0.0.1:9001
+10-26 01:16:27.533 10187 10187 I perfetto:       http_server.cc:78 [HTTP] Starting HTTP server on [::1]:9001
+10-26 01:16:27.533 10187 10187 W perfetto:            httpd.cc:112 [HTTP] This server can be used by reloading https://ui.perfetto.dev and clicking on YES on the "Trace Processor native acceleration" dialog or through the Python API (see https://perfetto.dev/docs/analysis/trace-processor#python-api).
+10-26 01:16:27.534  6015  6038 D TrafficStats: tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.535 10187 10187 I perfetto:      http_server.cc:120 [HTTP] New connection
+10-26 01:16:27.535 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /status [body=0B, origin=""]
+10-26 01:16:27.536  6015  6038 D Benchmark: Perfetto trace processor shell server started (port=9001).
+10-26 01:16:27.536  6015  6038 D UiDevice: Turning on screen.
+10-26 01:16:27.536  6015  6038 D UiDevice: Searching for node with selector: BySelector [TEXT='^.*\Qisn't responding\E.*$'].
+10-26 01:16:27.551  6015  6038 D UiDevice: Executing shell command: cmd statusbar collapse
+10-26 01:16:27.561  6015  6038 D Benchmark: Starting activity with command: am start  -W "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10000000;package=it.xonos.ma;component=it.xonos.ma/.phone.MainActivity;end"
+10-26 01:16:27.563  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:27.582  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.586  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1329 [CONTEXT service_id=218 ]
+10-26 01:16:27.609   917   985 D SplashScreenView: Build android.window.SplashScreenView{d9bad57 V.E...... ......ID 0,0-0,0}
+10-26 01:16:27.609   917   985 D SplashScreenView: Icon: view: android.widget.ImageView{2638044 V.ED..... ......I. 0,0-0,0 #10204f0 android:id/splashscreen_icon_view} drawable: com.android.wm.shell.startingsurface.SplashscreenIconDrawableFactory$ImmobileIconDrawable@e0a852d size: 504
+10-26 01:16:27.609   917   985 D SplashScreenView: Branding: view: android.view.View{cdc9a62 G.ED..... ......I. 0,0-0,0 #10204ef android:id/splashscreen_branding_view} drawable: null size w: 0 h: 0
+10-26 01:16:27.623   364   364 D Zygote  : Forked child process 10202
+10-26 01:16:27.623   415   415 I BpBinder: onLastStrongRef automatically unlinking death recipients:
+10-26 01:16:27.626 10202 10202 I it.xonos.ma: Using CollectorTypeCC GC.
+10-26 01:16:27.627 10202 10202 W it.xonos.ma: Unexpected CPU variant for x86: x86_64.
+10-26 01:16:27.627 10202 10202 W it.xonos.ma: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+10-26 01:16:27.645   440   451 I adbd    : jdwp connection from 10202
+10-26 01:16:27.693  1197  2180 D EGL_emulation: app_time_stats: avg=231.22ms min=51.93ms max=897.67ms count=5
+10-26 01:16:27.698 10202 10202 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10192; state: ENABLED
+10-26 01:16:27.698 10202 10202 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10192; state: ENABLED
+10-26 01:16:27.726 10202 10202 D nativeloader: Configuring clns-6 for other apk /data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/lib/x86_64:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/it.xonos.ma
+10-26 01:16:27.730 10202 10202 V GraphicsEnvironment: Currently set values for:
+10-26 01:16:27.730 10202 10202 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+10-26 01:16:27.730 10202 10202 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+10-26 01:16:27.730 10202 10202 V GraphicsEnvironment: ANGLE GameManagerService for it.xonos.ma: false
+10-26 01:16:27.730 10202 10202 V GraphicsEnvironment: it.xonos.ma is not listed in per-application setting
+10-26 01:16:27.731 10202 10202 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+10-26 01:16:27.742 10202 10226 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+10-26 01:16:27.744 10202 10226 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+10-26 01:16:27.745 10202 10226 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+10-26 01:16:27.748  1823  1823 I GsaVoiceInteractionSrv: Handling ACTION_STOP_HOTWORD
+10-26 01:16:27.752  1823  2261 E HwDetectorWithState: a: 3
+10-26 01:16:27.794 10202 10202 D CompatibilityChangeReporter: Compat change id reported: 270306772; UID 10192; state: ENABLED
+10-26 01:16:27.795 10202 10230 D TrafficStats: tagSocket(82) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:27.798 10202 10202 D CompatibilityChangeReporter: Compat change id reported: 235355681; UID 10192; state: ENABLED
+10-26 01:16:27.800 10202 10202 I MediaController: Init 364dfd [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+10-26 01:16:27.819 10202 10227 I Xonos   : Collegato a Music Assistant (runnervmr9t6g) (0.0.0) su http://10.0.2.2:8095
+10-26 01:16:27.822 10202 10202 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10192; state: DISABLED
+10-26 01:16:27.823 10202 10202 W OpenGLRenderer: Unknown dataspace 0
+10-26 01:16:28.000 10202 10223 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-26 01:16:28.204   166   166 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+10-26 01:16:28.204 10202 10223 I Gralloc4: mapper 4.x is not supported
+10-26 01:16:28.603 10202 10202 D CompatibilityChangeReporter: Compat change id reported: 160794467; UID 10192; state: ENABLED
+10-26 01:16:28.605 10202 10202 I MediaSessionImpl: Init 9c8bf2e [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+10-26 01:16:28.607 10202 10202 I MediaSessionCompat: Couldn't find a unique registered media button receiver in the given context.
+10-26 01:16:28.615   553  1006 D MediaSessionService: Media button session is changed to it.xonos.ma/androidx.media3.session.id. (userId=0)
+10-26 01:16:28.622 10202 10219 I OpenGLRenderer: Davey! duration=864ms; Flags=1, FrameTimelineVsyncId=101263, IntendedVsync=1329517791933, Vsync=1329601125263, InputEventId=0, HandleInputStart=1329617062473, AnimationStart=1329617062724, PerformTraversalsStart=1329617086660, DrawStart=1330024838717, FrameDeadline=1329534458599, FrameInterval=1329617055193, FrameStartTime=16666666, SyncQueued=1330050221718, SyncStart=1330052793783, IssueDrawCommandsStart=1330053306508, SwapBuffers=1330263031261, FrameCompleted=1330384764501, DequeueBufferDuration=2944, QueueBufferDuration=402751, GpuCompleted=1330384764501, SwapBuffersCompleted=1330372695149, DisplayPresentTime=0, CommandSubmissionCompleted=1330263031261,
+10-26 01:16:28.622   553   572 I ActivityTaskManager: Displayed it.xonos.ma/.phone.MainActivity for user 0: +1s26ms
+10-26 01:16:28.621  1119  1119 V MediaPlayerList: onActiveSessionsChanged: number of controllers: 1
+10-26 01:16:28.643  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: com.google.android.googlequicksearchbox
+10-26 01:16:28.643  1119  1119 V MediaPlayerList: onActiveSessionsChanged: number of controllers: 1
+10-26 01:16:28.651  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: com.google.android.googlequicksearchbox
+10-26 01:16:28.652  1119  1119 W MediaPlayerList: onMediaKeyEventSessionChanged(Token): Addressed Player changed to a player we didn't have a session for
+10-26 01:16:28.652  1119  1119 I MediaPlayerList: Adding wrapped media player: it.xonos.ma at key: 2
+10-26 01:16:28.652  1119  1119 I MediaPlayerList: onMediaKeyEventSessionChanged: token=it.xonos.ma
+10-26 01:16:28.653  1119  1119 D MediaPlayerList: setActivePlayer(): setting player to it.xonos.ma
+10-26 01:16:28.653  1119  1119 I MediaPlayerList: sendMediaUpdate: Creating a one item queue for a player with no queue
+10-26 01:16:28.653  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=NONE(0), position=0, buffered position=0, speed=0.0, updated=1330406, actions=3145397, custom actions=[], active item id=0, error=null}
+10-26 01:16:28.654  1119  1119 D MediaControlGattService: updatePlayerState: playbackState= INACTIVE
+10-26 01:16:28.654  1119  1119 D MediaControlGattService: updateMediaStateChar
+10-26 01:16:28.654  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:28.654  1119  1119 D MediaControlGattService: updateMediaStateChar setting to state= 0
+10-26 01:16:28.658   553  2305 D ConnectivityService: requestNetwork for uid/pid:10192/10202 activeRequest: null callbackRequest: 161 [NetworkRequest [ REQUEST id=162, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: it.xonos.ma UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
+10-26 01:16:28.659  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:28.659  1119  1119 W MediaControlGattService: Feature PLAYER_ICON_URL(BIT 3) support: false
+10-26 01:16:28.659  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.659  1119  1119 W MediaControlGattService: Feature PLAYER_ICON_OBJ_ID(BIT 2) support: false
+10-26 01:16:28.659  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.659  1119  1119 W MediaControlGattService: Feature CURRENT_TRACK_SEGMENT_OBJ_ID(BIT 10) support: false
+10-26 01:16:28.664  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.664  1119  1119 W MediaControlGattService: Feature CURRENT_TRACK_OBJ_ID(BIT 11) support: false
+10-26 01:16:28.665 10202 10202 I Choreographer: Skipped 48 frames!  The application may be doing too much work on its main thread.
+10-26 01:16:28.668  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.668  1119  1119 W MediaControlGattService: Feature NEXT_TRACK_OBJ_ID(BIT 12) support: false
+10-26 01:16:28.668  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.668  1119  1119 W MediaControlGattService: Feature CURRENT_GROUP_OBJ_ID(BIT 13) support: false
+10-26 01:16:28.668  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.668  1119  1119 W MediaControlGattService: Feature PARENT_GROUP_OBJ_ID(BIT 14) support: false
+10-26 01:16:28.668  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature SEARCH_RESULT_OBJ_ID(BIT 20) support: false
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature TRACK_POSITION(BIT 7) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature TRACK_POSITION_NOTIFY support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER_SUPPORTED(BIT 16) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER(BIT 15) support: true
+10-26 01:16:28.669  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED(BIT 19) support: true
+10-26 01:16:28.670  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:28.670  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:28.670  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:28.670  1119  1119 W MediaControlGattService: Feature PLAYER_NAME_NOTIFY support: true
+10-26 01:16:28.670  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED(BIT 19) support: true
+10-26 01:16:28.670  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER_SUPPORTED(BIT 16) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER(BIT 15) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature PLAYER_ICON_OBJ_ID(BIT 2) support: false
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature PLAYER_ICON_URL(BIT 3) support: false
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED(BIT 19) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED_NOTIFY support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER_SUPPORTED(BIT 16) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER(BIT 15) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER_NOTIFY support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:16:28.671  1119  1119 W MediaControlGattService: Feature TRACK_DURATION_NOTIFY support: true
+10-26 01:16:28.672  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:28.672  1119  1119 W MediaControlGattService: Feature TRACK_CHANGED(BIT 4) support: true
+10-26 01:16:28.672  1119  1119 W MediaPlayerList: onMediaKeyEventSessionChanged(Token): Addressed Player changed to a player we didn't have a session for
+10-26 01:16:28.673  1119  1119 I MediaPlayerList: Adding wrapped media player: it.xonos.ma at key: 2
+10-26 01:16:28.673  1119  1119 I MediaPlayerList: onMediaKeyEventSessionChanged: token=it.xonos.ma
+10-26 01:16:28.684   553   837 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=162, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: it.xonos.ma UnderlyingNetworks: Null] ]
+10-26 01:16:28.684   553   837 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=162, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: it.xonos.ma UnderlyingNetworks: Null] ]
+10-26 01:16:28.684   553   837 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=162, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: it.xonos.ma UnderlyingNetworks: Null] ]
+10-26 01:16:28.684   553   837 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=162, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: it.xonos.ma UnderlyingNetworks: Null] ]
+10-26 01:16:28.685   553   844 D ConnectivityService: NetReassign [162 : null → 100] [c 4] [a 1] [i 16]
+10-26 01:16:28.686  1119  1119 D MediaPlayerList: setActivePlayer(): setting player to it.xonos.ma
+10-26 01:16:28.687   553  1006 I ImeTracker: it.xonos.ma:7da35673: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+10-26 01:16:28.687   553  1006 I ImeTracker: it.xonos.ma:7da35673: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-26 01:16:28.691 10202 10256 D TrafficStats: tagSocket(103) with statsTag=0xffffffff, statsUid=-1
+10-26 01:16:28.700  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3227
+10-26 01:16:28.705  1119  1119 E IPCThreadState: Binder transaction failure: 911772/29189/-22
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: Dead object in unregisterCallback.
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: android.os.DeadObjectException
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.os.BinderProxy.transactNative(Native Method)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.os.BinderProxy.transact(BinderProxy.java:584)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.support.v4.media.session.IMediaSession$Stub$Proxy.unregisterCallbackListener(IMediaSession.java:727)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.support.v4.media.session.MediaControllerCompat$MediaControllerImplApi21.unregisterCallback(MediaControllerCompat.java:2057)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.support.v4.media.session.MediaControllerCompat.unregisterCallback(MediaControllerCompat.java:589)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.bluetooth.audio_util.PlayerSettingsManager.activePlayerChanged(PlayerSettingsManager.java:74)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.bluetooth.audio_util.PlayerSettingsManager.lambda$new$0(PlayerSettingsManager.java:46)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.bluetooth.audio_util.PlayerSettingsManager.$r8$lambda$-fLcIDEM7wRNmT1VPKptBzgiQwY(PlayerSettingsManager.java:0)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.bluetooth.audio_util.PlayerSettingsManager$$ExternalSyntheticLambda0.onActivePlayerChanged(R8$$SyntheticClass:0)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.bluetooth.audio_util.MediaPlayerList.setActivePlayer(MediaPlayerList.java:650)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.bluetooth.audio_util.MediaPlayerList$5.onMediaKeyEventSessionChanged(MediaPlayerList.java:923)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.media.session.MediaSessionManager$OnMediaKeyEventSessionChangedListenerStub.lambda$onMediaKeyEventSessionChanged$0(MediaSessionManager.java:1410)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.media.session.MediaSessionManager$OnMediaKeyEventSessionChangedListenerStub$$ExternalSyntheticLambda0.run(Unknown Source:6)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.os.Handler.handleCallback(Handler.java:958)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.os.Handler.dispatchMessage(Handler.java:99)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.os.Looper.loopOnce(Looper.java:205)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.os.Looper.loop(Looper.java:294)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at android.app.ActivityThread.main(ActivityThread.java:8177)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at java.lang.reflect.Method.invoke(Native Method)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
+10-26 01:16:28.705  1119  1119 E MediaControllerCompat: 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
+10-26 01:16:28.706   553  1006 I MediaSessionService: tempAllowlistTargetPkgIfPossible callingPackage:com.google.android.bluetooth targetPackage:it.xonos.ma reason:MediaSessionRecord:android.support.v4.media.session.command.GET_EXTRA_BINDER [WIU] [FGS]
+10-26 01:16:28.744  6015  6038 D Benchmark: Result: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=it.xonos.ma cmp=it.xonos.ma/.phone.MainActivity }
+10-26 01:16:28.744  6015  6038 D Benchmark: Status: ok
+10-26 01:16:28.744  6015  6038 D Benchmark: LaunchState: COLD
+10-26 01:16:28.744  6015  6038 D Benchmark: Activity: it.xonos.ma/.phone.MainActivity
+10-26 01:16:28.744  6015  6038 D Benchmark: TotalTime: 1026
+10-26 01:16:28.744  6015  6038 D Benchmark: WaitTime: 1046
+10-26 01:16:28.744  6015  6038 D Benchmark: Complete
+10-26 01:16:28.768  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 0, unlocked = true
+10-26 01:16:28.769  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=it.xonos.ma fieldId=0 fieldName=null extras=null}, false)
+10-26 01:16:28.770  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.shouldHideHeaderOnInitialState():4008 ShouldHideHeaderOnInitialState = false
+10-26 01:16:28.770  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 2, unlocked = true
+10-26 01:16:28.771  1119  1414 D BtGatt.ScanManager: uid 10127 isForeground true scanMode -1
+10-26 01:16:28.772  1119  1414 D BtGatt.ScanManager: uid 10127 isForeground true scanMode -1
+10-26 01:16:28.781  1119  1119 I MediaPlayerList: sendMediaUpdate: Creating a one item queue for a player with no queue
+10-26 01:16:28.781  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=NONE(0), position=0, buffered position=0, speed=0.0, updated=1330406, actions=3145397, custom actions=[], active item id=0, error=null}
+10-26 01:16:28.781  1119  1119 D AvrcpTargetJni: sendMediaUpdateNative
+10-26 01:16:28.782 10202 10202 I MediaController: Init 2cc1f9f [AndroidXMedia3/1.11.1] [emu64xa, sdk_gphone64_x86_64, Google, 34]
+10-26 01:16:28.783  1119  1119 I bt_stack: [INFO:avrcp_service.cc(515)] virtual void bluetooth::avrcp::AvrcpService::SendMediaUpdate(bool, bool, bool) track_changed=0 :  play_state=1 :  queue=0
+10-26 01:16:28.783  1119  1119 V MediaPlayerList: onActiveSessionsChanged: number of controllers: 2
+10-26 01:16:28.783  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: com.google.android.googlequicksearchbox
+10-26 01:16:28.783  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: it.xonos.ma
+10-26 01:16:28.794  5075  5090 I FontLog : Received query Noto Color Emoji Compat, URI content://com.google.android.gms.fonts [CONTEXT service_id=132 ]
+10-26 01:16:28.795  5075  5090 I FontLog : Query [emojicompat-emoji-font] resolved to {Noto Color Emoji Compat, wdth 100.0, wght 400, ital 0.0, bestEffort false} [CONTEXT service_id=132 ]
+10-26 01:16:28.798  5075  5090 I FontLog : Fetch {Noto Color Emoji Compat, wdth 100.0, wght 400, ital 0.0, bestEffort false} end status Status{statusCode=SUCCESS, resolution=null} [CONTEXT service_id=132 ]
+10-26 01:16:28.813   553  2219 W system_server: Long monitor contention with owner binder:553_8 (1006) at void com.android.server.wm.WindowManagerService$LocalService.updateInputMethodTargetWindow(android.os.IBinder, android.os.IBinder)(WindowManagerService.java:7929) waiters=1 in int com.android.server.wm.WindowManagerService$LocalService.getDisplayIdForWindow(android.os.IBinder) for 115ms
+10-26 01:16:28.826  5075  5544 I FontLog : Pulling font file for id = 9, cache size = 5 [CONTEXT service_id=132 ]
+10-26 01:16:28.851  5075  5544 I FontLog : Pulling font file for id = 9, cache size = 5 [CONTEXT service_id=132 ]
+10-26 01:16:28.859  1119  1119 I MediaPlayerList: sendMediaUpdate: Creating a one item queue for a player with no queue
+10-26 01:16:28.860  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=NONE(0), position=0, buffered position=0, speed=0.0, updated=1330561, actions=3145397, custom actions=[], active item id=0, error=null}
+10-26 01:16:28.860  1119  1119 D AvrcpTargetJni: sendMediaUpdateNative
+10-26 01:16:28.860  1119  1119 I bt_stack: [INFO:avrcp_service.cc(515)] virtual void bluetooth::avrcp::AvrcpService::SendMediaUpdate(bool, bool, bool) track_changed=0 :  play_state=0 :  queue=0
+10-26 01:16:28.860  1119  1119 V MediaPlayerList: onActiveSessionsChanged: number of controllers: 2
+10-26 01:16:28.860  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: com.google.android.googlequicksearchbox
+10-26 01:16:28.860  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: it.xonos.ma
+10-26 01:16:28.860  1119  1119 I MediaPlayerList: sendMediaUpdate: Creating a one item queue for a player with no queue
+10-26 01:16:28.860  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=NONE(0), position=0, buffered position=0, speed=0.0, updated=1330561, actions=3145397, custom actions=[], active item id=0, error=null}
+10-26 01:16:28.860  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:28.860  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:28.860  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:28.861 10202 10256 I Xonos   : Sendspin: Music Assistant (runnervmr9t6g), ruoli ["player@v1"]
+10-26 01:16:28.862 10202 10256 D Xonos   : Gruppo: stopped
+10-26 01:16:28.911  1771  9466 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:28.947 10202 10227 I Xonos   : Lettore pronto in Music Assistant
+10-26 01:16:29.006 10202 10217 I OpenGLRenderer: Davey! duration=865ms; Flags=0, FrameTimelineVsyncId=101349, IntendedVsync=1329634458595, Vsync=1330434458563, InputEventId=0, HandleInputStart=1330446284740, AnimationStart=1330446285061, PerformTraversalsStart=1330449909427, DrawStart=1330449983567, FrameDeadline=1330417791897, FrameInterval=1330443392877, FrameStartTime=16666666, SyncQueued=1330451610364, SyncStart=1330451683863, IssueDrawCommandsStart=1330452021837, SwapBuffers=1330476992212, FrameCompleted=1330500280717, DequeueBufferDuration=2814, QueueBufferDuration=202652, GpuCompleted=1330500244263, SwapBuffersCompleted=1330500280717, DisplayPresentTime=0, CommandSubmissionCompleted=1330476992212,
+10-26 01:16:29.121  1119  1119 D AvrcpTargetJni: sendPlayerSettingsNative
+10-26 01:16:29.121  1119  1119 I bt_stack: [INFO:avrcp_service.cc(551)] virtual void bluetooth::avrcp::AvrcpService::SendPlayerSettingsChanged(std::vector<PlayerAttribute>, std::vector<uint8_t>)
+10-26 01:16:29.122  1119  1119 I bt_stack: [INFO:avrcp_service.cc(565)] attribute=PlayerAttribute::REPEAT : value=PlayerRepeatValue::OFF
+10-26 01:16:29.122  1119  1119 I bt_stack: attribute=PlayerAttribute::SHUFFLE : value=PlayerShuffleValue::OFF
+10-26 01:16:29.122  1119  1119 I bt_stack:
+10-26 01:16:29.160   553  2219 W system_server: Long monitor contention with owner binder:553_15 (2305) at boolean com.android.server.am.CachedAppOptimizer.enableFreezer(boolean)(CachedAppOptimizer.java:1010) waiters=2 in java.lang.String com.android.server.am.ActivityManagerService.getTagForIntentSender(android.content.IIntentSender, java.lang.String) for 150ms
+10-26 01:16:29.170  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1330 [CONTEXT service_id=218 ]
+10-26 01:16:29.170  3261  3261 I ProvidersCache: Updating roots due to change on user 0at content://com.android.externalstorage.documents/
+10-26 01:16:29.200  4347  4466 W Bugle   : TextClassifierLibManagerImpl: Reclaiming memory at level: 40
+10-26 01:16:29.208   553   572 I ActivityTaskManager: Fully drawn it.xonos.ma/.phone.MainActivity: +1s620ms
+10-26 01:16:29.263  4347  4486 W TimedProcessReaper: Memory state is: 400
+10-26 01:16:29.266   917   984 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$ExternalSyntheticLambda17@2374729
+10-26 01:16:29.273  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 286 uptime_millis: 286 exec_start_elapsed_seconds: 1330 [CONTEXT service_id=218 ]
+10-26 01:16:29.280   553  2219 W InputManager-JNI: Input channel object '62d71b6 Splash Screen it.xonos.ma (client)' was disposed without first being removed with the input manager!
+10-26 01:16:29.307  3261 10277 W oid.documentsui: Long monitor contention with owner pool-22-thread-1 (10276) at void com.android.documentsui.roots.ProvidersCache$MultiProviderUpdateTask.handleDocumentsProvider(android.content.pm.ProviderInfo, com.android.documentsui.base.UserId)(ProvidersCache.java:645) waiters=3 in void com.android.documentsui.roots.ProvidersCache$MultiProviderUpdateTask.handleDocumentsProvider(android.content.pm.ProviderInfo, com.android.documentsui.base.UserId) for 132ms
+10-26 01:16:29.352  1197  1233 I ImeTracker: com.google.android.apps.nexuslauncher:7f363b02: onRequestHide at ORIGIN_CLIENT_HIDE_SOFT_INPUT reason HIDE_SOFT_INPUT
+10-26 01:16:29.352  1197  1233 I ImeTracker: com.google.android.apps.nexuslauncher:7f363b02: onFailed at PHASE_CLIENT_VIEW_SERVED
+10-26 01:16:29.372  9561 10285 I GMS_MM_Logger: Memory Metric Logging not allowed. Stopping.
+10-26 01:16:29.385  1197  2654 D OneSearchSuggestProvider: Shut down the binder channel
+10-26 01:16:29.389  1197  1212 I IPCThreadState: oneway function results for code 2 on binder at 0x786866c6d660 will be dropped but finished with status UNKNOWN_TRANSACTION
+10-26 01:16:29.424 10202 10297 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-26 01:16:29.797 10202 10223 D EGL_emulation: app_time_stats: avg=294.77ms min=71.11ms max=604.43ms count=4
+10-26 01:16:29.807 10202 10202 I Choreographer: Skipped 38 frames!  The application may be doing too much work on its main thread.
+10-26 01:16:29.815 10202 10219 I OpenGLRenderer: Davey! duration=864ms; Flags=0, FrameTimelineVsyncId=101622, IntendedVsync=1330651125221, Vsync=1330934458543, InputEventId=0, HandleInputStart=1330936356422, AnimationStart=1330936357213, PerformTraversalsStart=1330973455847, DrawStart=1330973631238, FrameDeadline=1330984458541, FrameInterval=1330936284855, FrameStartTime=16666666, SyncQueued=1331108338388, SyncStart=1331169470981, IssueDrawCommandsStart=1331173643294, SwapBuffers=1331537369666, FrameCompleted=1331576584176, DequeueBufferDuration=5918, QueueBufferDuration=2513669, GpuCompleted=1331576050499, SwapBuffersCompleted=1331576584176, DisplayPresentTime=0, CommandSubmissionCompleted=1331537369666,
+10-26 01:16:29.836  1119  1119 V AudioMediaPlayerWrapper: onQueueChanged(): it.xonos.ma tried to update with no queue
+10-26 01:16:29.836  1119  1119 V AudioMediaPlayerWrapper: onQueueChanged(): it.xonos.ma tried to update with no queue
+10-26 01:16:29.845  1119  1119 D AudioMediaPlayerWrapper: it.xonos.ma Only Title and Artist info sync for metadata
+10-26 01:16:29.847  1119  1119 V AudioMediaPlayerWrapper: trySendMediaUpdate(): Metadata has been updated for it.xonos.ma
+10-26 01:16:29.847  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.847  1119  1119 D MediaControlGattService: updatePlayerState: playbackState= PAUSED
+10-26 01:16:29.847  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:16:29.847  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:16:29.847  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:16:29.847  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED_NOTIFY support: true
+10-26 01:16:29.852  1119  1119 W MediaControlGattService: Feature TRACK_POSITION(BIT 7) support: true
+10-26 01:16:29.852  1119  1119 W MediaControlGattService: Feature TRACK_POSITION_NOTIFY support: true
+10-26 01:16:29.852  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:29.852  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:29.854  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:29.854  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:29.854  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED(BIT 19) support: true
+10-26 01:16:29.854  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED_NOTIFY support: true
+10-26 01:16:29.855  6015  6038 I System.out: 0 Flags,FrameTimelineVsyncId,IntendedVsync,Vsync,InputEventId,HandleInputStart,AnimationStart,PerformTraversalsStart,DrawStart,FrameDeadline,FrameInterval,FrameStartTime,SyncQueued,SyncStart,IssueDrawCommandsStart,SwapBuffers,FrameCompleted,DequeueBufferDuration,QueueBufferDuration,GpuCompleted,SwapBuffersCompleted,DisplayPresentTime,CommandSubmissionCompleted,
+10-26 01:16:29.855  6015  6038 I System.out: 1 1,101263,1329517791933,1329601125263,0,1329617062473,1329617062724,1329617086660,1330024838717,1329534458599,1329617055193,16666666,1330050221718,1330052793783,1330053306508,1330263031261,1330384764501,2944,402751,1330384764501,1330372695149,0,1330263031261,
+10-26 01:16:29.855  6015  6038 I System.out: 2 0,101349,1329634458595,1330434458563,0,1330446284740,1330446285061,1330449909427,1330449983567,1330417791897,1330443392877,16666666,1330451610364,1330451683863,1330452021837,1330476992212,1330500280717,2814,202652,1330500244263,1330500280717,0,1330476992212,
+10-26 01:16:29.855  6015  6038 I System.out: 3 0,101558,1330451125229,1330467791895,0,1330483427810,1330483427991,1330483711213,1330483728299,1330517791893,1330483422112,16666666,1330483973054,1330500312304,1330500350121,1330784458669,1330947071833,3756,191405,1330947071833,1330876249028,0,1330784458669,
+10-26 01:16:29.855  6015  6038 I System.out: 4 0,101581,1330484458561,1330567791891,0,1330567964861,1330567965091,1330568327231,1330568355073,1330967791875,1330567958411,16666666,1330568637083,1330876274687,1330876528205,1330941260616,1330974053588,24302388,2192631,1330947323589,1330974053588,0,1330941260616,
+10-26 01:16:29.855  6015  6038 I System.out: 5 0,101622,1330651125221,1330934458543,0,1330936356422,1330936357213,1330973455847,1330973631238,1330667791887,1330936284855,16666666,1331108338388,1331169470981,1331173643294,1331537369666,0,5918,2513669,0,1331576584176,0,1331537369666,
+10-26 01:16:29.856  6015  6038 D UiDevice: Waiting 30000ms for SearchCondition[hasObject=BySelector [RES='field_home|home']].
+10-26 01:16:29.857  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='field_home|home'].
+10-26 01:16:29.859  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:16:29.859  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:16:29.859  1119  1119 W MediaControlGattService: Feature TRACK_TITLE_NOTIFY support: true
+10-26 01:16:29.862  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature TRACK_DURATION_NOTIFY support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:29.863  1119  1119 D MediaControlGattService: updateMediaStateChar
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:29.863  1119  1119 D MediaControlGattService: updateMediaStateChar setting to state= 2
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:16:29.863  1119  1119 W MediaControlGattService: Feature TRACK_CHANGED(BIT 4) support: true
+10-26 01:16:29.863  1119  1119 D AudioMediaPlayerWrapper: it.xonos.ma Only Title and Artist info sync for metadata
+10-26 01:16:29.867  1119  1119 V AudioMediaPlayerWrapper: trySendMediaUpdate(): Metadata has been updated for it.xonos.ma
+10-26 01:16:29.867  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.867  1119  1119 D AvrcpTargetJni: sendMediaUpdateNative
+10-26 01:16:29.868  1119  1119 I bt_stack: [INFO:avrcp_service.cc(515)] virtual void bluetooth::avrcp::AvrcpService::SendMediaUpdate(bool, bool, bool) track_changed=1 :  play_state=1 :  queue=1
+10-26 01:16:29.868  1119  1119 V AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma : PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.868  1119  1119 W AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma tried to update with no new data
+10-26 01:16:29.868  1119  1119 V AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma : PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.868  1119  1119 W AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma tried to update with no new data
+10-26 01:16:29.868  1119  1119 V AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma : PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.868  1119  1119 W AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma tried to update with no new data
+10-26 01:16:29.868  1119  1119 V AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma : PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.868  1119  1119 W AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma tried to update with no new data
+10-26 01:16:29.868  1119  1119 V AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma : PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.868  1119  1119 W AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma tried to update with no new data
+10-26 01:16:29.868  1119  1119 V AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma : PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:29.868  1119  1119 W AudioMediaPlayerWrapper: onPlaybackStateChanged(): it.xonos.ma tried to update with no new data
+10-26 01:16:30.022  1119  1119 D AudioMediaPlayerWrapper: it.xonos.ma Only Title and Artist info sync for metadata
+10-26 01:16:30.023  1119  1119 V AudioMediaPlayerWrapper: trySendMediaUpdate(): Metadata has been updated for it.xonos.ma
+10-26 01:16:30.023  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:30.023  1119  1119 D AvrcpTargetJni: sendMediaUpdateNative
+10-26 01:16:30.023  1119  1119 I bt_stack: [INFO:avrcp_service.cc(515)] virtual void bluetooth::avrcp::AvrcpService::SendMediaUpdate(bool, bool, bool) track_changed=1 :  play_state=0 :  queue=0
+10-26 01:16:30.023  1119  1119 D AudioMediaPlayerWrapper: it.xonos.ma Only Title and Artist info sync for metadata
+10-26 01:16:30.023  1119  1119 V AudioMediaPlayerWrapper: trySendMediaUpdate(): Metadata has been updated for it.xonos.ma
+10-26 01:16:30.023  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:30.023  1119  1119 W MediaControlGattService: Feature TRACK_POSITION(BIT 7) support: true
+10-26 01:16:30.023  1119  1119 W MediaControlGattService: Feature TRACK_POSITION_NOTIFY support: true
+10-26 01:16:30.023  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:30.027  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:30.027  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:30.027  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:16:30.027  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:16:30.027  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:30.091  1770  1935 W AiAiEcho: LyftNotificationParser Ridesharing ETA not enabled
+10-26 01:16:30.092  1770  1935 W AiAiEcho: SmartspaceNotificationPredictor no parser can handle this notification or notification is invalid
+10-26 01:16:30.195   917  1002 D EGL_emulation: app_time_stats: avg=1870.60ms min=40.07ms max=3701.13ms count=2
+10-26 01:16:30.216  1119  1119 V AudioMediaPlayerWrapper: onQueueChanged(): it.xonos.ma
+10-26 01:16:30.217  1119  1119 V AudioMediaPlayerWrapper: onQueueChanged(): it.xonos.ma
+10-26 01:16:30.252  1770  1935 W AiAiEcho: LyftNotificationParser Ridesharing ETA not enabled
+10-26 01:16:30.252  1770  1935 W AiAiEcho: SmartspaceNotificationPredictor no parser can handle this notification or notification is invalid
+10-26 01:16:30.256   917  1000 D MediaDataManager: loaded art from android.media.metadata.ALBUM_ART_URI
+10-26 01:16:30.259   917   917 D MediaResumeListener: Checking for service component for it.xonos.ma
+10-26 01:16:30.260   917  1000 D MediaResumeListener: Testing if we can connect to ComponentInfo{it.xonos.ma/it.xonos.ma.playback.PlaybackService}
+10-26 01:16:30.265   917  1000 W LocalMediaManager: BluetoothAdapter is null or muting expected device not exist
+10-26 01:16:30.265   917  1000 D MediaDeviceManager: Can not get LocalBluetoothLeBroadcast
+10-26 01:16:30.272   917  1000 D MediaDeviceManager: Can not get LocalBluetoothLeBroadcast
+10-26 01:16:30.288   917   917 W ConstraintSet: id unknown center_vertical_guideline
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown action_button_guideline
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown icon
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown media_seamless
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown media_action_barrier_start
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown media_action_barrier_end
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown media_action_barrier_top
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown remove_text
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown settings
+10-26 01:16:30.289   917   917 W ConstraintSet: id unknown dismiss
+10-26 01:16:30.290   917   917 W ConstraintSet: id unknown cancel
+10-26 01:16:30.293   917   917 W ConstraintSet: id unknown center_vertical_guideline
+10-26 01:16:30.293   917   917 W ConstraintSet: id unknown action_button_guideline
+10-26 01:16:30.293   917   917 W ConstraintSet: id unknown icon
+10-26 01:16:30.293   917   917 W ConstraintSet: id unknown media_seamless
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown media_action_barrier_start
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown media_action_barrier_end
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown media_action_barrier_top
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown remove_text
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown settings
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown dismiss
+10-26 01:16:30.294   917   917 W ConstraintSet: id unknown cancel
+10-26 01:16:30.298   917   917 W ConstraintSet: id unknown center_vertical_guideline
+10-26 01:16:30.298   917   917 W ConstraintSet: id unknown action_button_guideline
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown icon
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown media_seamless
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown media_action_barrier_start
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown media_action_barrier_end
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown media_action_barrier_top
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown remove_text
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown settings
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown dismiss
+10-26 01:16:30.299   917   917 W ConstraintSet: id unknown cancel
+10-26 01:16:30.334  5075  5075 W DiscoveryManager: BroadcastReceiver not registered
+10-26 01:16:30.334  5075  9977 I DiscoveryManager: Filter criteria(null) scannerFlags(2)
+10-26 01:16:30.334  5075  9977 W DatabaseProcessor: processLocalDevices: failed to get the network info with non-null networkId.
+10-26 01:16:30.335  5075  5075 I CastMediaRouteProvider: Published 0 routes
+10-26 01:16:30.349   917   917 D LocalImageResolver: Couldn't use ImageDecoder for drawable, falling back to non-resized load.
+10-26 01:16:30.425  1770  1935 W AiAiEcho: LyftNotificationParser Ridesharing ETA not enabled
+10-26 01:16:30.425  1770  1935 W AiAiEcho: SmartspaceNotificationPredictor no parser can handle this notification or notification is invalid
+10-26 01:16:30.437   917  1000 D MediaDataManager: loaded art from android.media.metadata.ALBUM_ART_URI
+10-26 01:16:30.465 10202 10202 I MediaBrowserService: No root for client com.android.systemui from service android.service.media.MediaBrowserService$ServiceBinder$1
+10-26 01:16:30.468   917   917 W ConstraintSet: id unknown center_vertical_guideline
+10-26 01:16:30.469   917   917 W ConstraintSet: id unknown action_button_guideline
+10-26 01:16:30.469   917   917 W ConstraintSet: id unknown icon
+10-26 01:16:30.469   917   917 W ConstraintSet: id unknown media_seamless
+10-26 01:16:30.469   917   917 W ConstraintSet: id unknown media_action_barrier_start
+10-26 01:16:30.469   917   917 W ConstraintSet: id unknown media_action_barrier_end
+10-26 01:16:30.469   917   917 W ConstraintSet: id unknown media_action_barrier_top
+10-26 01:16:30.470   917   917 W ConstraintSet: id unknown remove_text
+10-26 01:16:30.470   917   917 W ConstraintSet: id unknown settings
+10-26 01:16:30.470   917   917 W ConstraintSet: id unknown dismiss
+10-26 01:16:30.470   917   917 W ConstraintSet: id unknown cancel
+10-26 01:16:30.473   917  1000 E MediaBrowser: onConnectFailed for ComponentInfo{it.xonos.ma/it.xonos.ma.playback.PlaybackService}
+10-26 01:16:30.474   917  1000 D ResumeMediaBrowser: Connection failed for ComponentInfo{it.xonos.ma/it.xonos.ma.playback.PlaybackService}
+10-26 01:16:30.474   917  1000 E MediaResumeListener: Cannot resume with ComponentInfo{it.xonos.ma/it.xonos.ma.playback.PlaybackService}
+10-26 01:16:30.603  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:16:30.635   917  1000 D MediaDataManager: loaded art from android.media.metadata.ALBUM_ART_URI
+10-26 01:16:30.749  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:16:30.749  6015  6038 D UiDevice: Retrieving node with selector: BySelector [TEXT='\QHome\E'].
+10-26 01:16:30.757  6015  6038 D UiObject2: Clicking on (172, 2274).
+10-26 01:16:30.757  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@8684; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(127, 2253 - 218, 2295); boundsInWindow: Rect(127, 2253 - 218, 2295); packageName: it.xonos.ma; className: android.widget.TextView; text: Home; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:16:30.777  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1332536, downTime=1332536, deviceId=-1, source=0x1002, displayId=0, eventId=-776636895 }
+10-26 01:16:30.790  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1332564, downTime=1332536, deviceId=-1, source=0x1002, displayId=0, eventId=-131927804 }
+10-26 01:16:30.816  6015  6038 W GestureController: Gestures took longer than expected (58ms >> 16ms), device might be in a busy state.
+10-26 01:16:30.817  6015  6038 D UiDevice: Waiting 60000ms for SearchCondition[findObject=BySelector [RES='\Qrow\E']].
+10-26 01:16:30.817  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qrow\E'].
+10-26 01:16:30.927 10202 10223 D EGL_emulation: app_time_stats: avg=65.93ms min=21.51ms max=307.11ms count=16
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown center_vertical_guideline
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown action_button_guideline
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown icon
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown media_seamless
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown media_action_barrier_start
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown media_action_barrier_end
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown media_action_barrier_top
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown remove_text
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown settings
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown dismiss
+10-26 01:16:31.091   917   917 W ConstraintSet: id unknown cancel
+10-26 01:16:31.523  6015  6038 D UiDevice: Waiting 3000ms for SearchCondition[hasObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:16:31.523  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:16:31.595  6015  6038 D PerfettoCapture: Supported ABIs: x86_64, arm64-v8a
+10-26 01:16:31.596  6015  6038 D PerfettoCapture: Recording perfetto trace
+10-26 01:16:31.603  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:31.636  6015  6038 D Benchmark: No processes for name perfetto, skipping kill
+10-26 01:16:31.677  6015  6038 D Benchmark: No processes for name tracebox, skipping kill
+10-26 01:16:31.701  1771  9679 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:31.713  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1333 [CONTEXT service_id=218 ]
+10-26 01:16:31.724  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 47 uptime_millis: 47 exec_start_elapsed_seconds: 1333 [CONTEXT service_id=218 ]
+10-26 01:16:31.800  6015  6038 I PerfettoCapture: Starting perfetto tracing with cmd: cat /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/trace_config.pb | perfetto --background-wait -c - -o /data/misc/perfetto-traces/trace_output.pb
+10-26 01:16:31.802  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:31.810 10331 10331 W perfetto: type=1400 audit(0.0:229): avc:  denied  { write } for  path="/data/local/tmp/temporaryScript_3884186150.sh_stderr" dev="dm-40" ino=196624 scontext=u:r:perfetto:s0 tcontext=u:object_r:shell_data_file:s0 tclass=file permissive=0
+10-26 01:16:31.820 10332 10332 I perfetto:    perfetto_cmd.cc:1053 Connected to the Perfetto traced service, starting tracing
+10-26 01:16:31.821   463   463 I perfetto: ng_service_impl.cc:1042 Configured tracing session 21, #sources:9, duration:0 ms, #buffers:2, total buffer size:36864 KB, total sessions:1, uid:0 session name: ""
+10-26 01:16:31.821   462   462 I perfetto:  probes_producer.cc:141 Ftrace setup (target_buf=41)
+10-26 01:16:31.822   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:31.827  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1333 [CONTEXT service_id=218 ]
+10-26 01:16:31.828  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1333 [CONTEXT service_id=218 ]
+10-26 01:16:31.917   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:32.066   462   462 I perfetto:    ftrace_procfs.cc:442 enabled ftrace in /sys/kernel/tracing/
+10-26 01:16:32.100  6015  6038 I PerfettoCapture: Perfetto output - 10332
+10-26 01:16:32.100  6015  6038 I PerfettoCapture: EXITCODE=0
+10-26 01:16:32.110  6015  6038 I PerfettoCapture: Perfetto tracing started successfully with pid 10332.
+10-26 01:16:32.112  1771  8685 I MediaProvider: Deleted 1 0 0 0 0 0 0 items on external_primary due to it.xonos.ma.baselineprofile
+10-26 01:16:32.113  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:16:32.113  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:16:32.120  6015  6038 D UiObject2: Clicking on (540, 2024).
+10-26 01:16:32.129  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1333 [CONTEXT service_id=218 ]
+10-26 01:16:32.132  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1333898, downTime=1333898, deviceId=-1, source=0x1002, displayId=0, eventId=-402395186 }
+10-26 01:16:32.137  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 13 uptime_millis: 13 exec_start_elapsed_seconds: 1333 [CONTEXT service_id=218 ]
+10-26 01:16:32.142  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1333919, downTime=1333898, deviceId=-1, source=0x1002, displayId=0, eventId=-461300129 }
+10-26 01:16:32.172 10202 10223 D EGL_emulation: app_time_stats: avg=42.00ms min=12.05ms max=413.51ms count=26
+10-26 01:16:32.173  6015  6038 W GestureController: Gestures took longer than expected (53ms >> 16ms), device might be in a busy state.
+10-26 01:16:32.173  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qplayer\E']].
+10-26 01:16:32.173  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:32.186 10202 10202 W WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+10-26 01:16:32.186 10202 10202 W WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-26 01:16:32.218  1119  1119 E AudioMediaPlayerWrapper: Timeout while waiting for metadata to sync for it.xonos.ma
+10-26 01:16:32.218  1119  1119 E AudioMediaPlayerWrapper:   └ Current Metadata: { mediaId="currsong" title="Fiori rosa, fiori di pesco" artist="Lucio Battisti" album="Emozioni" duration=60000 trackPosition=1/1 image=<Image source=2> }
+10-26 01:16:32.218  1119  1119 E AudioMediaPlayerWrapper:   └ Current Playstate: PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(0): { mediaId="NowPlayingId0" title="Emozioni" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=1/4 image=null }
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(1): { mediaId="NowPlayingId1" title="Acqua azzurra, acqua chiara" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=2/4 image=null }
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(2): { mediaId="NowPlayingId2" title="Mi ritorni in mente" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=3/4 image=null }
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(3): { mediaId="NowPlayingId3" title="Fiori rosa, fiori di pesco" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=4/4 image=null }
+10-26 01:16:32.219  1119  1119 V AudioMediaPlayerWrapper: trySendMediaUpdate(): Metadata has been updated for it.xonos.ma
+10-26 01:16:32.219  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:32.219  1119  1119 D AvrcpTargetJni: sendMediaUpdateNative
+10-26 01:16:32.219  1119  1119 I bt_stack: [INFO:avrcp_service.cc(515)] virtual void bluetooth::avrcp::AvrcpService::SendMediaUpdate(bool, bool, bool) track_changed=0 :  play_state=0 :  queue=1
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper: Timeout while waiting for metadata to sync for it.xonos.ma
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper:   └ Current Metadata: { mediaId="currsong" title="Fiori rosa, fiori di pesco" artist="Lucio Battisti" album="Emozioni" duration=60000 trackPosition=1/1 image=<Image source=2> }
+10-26 01:16:32.219  1119  1119 E AudioMediaPlayerWrapper:   └ Current Playstate: PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:32.221  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(0): { mediaId="NowPlayingId0" title="Emozioni" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=1/4 image=null }
+10-26 01:16:32.221  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(1): { mediaId="NowPlayingId1" title="Acqua azzurra, acqua chiara" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=2/4 image=null }
+10-26 01:16:32.221  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(2): { mediaId="NowPlayingId2" title="Mi ritorni in mente" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=3/4 image=null }
+10-26 01:16:32.221  1119  1119 E AudioMediaPlayerWrapper:   └ QueueItem(3): { mediaId="NowPlayingId3" title="Fiori rosa, fiori di pesco" artist="Lucio Battisti" album="Emozioni" duration=0 trackPosition=4/4 image=null }
+10-26 01:16:32.233  1119  1119 V AudioMediaPlayerWrapper: trySendMediaUpdate(): Metadata has been updated for it.xonos.ma
+10-26 01:16:32.233  1119  1119 D MediaPlayerList: sendMediaUpdate state=PlaybackState {state=PAUSED(2), position=0, buffered position=0, speed=0.0, updated=1331617, actions=3145653, custom actions=[], active item id=0, error=null}
+10-26 01:16:32.236  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:32.236  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:16:32.236  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:16:33.223 10202 10223 D EGL_emulation: app_time_stats: avg=76.37ms min=29.12ms max=259.15ms count=13
+10-26 01:16:33.650 10202 10345 D ProfileInstaller: Skipping profile installation for it.xonos.ma
+10-26 01:16:34.261  6015  6038 D UiDevice: Retrieving node with selector: BySelector [DESC='\QLyrics\E'].
+10-26 01:16:34.266  6015  6038 D UiObject2: Clicking on (126, 2253).
+10-26 01:16:34.267  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@9e40; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(95, 2222 - 158, 2285); boundsInWindow: Rect(95, 2222 - 158, 2285); packageName: it.xonos.ma; className: android.view.View; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: Lyrics; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:16:34.274  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1336045, downTime=1336045, deviceId=-1, source=0x1002, displayId=0, eventId=-778768783 }
+10-26 01:16:34.287  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1336063, downTime=1336045, deviceId=-1, source=0x1002, displayId=0, eventId=-634518184 }
+10-26 01:16:34.311  6015  6038 W GestureController: Gestures took longer than expected (44ms >> 16ms), device might be in a busy state.
+10-26 01:16:34.421 10202 10223 D EGL_emulation: app_time_stats: avg=1193.64ms min=1193.64ms max=1193.64ms count=1
+10-26 01:16:34.942   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:35.038  1119  1414 D BtGatt.ScanManager: uid 10127 isForeground true scanMode -1
+10-26 01:16:35.038  1119  1414 D BtGatt.ScanManager: uid 10127 isForeground true scanMode -1
+10-26 01:16:35.937   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:36.163   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:38.312  6015  6038 D UiDevice: Pressing back button.
+10-26 01:16:38.327  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onKeyDown():2444 Received KEYCODE_BACK. isAllViewsInvisible=false
+10-26 01:16:38.400 10202 10223 D EGL_emulation: app_time_stats: avg=279.33ms min=41.37ms max=3074.06ms count=14
+10-26 01:16:39.357  6015  6038 W InteractionController: Timed out waiting 1000ms for command and events.
+10-26 01:16:39.357  6015  6038 D UiDevice: Waiting 5000ms for SearchCondition[gone=BySelector [RES='\Qplayer\E']].
+10-26 01:16:39.357  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:39.385  6015  6038 I PerfettoCapture: Stopping perfetto.
+10-26 01:16:39.386  1771  6659 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:39.401 10332 10332 I perfetto:    perfetto_cmd.cc:1265 SIGINT/SIGTERM received: disabling tracing.
+10-26 01:16:39.403   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=161)
+10-26 01:16:39.411  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1341 [CONTEXT service_id=218 ]
+10-26 01:16:39.416  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 17 uptime_millis: 17 exec_start_elapsed_seconds: 1341 [CONTEXT service_id=218 ]
+10-26 01:16:39.434  6015  6038 D Benchmark: kill -TERM command output - Output(stdout=, stderr=)
+10-26 01:16:39.451   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:39.549  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10332)] to die
+10-26 01:16:39.654   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:39.659  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10332)] to die
+10-26 01:16:39.661   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=162)
+10-26 01:16:39.661   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=163)
+10-26 01:16:39.661   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=164)
+10-26 01:16:39.662   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=165)
+10-26 01:16:39.668 10332 10332 I perfetto:    perfetto_cmd.cc:1210 Trace written into the output file
+10-26 01:16:39.669   463   463 I perfetto: ng_service_impl.cc:2553 Tracing session 21 ended, total sessions:0
+10-26 01:16:39.672  6015  6038 I PerfettoCapture: Writing to /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter000_2026-10-26-01-16-39.perfetto-trace.
+10-26 01:16:39.674  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:39.684  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1341 [CONTEXT service_id=218 ]
+10-26 01:16:39.685  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1341 [CONTEXT service_id=218 ]
+10-26 01:16:39.740  6015  6038 D Benchmark: Moving /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter000_2026-10-26-01-16-39.perfetto-trace to /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlayerBenchmark_open_none__iter000_2026-10-26-01-16-39.perfetto-trace
+10-26 01:16:39.744  6015  6038 D Benchmark: Iteration 0 captured UiState{highlight_process=HighlightProcess{cmdline=it.xonos.ma}}
+10-26 01:16:39.798 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /parse [body=4428475B, origin=""]
+10-26 01:16:39.810 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /notify_eof [body=0B, origin=""]
+10-26 01:16:39.821  6015  6026 W System  : A resource failed to call close.
+10-26 01:16:39.822  6015  6026 W System  : A resource failed to call close.
+10-26 01:16:39.918 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /status [body=0B, origin=""]
+10-26 01:16:39.920 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /query [body=1394B, origin=""]
+10-26 01:16:39.933 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /restore_initial_tables [body=0B, origin=""]
+10-26 01:16:39.943   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:39.951  6015  6038 D UiDevice: Turning on screen.
+10-26 01:16:39.952  6015  6038 D UiDevice: Searching for node with selector: BySelector [TEXT='^.*\Qisn't responding\E.*$'].
+10-26 01:16:39.956  6015  6038 D UiDevice: Executing shell command: cmd statusbar collapse
+10-26 01:16:39.963  6015  6038 D Benchmark: Starting activity with command: am start  -W "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10000000;package=it.xonos.ma;component=it.xonos.ma/.phone.MainActivity;end"
+10-26 01:16:39.964  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:39.975  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1341 [CONTEXT service_id=218 ]
+10-26 01:16:39.977  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1341 [CONTEXT service_id=218 ]
+10-26 01:16:39.990   917  2907 D KeyguardService: setOccluded(false)
+10-26 01:16:39.990   917  2907 D KeyguardViewMediator: setOccluded(false)
+10-26 01:16:39.990   917   917 D KeyguardViewMediator: handleSetOccluded(false)
+10-26 01:16:40.021  6015  6038 D Benchmark: Result: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=it.xonos.ma cmp=it.xonos.ma/.phone.MainActivity }
+10-26 01:16:40.021  6015  6038 D Benchmark: Warning: Activity not started, intent has been delivered to currently running top-most instance.
+10-26 01:16:40.021  6015  6038 D Benchmark: Status: ok
+10-26 01:16:40.021  6015  6038 D Benchmark: LaunchState: UNKNOWN (0)
+10-26 01:16:40.021  6015  6038 D Benchmark: Activity: it.xonos.ma/.phone.MainActivity
+10-26 01:16:40.021  6015  6038 D Benchmark: TotalTime: 0
+10-26 01:16:40.021  6015  6038 D Benchmark: WaitTime: 4
+10-26 01:16:40.021  6015  6038 D Benchmark: Complete
+10-26 01:16:40.021  6015  6038 D Benchmark: Unable to safely detect Activity launch, waiting 2s
+10-26 01:16:40.771   363   422 I netd    : tetherGetStats() -> {[]} <0.94ms>
+10-26 01:16:40.773   363   422 I netd    : bandwidthSetGlobalAlert(2097152) <0.15ms>
+10-26 01:16:40.944   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:42.021  6015  6038 D UiDevice: Waiting 30000ms for SearchCondition[hasObject=BySelector [RES='field_home|home']].
+10-26 01:16:42.021  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='field_home|home'].
+10-26 01:16:42.024  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:16:42.028  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:16:42.028  6015  6038 D UiDevice: Retrieving node with selector: BySelector [TEXT='\QHome\E'].
+10-26 01:16:42.031  6015  6038 D UiObject2: Clicking on (172, 2274).
+10-26 01:16:42.031  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@8684; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(127, 2253 - 218, 2295); boundsInWindow: Rect(127, 2253 - 218, 2295); packageName: it.xonos.ma; className: android.widget.TextView; text: Home; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:16:42.053  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1343810, downTime=1343810, deviceId=-1, source=0x1002, displayId=0, eventId=-430925264 }
+10-26 01:16:42.066  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1343839, downTime=1343810, deviceId=-1, source=0x1002, displayId=0, eventId=-492996946 }
+10-26 01:16:42.068 10202 10223 D EGL_emulation: app_time_stats: avg=327.52ms min=17.81ms max=3292.08ms count=11
+10-26 01:16:42.082  6015  6038 W GestureController: Gestures took longer than expected (50ms >> 16ms), device might be in a busy state.
+10-26 01:16:42.082  6015  6038 D UiDevice: Waiting 60000ms for SearchCondition[findObject=BySelector [RES='\Qrow\E']].
+10-26 01:16:42.082  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qrow\E'].
+10-26 01:16:42.106  6015  6038 D UiDevice: Waiting 3000ms for SearchCondition[hasObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:16:42.107  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:16:42.196  6015  6038 D PerfettoCapture: Supported ABIs: x86_64, arm64-v8a
+10-26 01:16:42.196  6015  6038 D PerfettoCapture: Recording perfetto trace
+10-26 01:16:42.203  1771  9679 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:42.242  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:42.262  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 35 uptime_millis: 35 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:42.286  6015  6038 D Benchmark: No processes for name perfetto, skipping kill
+10-26 01:16:42.309  6015  6038 D Benchmark: No processes for name tracebox, skipping kill
+10-26 01:16:42.325  1771  6660 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:42.409  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:42.419  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 34 uptime_millis: 34 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:42.464  6015  6038 I PerfettoCapture: Starting perfetto tracing with cmd: cat /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/trace_config.pb | perfetto --background-wait -c - -o /data/misc/perfetto-traces/trace_output.pb
+10-26 01:16:42.465  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:42.490 10419 10419 W perfetto: type=1400 audit(0.0:230): avc:  denied  { write } for  path="/data/local/tmp/temporaryScript_2547479835.sh_stderr" dev="dm-40" ino=196624 scontext=u:r:perfetto:s0 tcontext=u:object_r:shell_data_file:s0 tclass=file permissive=0
+10-26 01:16:42.505 10420 10420 I perfetto:    perfetto_cmd.cc:1053 Connected to the Perfetto traced service, starting tracing
+10-26 01:16:42.505   463   463 I perfetto: ng_service_impl.cc:1042 Configured tracing session 22, #sources:9, duration:0 ms, #buffers:2, total buffer size:36864 KB, total sessions:1, uid:0 session name: ""
+10-26 01:16:42.516   462   462 I perfetto:  probes_producer.cc:141 Ftrace setup (target_buf=43)
+10-26 01:16:42.518   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:42.538  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:42.551  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 22 uptime_millis: 22 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:43.064   462   462 I perfetto:    ftrace_procfs.cc:442 enabled ftrace in /sys/kernel/tracing/
+10-26 01:16:43.096  6015  6038 I PerfettoCapture: Perfetto output - 10420
+10-26 01:16:43.096  6015  6038 I PerfettoCapture: EXITCODE=0
+10-26 01:16:43.106  6015  6038 I PerfettoCapture: Perfetto tracing started successfully with pid 10420.
+10-26 01:16:43.108  1771  6661 I MediaProvider: Deleted 1 0 0 0 0 0 0 items on external_primary due to it.xonos.ma.baselineprofile
+10-26 01:16:43.108  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:16:43.108  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:16:43.113  6015  6038 D UiObject2: Clicking on (540, 2024).
+10-26 01:16:43.118  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:43.120  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1344 [CONTEXT service_id=218 ]
+10-26 01:16:43.124  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1344891, downTime=1344891, deviceId=-1, source=0x1002, displayId=0, eventId=-105864943 }
+10-26 01:16:43.132  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1344910, downTime=1344891, deviceId=-1, source=0x1002, displayId=0, eventId=-1019304119 }
+10-26 01:16:43.151 10202 10202 W WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+10-26 01:16:43.151 10202 10202 W WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-26 01:16:43.166  6015  6038 W GestureController: Gestures took longer than expected (53ms >> 16ms), device might be in a busy state.
+10-26 01:16:43.167  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qplayer\E']].
+10-26 01:16:43.167  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:43.198 10202 10223 D EGL_emulation: app_time_stats: avg=34.79ms min=17.75ms max=172.01ms count=29
+10-26 01:16:43.244  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:43.344  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:43.630 10072 10077 I AidlLazyServiceRegistrar: Process has 0 (of 1 available) client(s) in use after notification artd has clients: 0
+10-26 01:16:43.630 10072 10077 I AidlLazyServiceRegistrar: Trying to shut down the service. No clients in use for any service in process.
+10-26 01:16:43.633 10072 10077 I AidlLazyServiceRegistrar: Unregistered all clients and exiting
+10-26 01:16:44.720  6015  6038 D UiDevice: Retrieving node with selector: BySelector [DESC='\QLyrics\E'].
+10-26 01:16:44.725  6015  6038 D UiObject2: Clicking on (126, 2253).
+10-26 01:16:44.725  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@a7d1; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(95, 2222 - 158, 2285); boundsInWindow: Rect(95, 2222 - 158, 2285); packageName: it.xonos.ma; className: android.view.View; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: Lyrics; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:16:44.741  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1346503, downTime=1346503, deviceId=-1, source=0x1002, displayId=0, eventId=-104991823 }
+10-26 01:16:44.753  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1346526, downTime=1346503, deviceId=-1, source=0x1002, displayId=0, eventId=-685776571 }
+10-26 01:16:44.769  6015  6038 W GestureController: Gestures took longer than expected (44ms >> 16ms), device might be in a busy state.
+10-26 01:16:44.809 10202 10223 D EGL_emulation: app_time_stats: avg=85.16ms min=25.69ms max=626.61ms count=18
+10-26 01:16:44.958   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:45.958   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:46.162   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:47.961   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:48.769  6015  6038 D UiDevice: Pressing back button.
+10-26 01:16:48.774  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onKeyDown():2444 Received KEYCODE_BACK. isAllViewsInvisible=false
+10-26 01:16:48.842 10202 10223 D EGL_emulation: app_time_stats: avg=247.85ms min=45.95ms max=3047.99ms count=16
+10-26 01:16:49.790  6015  6038 W InteractionController: Timed out waiting 1000ms for command and events.
+10-26 01:16:49.790  6015  6038 D UiDevice: Waiting 5000ms for SearchCondition[gone=BySelector [RES='\Qplayer\E']].
+10-26 01:16:49.790  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:49.795  6015  6038 I PerfettoCapture: Stopping perfetto.
+10-26 01:16:49.796  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:49.807 10420 10420 I perfetto:    perfetto_cmd.cc:1265 SIGINT/SIGTERM received: disabling tracing.
+10-26 01:16:49.808   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=169)
+10-26 01:16:49.816  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1351 [CONTEXT service_id=218 ]
+10-26 01:16:49.817  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 8 uptime_millis: 8 exec_start_elapsed_seconds: 1351 [CONTEXT service_id=218 ]
+10-26 01:16:49.826  6015  6038 D Benchmark: kill -TERM command output - Output(stdout=, stderr=)
+10-26 01:16:49.834   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:49.960  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10420)] to die
+10-26 01:16:50.034   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:50.040   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=170)
+10-26 01:16:50.040   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=171)
+10-26 01:16:50.040   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=172)
+10-26 01:16:50.040   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=173)
+10-26 01:16:50.045 10420 10420 I perfetto:    perfetto_cmd.cc:1210 Trace written into the output file
+10-26 01:16:50.045   463   463 I perfetto: ng_service_impl.cc:2553 Tracing session 22 ended, total sessions:0
+10-26 01:16:50.071  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10420)] to die
+10-26 01:16:50.081  6015  6038 I PerfettoCapture: Writing to /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter001_2026-10-26-01-16-49.perfetto-trace.
+10-26 01:16:50.082  1771  6661 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:50.092  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1351 [CONTEXT service_id=218 ]
+10-26 01:16:50.093  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1351 [CONTEXT service_id=218 ]
+10-26 01:16:50.157  6015  6038 D Benchmark: Moving /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter001_2026-10-26-01-16-49.perfetto-trace to /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlayerBenchmark_open_none__iter001_2026-10-26-01-16-49.perfetto-trace
+10-26 01:16:50.160  6015  6038 D Benchmark: Iteration 1 captured UiState{highlight_process=HighlightProcess{cmdline=it.xonos.ma}}
+10-26 01:16:50.218 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /parse [body=4320310B, origin=""]
+10-26 01:16:50.309 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /notify_eof [body=0B, origin=""]
+10-26 01:16:50.407 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /status [body=0B, origin=""]
+10-26 01:16:50.409 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /query [body=1394B, origin=""]
+10-26 01:16:50.424 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /restore_initial_tables [body=0B, origin=""]
+10-26 01:16:50.436  6015  6038 D UiDevice: Turning on screen.
+10-26 01:16:50.437  6015  6038 D UiDevice: Searching for node with selector: BySelector [TEXT='^.*\Qisn't responding\E.*$'].
+10-26 01:16:50.442  6015  6038 D UiDevice: Executing shell command: cmd statusbar collapse
+10-26 01:16:50.449  6015  6038 D Benchmark: Starting activity with command: am start  -W "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10000000;package=it.xonos.ma;component=it.xonos.ma/.phone.MainActivity;end"
+10-26 01:16:50.450  1771  9467 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:50.465  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1352 [CONTEXT service_id=218 ]
+10-26 01:16:50.466  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1352 [CONTEXT service_id=218 ]
+10-26 01:16:50.471   917  2907 D KeyguardService: setOccluded(false)
+10-26 01:16:50.471   917  2907 D KeyguardViewMediator: setOccluded(false)
+10-26 01:16:50.471   917   917 D KeyguardViewMediator: handleSetOccluded(false)
+10-26 01:16:50.486  6015  6038 D Benchmark: Result: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=it.xonos.ma cmp=it.xonos.ma/.phone.MainActivity }
+10-26 01:16:50.486  6015  6038 D Benchmark: Warning: Activity not started, intent has been delivered to currently running top-most instance.
+10-26 01:16:50.486  6015  6038 D Benchmark: Status: ok
+10-26 01:16:50.486  6015  6038 D Benchmark: LaunchState: UNKNOWN (0)
+10-26 01:16:50.486  6015  6038 D Benchmark: Activity: it.xonos.ma/.phone.MainActivity
+10-26 01:16:50.486  6015  6038 D Benchmark: TotalTime: 0
+10-26 01:16:50.486  6015  6038 D Benchmark: WaitTime: 2
+10-26 01:16:50.486  6015  6038 D Benchmark: Complete
+10-26 01:16:50.486  6015  6038 D Benchmark: Unable to safely detect Activity launch, waiting 2s
+10-26 01:16:50.967   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:51.190   363   422 I netd    : tetherGetStats() -> {[]} <0.34ms>
+10-26 01:16:51.191   363   422 I netd    : bandwidthSetGlobalAlert(2097152) <0.09ms>
+10-26 01:16:51.193   363   422 I netd    : bandwidthRemoveInterfaceQuota(eth0) <0.47ms>
+10-26 01:16:51.193   363   422 I netd    : bandwidthSetInterfaceQuota(eth0, 9223372036854775807) <0.48ms>
+10-26 01:16:52.486  6015  6038 D UiDevice: Waiting 30000ms for SearchCondition[hasObject=BySelector [RES='field_home|home']].
+10-26 01:16:52.486  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='field_home|home'].
+10-26 01:16:52.489  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:16:52.493  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:16:52.493  6015  6038 D UiDevice: Retrieving node with selector: BySelector [TEXT='\QHome\E'].
+10-26 01:16:52.496  6015  6038 D UiObject2: Clicking on (172, 2274).
+10-26 01:16:52.496  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@8684; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(127, 2253 - 218, 2295); boundsInWindow: Rect(127, 2253 - 218, 2295); packageName: it.xonos.ma; className: android.widget.TextView; text: Home; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:16:52.507  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1354275, downTime=1354275, deviceId=-1, source=0x1002, displayId=0, eventId=-411089541 }
+10-26 01:16:52.518  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1354294, downTime=1354275, deviceId=-1, source=0x1002, displayId=0, eventId=-724318894 }
+10-26 01:16:52.531  6015  6038 W GestureController: Gestures took longer than expected (34ms >> 16ms), device might be in a busy state.
+10-26 01:16:52.532  6015  6038 D UiDevice: Waiting 60000ms for SearchCondition[findObject=BySelector [RES='\Qrow\E']].
+10-26 01:16:52.532  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qrow\E'].
+10-26 01:16:52.542 10202 10223 D EGL_emulation: app_time_stats: avg=330.64ms min=19.01ms max=3317.60ms count=11
+10-26 01:16:52.549  6015  6038 D UiDevice: Waiting 3000ms for SearchCondition[hasObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:16:52.549  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:16:52.559  6015  6038 D PerfettoCapture: Supported ABIs: x86_64, arm64-v8a
+10-26 01:16:52.559  6015  6038 D PerfettoCapture: Recording perfetto trace
+10-26 01:16:52.562  1771  9778 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:52.599  6015  6038 D Benchmark: No processes for name perfetto, skipping kill
+10-26 01:16:52.613  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1354 [CONTEXT service_id=218 ]
+10-26 01:16:52.624  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 21 uptime_millis: 21 exec_start_elapsed_seconds: 1354 [CONTEXT service_id=218 ]
+10-26 01:16:52.624  6015  6038 D Benchmark: No processes for name tracebox, skipping kill
+10-26 01:16:52.640  1771  9679 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:52.729  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1354 [CONTEXT service_id=218 ]
+10-26 01:16:52.740  6015  6038 I PerfettoCapture: Starting perfetto tracing with cmd: cat /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/trace_config.pb | perfetto --background-wait -c - -o /data/misc/perfetto-traces/trace_output.pb
+10-26 01:16:52.741  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 45 uptime_millis: 45 exec_start_elapsed_seconds: 1354 [CONTEXT service_id=218 ]
+10-26 01:16:52.743  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:16:52.778 10503 10503 W perfetto: type=1400 audit(0.0:231): avc:  denied  { write } for  path="/data/local/tmp/temporaryScript_4061425947.sh_stderr" dev="dm-40" ino=196624 scontext=u:r:perfetto:s0 tcontext=u:object_r:shell_data_file:s0 tclass=file permissive=0
+10-26 01:16:52.791 10504 10504 I perfetto:    perfetto_cmd.cc:1053 Connected to the Perfetto traced service, starting tracing
+10-26 01:16:52.791   463   463 I perfetto: ng_service_impl.cc:1042 Configured tracing session 23, #sources:9, duration:0 ms, #buffers:2, total buffer size:36864 KB, total sessions:1, uid:0 session name: ""
+10-26 01:16:52.791   462   462 I perfetto:  probes_producer.cc:141 Ftrace setup (target_buf=45)
+10-26 01:16:52.792   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:16:53.488   462   462 I perfetto:    ftrace_procfs.cc:442 enabled ftrace in /sys/kernel/tracing/
+10-26 01:16:53.528  6015  6038 I PerfettoCapture: Perfetto output - 10504
+10-26 01:16:53.528  6015  6038 I PerfettoCapture: EXITCODE=0
+10-26 01:16:53.539  6015  6038 I PerfettoCapture: Perfetto tracing started successfully with pid 10504.
+10-26 01:16:53.541  1771  9777 I MediaProvider: Deleted 1 0 0 0 0 0 0 items on external_primary due to it.xonos.ma.baselineprofile
+10-26 01:16:53.542  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:16:53.542  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:16:53.546  6015  6038 D UiObject2: Clicking on (540, 2024).
+10-26 01:16:53.552  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1355 [CONTEXT service_id=218 ]
+10-26 01:16:53.553  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1355 [CONTEXT service_id=218 ]
+10-26 01:16:53.566  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1355325, downTime=1355325, deviceId=-1, source=0x1002, displayId=0, eventId=-725739832 }
+10-26 01:16:53.574  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1355351, downTime=1355325, deviceId=-1, source=0x1002, displayId=0, eventId=-300585216 }
+10-26 01:16:53.593 10202 10223 D EGL_emulation: app_time_stats: avg=30.59ms min=15.41ms max=111.05ms count=28
+10-26 01:16:53.610  6015  6038 W GestureController: Gestures took longer than expected (63ms >> 16ms), device might be in a busy state.
+10-26 01:16:53.612  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qplayer\E']].
+10-26 01:16:53.612  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:53.616 10202 10202 W WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+10-26 01:16:53.616 10202 10202 W WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-26 01:16:53.726  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:53.832  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:53.958  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:54.062  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:54.211  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:54.312  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:16:54.624 10202 10223 D EGL_emulation: app_time_stats: avg=60.51ms min=19.11ms max=102.90ms count=16
+10-26 01:16:54.654  5167 10515 I GmscoreIpa: Starting mediastore instant index [CONTEXT service_id=255 ]
+10-26 01:16:54.983   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:55.393  6015  6038 D UiDevice: Retrieving node with selector: BySelector [DESC='\QLyrics\E'].
+10-26 01:16:55.406  6015  6038 D UiObject2: Clicking on (126, 2253).
+10-26 01:16:55.407  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@b124; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(95, 2222 - 158, 2285); boundsInWindow: Rect(95, 2222 - 158, 2285); packageName: it.xonos.ma; className: android.view.View; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: Lyrics; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:16:55.433  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1357185, downTime=1357185, deviceId=-1, source=0x1002, displayId=0, eventId=-202350207 }
+10-26 01:16:55.454  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1357222, downTime=1357185, deviceId=-1, source=0x1002, displayId=0, eventId=-586438408 }
+10-26 01:16:55.467  6015  6038 W GestureController: Gestures took longer than expected (60ms >> 16ms), device might be in a busy state.
+10-26 01:16:55.660 10202 10223 D EGL_emulation: app_time_stats: avg=340.57ms min=72.64ms max=873.15ms count=3
+10-26 01:16:55.992   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:56.165   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:16:59.468  6015  6038 D UiDevice: Pressing back button.
+10-26 01:16:59.474  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onKeyDown():2444 Received KEYCODE_BACK. isAllViewsInvisible=false
+10-26 01:16:59.532 10202 10223 D EGL_emulation: app_time_stats: avg=251.40ms min=33.85ms max=3080.01ms count=15
+10-26 01:16:59.991   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:00.010  1770  1902 I AiAiEcho: Predicting[0]:
+10-26 01:17:00.010  1770  1902 I AiAiEcho: EchoTargets:
+10-26 01:17:00.010  1770  1902 I AiAiEcho: Filtered by AiAi flag check:
+10-26 01:17:00.010  1770  1902 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:
+10-26 01:17:00.012  1770  1902 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface lockscreen with targets# 0 (types=[])
+10-26 01:17:00.025   917   917 W PageIndicator: Total number of pages invalid: 0. Assuming 1 page.
+10-26 01:17:00.026  6015  6038 D UiDevice: Waiting 5000ms for SearchCondition[gone=BySelector [RES='\Qplayer\E']].
+10-26 01:17:00.026  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:00.027   917  1002 D EGL_emulation: app_time_stats: avg=7455.80ms min=127.59ms max=29375.90ms count=4
+10-26 01:17:00.341  5075  5075 W DiscoveryManager: BroadcastReceiver not registered
+10-26 01:17:00.341  5075 10066 I DiscoveryManager: Filter criteria(null) scannerFlags(0)
+10-26 01:17:00.341  5075 10066 W DatabaseProcessor: processLocalDevices: failed to get the network info with non-null networkId.
+10-26 01:17:00.341  5075  5075 I CastMediaRouteProvider: Published 0 routes
+10-26 01:17:00.711  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:00.715  6015  6038 I PerfettoCapture: Stopping perfetto.
+10-26 01:17:00.717  1771  9466 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:00.727 10504 10504 I perfetto:    perfetto_cmd.cc:1265 SIGINT/SIGTERM received: disabling tracing.
+10-26 01:17:00.728   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=177)
+10-26 01:17:00.733  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1362 [CONTEXT service_id=218 ]
+10-26 01:17:00.743  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 6 uptime_millis: 6 exec_start_elapsed_seconds: 1362 [CONTEXT service_id=218 ]
+10-26 01:17:00.744  6015  6038 D Benchmark: kill -TERM command output - Output(stdout=, stderr=)
+10-26 01:17:00.767   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:00.860  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10504)] to die
+10-26 01:17:00.970  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10504)] to die
+10-26 01:17:00.986   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:00.992   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:00.992   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=178)
+10-26 01:17:00.993   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=179)
+10-26 01:17:00.993   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=180)
+10-26 01:17:00.993   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=181)
+10-26 01:17:00.997 10504 10504 I perfetto:    perfetto_cmd.cc:1210 Trace written into the output file
+10-26 01:17:00.998   463   463 I perfetto: ng_service_impl.cc:2553 Tracing session 23 ended, total sessions:0
+10-26 01:17:01.081  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10504)] to die
+10-26 01:17:01.091  6015  6038 I PerfettoCapture: Writing to /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter002_2026-10-26-01-17-00.perfetto-trace.
+10-26 01:17:01.093  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:01.103  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1362 [CONTEXT service_id=218 ]
+10-26 01:17:01.105  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1362 [CONTEXT service_id=218 ]
+10-26 01:17:01.169  6015  6038 D Benchmark: Moving /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter002_2026-10-26-01-17-00.perfetto-trace to /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlayerBenchmark_open_none__iter002_2026-10-26-01-17-00.perfetto-trace
+10-26 01:17:01.172  6015  6038 D Benchmark: Iteration 2 captured UiState{highlight_process=HighlightProcess{cmdline=it.xonos.ma}}
+10-26 01:17:01.230 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /parse [body=4347315B, origin=""]
+10-26 01:17:01.306 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /notify_eof [body=0B, origin=""]
+10-26 01:17:01.314  6015  6026 W System  : A resource failed to call close.
+10-26 01:17:01.315  6015  6026 W System  : A resource failed to call close.
+10-26 01:17:01.399 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /status [body=0B, origin=""]
+10-26 01:17:01.401 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /query [body=1394B, origin=""]
+10-26 01:17:01.408 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /restore_initial_tables [body=0B, origin=""]
+10-26 01:17:01.420  6015  6038 D UiDevice: Turning on screen.
+10-26 01:17:01.421  6015  6038 D UiDevice: Searching for node with selector: BySelector [TEXT='^.*\Qisn't responding\E.*$'].
+10-26 01:17:01.425  6015  6038 D UiDevice: Executing shell command: cmd statusbar collapse
+10-26 01:17:01.431  6015  6038 D Benchmark: Starting activity with command: am start  -W "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10000000;package=it.xonos.ma;component=it.xonos.ma/.phone.MainActivity;end"
+10-26 01:17:01.433  1771  9777 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:01.444  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1363 [CONTEXT service_id=218 ]
+10-26 01:17:01.445  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1363 [CONTEXT service_id=218 ]
+10-26 01:17:01.453   917  2907 D KeyguardService: setOccluded(false)
+10-26 01:17:01.453   917  2907 D KeyguardViewMediator: setOccluded(false)
+10-26 01:17:01.453   917   917 D KeyguardViewMediator: handleSetOccluded(false)
+10-26 01:17:01.484  6015  6038 D Benchmark: Result: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=it.xonos.ma cmp=it.xonos.ma/.phone.MainActivity }
+10-26 01:17:01.484  6015  6038 D Benchmark: Warning: Activity not started, intent has been delivered to currently running top-most instance.
+10-26 01:17:01.484  6015  6038 D Benchmark: Status: ok
+10-26 01:17:01.484  6015  6038 D Benchmark: LaunchState: UNKNOWN (0)
+10-26 01:17:01.484  6015  6038 D Benchmark: Activity: it.xonos.ma/.phone.MainActivity
+10-26 01:17:01.484  6015  6038 D Benchmark: TotalTime: 0
+10-26 01:17:01.484  6015  6038 D Benchmark: WaitTime: 1
+10-26 01:17:01.484  6015  6038 D Benchmark: Complete
+10-26 01:17:01.484  6015  6038 D Benchmark: Unable to safely detect Activity launch, waiting 2s
+10-26 01:17:02.202   363   422 I netd    : tetherGetStats() -> {[]} <0.33ms>
+10-26 01:17:02.204   363   422 I netd    : bandwidthSetGlobalAlert(2097152) <0.08ms>
+10-26 01:17:03.485  6015  6038 D UiDevice: Waiting 30000ms for SearchCondition[hasObject=BySelector [RES='field_home|home']].
+10-26 01:17:03.485  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='field_home|home'].
+10-26 01:17:03.488  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:17:03.491  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:17:03.491  6015  6038 D UiDevice: Retrieving node with selector: BySelector [TEXT='\QHome\E'].
+10-26 01:17:03.495  6015  6038 D UiObject2: Clicking on (172, 2274).
+10-26 01:17:03.495  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@8684; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(127, 2253 - 218, 2295); boundsInWindow: Rect(127, 2253 - 218, 2295); packageName: it.xonos.ma; className: android.widget.TextView; text: Home; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:17:03.507  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1365274, downTime=1365274, deviceId=-1, source=0x1002, displayId=0, eventId=-351186265 }
+10-26 01:17:03.518  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1365293, downTime=1365274, deviceId=-1, source=0x1002, displayId=0, eventId=-963956322 }
+10-26 01:17:03.532  6015  6038 W GestureController: Gestures took longer than expected (36ms >> 16ms), device might be in a busy state.
+10-26 01:17:03.533  6015  6038 D UiDevice: Waiting 60000ms for SearchCondition[findObject=BySelector [RES='\Qrow\E']].
+10-26 01:17:03.533  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qrow\E'].
+10-26 01:17:03.547 10202 10223 D EGL_emulation: app_time_stats: avg=359.73ms min=18.72ms max=3622.95ms count=11
+10-26 01:17:03.550  6015  6038 D UiDevice: Waiting 3000ms for SearchCondition[hasObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:17:03.550  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:17:03.559  6015  6038 D PerfettoCapture: Supported ABIs: x86_64, arm64-v8a
+10-26 01:17:03.559  6015  6038 D PerfettoCapture: Recording perfetto trace
+10-26 01:17:03.573  1771  9679 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:03.638  6015  6038 D Benchmark: No processes for name perfetto, skipping kill
+10-26 01:17:03.658  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1365 [CONTEXT service_id=218 ]
+10-26 01:17:03.662  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 23 uptime_millis: 23 exec_start_elapsed_seconds: 1365 [CONTEXT service_id=218 ]
+10-26 01:17:03.706  6015  6038 D Benchmark: No processes for name tracebox, skipping kill
+10-26 01:17:03.711  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:03.807  6015  6038 I PerfettoCapture: Starting perfetto tracing with cmd: cat /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/trace_config.pb | perfetto --background-wait -c - -o /data/misc/perfetto-traces/trace_output.pb
+10-26 01:17:03.808  1771  9679 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:03.822 10592 10592 W perfetto: type=1400 audit(0.0:232): avc:  denied  { write } for  path="/data/local/tmp/temporaryScript_3234631190.sh_stderr" dev="dm-40" ino=196624 scontext=u:r:perfetto:s0 tcontext=u:object_r:shell_data_file:s0 tclass=file permissive=0
+10-26 01:17:03.842 10593 10593 I perfetto:    perfetto_cmd.cc:1053 Connected to the Perfetto traced service, starting tracing
+10-26 01:17:03.843   463   463 I perfetto: ng_service_impl.cc:1042 Configured tracing session 24, #sources:9, duration:0 ms, #buffers:2, total buffer size:36864 KB, total sessions:1, uid:0 session name: ""
+10-26 01:17:03.843   462   462 I perfetto:  probes_producer.cc:141 Ftrace setup (target_buf=47)
+10-26 01:17:03.845   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:03.916  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1365 [CONTEXT service_id=218 ]
+10-26 01:17:03.929  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 21 uptime_millis: 21 exec_start_elapsed_seconds: 1365 [CONTEXT service_id=218 ]
+10-26 01:17:04.484   462   462 I perfetto:    ftrace_procfs.cc:442 enabled ftrace in /sys/kernel/tracing/
+10-26 01:17:04.520  6015  6038 I PerfettoCapture: Perfetto output - 10593
+10-26 01:17:04.520  6015  6038 I PerfettoCapture: EXITCODE=0
+10-26 01:17:04.530  6015  6038 I PerfettoCapture: Perfetto tracing started successfully with pid 10593.
+10-26 01:17:04.532  1771  9778 I MediaProvider: Deleted 1 0 0 0 0 0 0 items on external_primary due to it.xonos.ma.baselineprofile
+10-26 01:17:04.532  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:17:04.533  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:17:04.537  6015  6038 D UiObject2: Clicking on (540, 2024).
+10-26 01:17:04.545  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1366315, downTime=1366315, deviceId=-1, source=0x1002, displayId=0, eventId=-308526107 }
+10-26 01:17:04.551  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1366326, downTime=1366315, deviceId=-1, source=0x1002, displayId=0, eventId=-128582032 }
+10-26 01:17:04.556  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1366 [CONTEXT service_id=218 ]
+10-26 01:17:04.559  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 18 uptime_millis: 18 exec_start_elapsed_seconds: 1366 [CONTEXT service_id=218 ]
+10-26 01:17:04.570 10202 10202 W WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+10-26 01:17:04.570 10202 10202 W WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-26 01:17:04.578  6015  6038 W GestureController: Gestures took longer than expected (41ms >> 16ms), device might be in a busy state.
+10-26 01:17:04.579  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qplayer\E']].
+10-26 01:17:04.579  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:04.610 10202 10223 D EGL_emulation: app_time_stats: avg=34.10ms min=14.03ms max=157.22ms count=27
+10-26 01:17:04.647  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:04.748  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:05.005   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:06.006   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:06.162   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:06.275  6015  6038 D UiDevice: Retrieving node with selector: BySelector [DESC='\QLyrics\E'].
+10-26 01:17:06.280  6015  6038 D UiObject2: Clicking on (126, 2253).
+10-26 01:17:06.280  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@ba77; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(95, 2222 - 158, 2285); boundsInWindow: Rect(95, 2222 - 158, 2285); packageName: it.xonos.ma; className: android.view.View; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: Lyrics; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:17:06.293  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1368058, downTime=1368058, deviceId=-1, source=0x1002, displayId=0, eventId=-691967612 }
+10-26 01:17:06.305  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1368080, downTime=1368058, deviceId=-1, source=0x1002, displayId=0, eventId=-541061853 }
+10-26 01:17:06.316  6015  6038 W GestureController: Gestures took longer than expected (36ms >> 16ms), device might be in a busy state.
+10-26 01:17:06.359 10202 10223 D EGL_emulation: app_time_stats: avg=94.27ms min=25.88ms max=749.61ms count=18
+10-26 01:17:08.009   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:10.316  6015  6038 D UiDevice: Pressing back button.
+10-26 01:17:10.324  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onKeyDown():2444 Received KEYCODE_BACK. isAllViewsInvisible=false
+10-26 01:17:10.389 10202 10223 D EGL_emulation: app_time_stats: avg=247.77ms min=39.56ms max=3056.67ms count=16
+10-26 01:17:11.015   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:11.340  6015  6038 W InteractionController: Timed out waiting 1000ms for command and events.
+10-26 01:17:11.340  6015  6038 D UiDevice: Waiting 5000ms for SearchCondition[gone=BySelector [RES='\Qplayer\E']].
+10-26 01:17:11.340  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:11.444  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:11.448  6015  6038 I PerfettoCapture: Stopping perfetto.
+10-26 01:17:11.450  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:11.461  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1373 [CONTEXT service_id=218 ]
+10-26 01:17:11.462  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1373 [CONTEXT service_id=218 ]
+10-26 01:17:11.463 10593 10593 I perfetto:    perfetto_cmd.cc:1265 SIGINT/SIGTERM received: disabling tracing.
+10-26 01:17:11.464   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=185)
+10-26 01:17:11.488   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:11.499  6015  6038 D Benchmark: kill -TERM command output - Output(stdout=, stderr=)
+10-26 01:17:11.610  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10593)] to die
+10-26 01:17:11.698   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:11.704   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=186)
+10-26 01:17:11.704   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=187)
+10-26 01:17:11.704   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=188)
+10-26 01:17:11.705   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=189)
+10-26 01:17:11.709 10593 10593 I perfetto:    perfetto_cmd.cc:1210 Trace written into the output file
+10-26 01:17:11.709   463   463 I perfetto: ng_service_impl.cc:2553 Tracing session 24 ended, total sessions:0
+10-26 01:17:11.720  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10593)] to die
+10-26 01:17:11.730  6015  6038 I PerfettoCapture: Writing to /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter003_2026-10-26-01-17-11.perfetto-trace.
+10-26 01:17:11.732  1771  9467 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:11.744  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1373 [CONTEXT service_id=218 ]
+10-26 01:17:11.746  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1373 [CONTEXT service_id=218 ]
+10-26 01:17:11.790  6015  6038 D Benchmark: Moving /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter003_2026-10-26-01-17-11.perfetto-trace to /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlayerBenchmark_open_none__iter003_2026-10-26-01-17-11.perfetto-trace
+10-26 01:17:11.794  6015  6038 D Benchmark: Iteration 3 captured UiState{highlight_process=HighlightProcess{cmdline=it.xonos.ma}}
+10-26 01:17:11.805 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /parse [body=4285850B, origin=""]
+10-26 01:17:11.880 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /notify_eof [body=0B, origin=""]
+10-26 01:17:11.970 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /status [body=0B, origin=""]
+10-26 01:17:11.972 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /query [body=1394B, origin=""]
+10-26 01:17:11.987 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /restore_initial_tables [body=0B, origin=""]
+10-26 01:17:11.999  6015  6038 D UiDevice: Turning on screen.
+10-26 01:17:11.999  6015  6038 D UiDevice: Searching for node with selector: BySelector [TEXT='^.*\Qisn't responding\E.*$'].
+10-26 01:17:12.004  6015  6038 D UiDevice: Executing shell command: cmd statusbar collapse
+10-26 01:17:12.011  6015  6038 D Benchmark: Starting activity with command: am start  -W "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;launchFlags=0x10000000;package=it.xonos.ma;component=it.xonos.ma/.phone.MainActivity;end"
+10-26 01:17:12.012  1771  9466 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:12.022  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1373 [CONTEXT service_id=218 ]
+10-26 01:17:12.023  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1373 [CONTEXT service_id=218 ]
+10-26 01:17:12.032   917  1916 D KeyguardService: setOccluded(false)
+10-26 01:17:12.032   917  1916 D KeyguardViewMediator: setOccluded(false)
+10-26 01:17:12.032   917   917 D KeyguardViewMediator: handleSetOccluded(false)
+10-26 01:17:12.076  6015  6038 D Benchmark: Result: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] flg=0x10000000 pkg=it.xonos.ma cmp=it.xonos.ma/.phone.MainActivity }
+10-26 01:17:12.076  6015  6038 D Benchmark: Warning: Activity not started, intent has been delivered to currently running top-most instance.
+10-26 01:17:12.076  6015  6038 D Benchmark: Status: ok
+10-26 01:17:12.076  6015  6038 D Benchmark: LaunchState: UNKNOWN (0)
+10-26 01:17:12.076  6015  6038 D Benchmark: Activity: it.xonos.ma/.phone.MainActivity
+10-26 01:17:12.076  6015  6038 D Benchmark: TotalTime: 0
+10-26 01:17:12.076  6015  6038 D Benchmark: WaitTime: 1
+10-26 01:17:12.076  6015  6038 D Benchmark: Complete
+10-26 01:17:12.076  6015  6038 D Benchmark: Unable to safely detect Activity launch, waiting 2s
+10-26 01:17:12.819   363   422 I netd    : tetherGetStats() -> {[]} <0.39ms>
+10-26 01:17:12.820   363   422 I netd    : bandwidthSetGlobalAlert(2097152) <0.07ms>
+10-26 01:17:12.820   363   422 I netd    : bandwidthRemoveInterfaceQuota(eth0) <0.29ms>
+10-26 01:17:12.821   363   422 I netd    : bandwidthSetInterfaceQuota(eth0, 9223372036854775807) <0.33ms>
+10-26 01:17:13.544   553   837 E WifiStaIfaceAidlImpl: installApfPacketFilter failed with service-specific exception: android.os.ServiceSpecificException:  (code 4)
+10-26 01:17:14.076  6015  6038 D UiDevice: Waiting 30000ms for SearchCondition[hasObject=BySelector [RES='field_home|home']].
+10-26 01:17:14.077  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='field_home|home'].
+10-26 01:17:14.081  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:17:14.085  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qfield_home\E'].
+10-26 01:17:14.085  6015  6038 D UiDevice: Retrieving node with selector: BySelector [TEXT='\QHome\E'].
+10-26 01:17:14.088  6015  6038 D UiObject2: Clicking on (172, 2274).
+10-26 01:17:14.089  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@8684; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(127, 2253 - 218, 2295); boundsInWindow: Rect(127, 2253 - 218, 2295); packageName: it.xonos.ma; className: android.widget.TextView; text: Home; error: null; maxTextLength: -1; stateDescription: null; contentDescription: null; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:17:14.107  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1375867, downTime=1375867, deviceId=-1, source=0x1002, displayId=0, eventId=-627316646 }
+10-26 01:17:14.122  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=172.0, y[0]=2274.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1375896, downTime=1375867, deviceId=-1, source=0x1002, displayId=0, eventId=-998893406 }
+10-26 01:17:14.134  6015  6038 W GestureController: Gestures took longer than expected (45ms >> 16ms), device might be in a busy state.
+10-26 01:17:14.135  6015  6038 D UiDevice: Waiting 60000ms for SearchCondition[findObject=BySelector [RES='\Qrow\E']].
+10-26 01:17:14.135  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qrow\E'].
+10-26 01:17:14.153 10202 10223 D EGL_emulation: app_time_stats: avg=336.95ms min=21.40ms max=3369.45ms count=11
+10-26 01:17:14.163  6015  6038 D UiDevice: Waiting 3000ms for SearchCondition[hasObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:17:14.163  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:17:14.258  6015  6038 D PerfettoCapture: Supported ABIs: x86_64, arm64-v8a
+10-26 01:17:14.258  6015  6038 D PerfettoCapture: Recording perfetto trace
+10-26 01:17:14.268  1771  8685 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:14.303  6015  6038 D Benchmark: No processes for name perfetto, skipping kill
+10-26 01:17:14.351  6015  6038 D Benchmark: No processes for name tracebox, skipping kill
+10-26 01:17:14.357  1771  6660 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:14.360  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1376 [CONTEXT service_id=218 ]
+10-26 01:17:14.378  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 39 uptime_millis: 39 exec_start_elapsed_seconds: 1376 [CONTEXT service_id=218 ]
+10-26 01:17:14.441  6015  6038 I PerfettoCapture: Starting perfetto tracing with cmd: cat /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/trace_config.pb | perfetto --background-wait -c - -o /data/misc/perfetto-traces/trace_output.pb
+10-26 01:17:14.447  1771  9777 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:14.502 10677 10677 W perfetto: type=1400 audit(0.0:233): avc:  denied  { write } for  path="/data/local/tmp/temporaryScript_1650988051.sh_stderr" dev="dm-40" ino=196624 scontext=u:r:perfetto:s0 tcontext=u:object_r:shell_data_file:s0 tclass=file permissive=0
+10-26 01:17:14.536 10678 10678 I perfetto:    perfetto_cmd.cc:1053 Connected to the Perfetto traced service, starting tracing
+10-26 01:17:14.537   463   463 I perfetto: ng_service_impl.cc:1042 Configured tracing session 25, #sources:9, duration:0 ms, #buffers:2, total buffer size:36864 KB, total sessions:1, uid:0 session name: ""
+10-26 01:17:14.537   462   462 I perfetto:  probes_producer.cc:141 Ftrace setup (target_buf=49)
+10-26 01:17:14.538   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:14.544  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1376 [CONTEXT service_id=218 ]
+10-26 01:17:14.552  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 23 uptime_millis: 23 exec_start_elapsed_seconds: 1376 [CONTEXT service_id=218 ]
+10-26 01:17:15.045   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:15.120   462   462 I perfetto:    ftrace_procfs.cc:442 enabled ftrace in /sys/kernel/tracing/
+10-26 01:17:15.152  6015  6038 I PerfettoCapture: Perfetto output - 10678
+10-26 01:17:15.152  6015  6038 I PerfettoCapture: EXITCODE=0
+10-26 01:17:15.162  6015  6038 I PerfettoCapture: Perfetto tracing started successfully with pid 10678.
+10-26 01:17:15.164  1771  9777 I MediaProvider: Deleted 1 0 0 0 0 0 0 items on external_primary due to it.xonos.ma.baselineprofile
+10-26 01:17:15.165  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qmini_player\E']].
+10-26 01:17:15.165  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qmini_player\E'].
+10-26 01:17:15.169  6015  6038 D UiObject2: Clicking on (540, 2024).
+10-26 01:17:15.179  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1376 [CONTEXT service_id=218 ]
+10-26 01:17:15.181  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1376947, downTime=1376947, deviceId=-1, source=0x1002, displayId=0, eventId=-942700557 }
+10-26 01:17:15.182  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 11 uptime_millis: 11 exec_start_elapsed_seconds: 1376 [CONTEXT service_id=218 ]
+10-26 01:17:15.194  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=540.0, y[0]=2024.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1376969, downTime=1376947, deviceId=-1, source=0x1002, displayId=0, eventId=-593736465 }
+10-26 01:17:15.206 10202 10223 D EGL_emulation: app_time_stats: avg=33.11ms min=19.16ms max=116.16ms count=28
+10-26 01:17:15.226  6015  6038 W GestureController: Gestures took longer than expected (57ms >> 16ms), device might be in a busy state.
+10-26 01:17:15.230  6015  6038 D UiDevice: Waiting 20000ms for SearchCondition[findObject=BySelector [RES='\Qplayer\E']].
+10-26 01:17:15.231  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:15.233 10202 10202 W WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+10-26 01:17:15.233 10202 10202 W WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-26 01:17:15.323  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:15.424  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:15.552  6015  6038 D UiDevice: Node not found with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:15.655  6015  6038 D UiDevice: Retrieving node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:16.046   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:16.167   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:16.252 10202 10223 D EGL_emulation: app_time_stats: avg=62.50ms min=25.56ms max=83.96ms count=16
+10-26 01:17:17.025  6015  6038 D UiDevice: Retrieving node with selector: BySelector [DESC='\QLyrics\E'].
+10-26 01:17:17.030  6015  6038 D UiObject2: Clicking on (126, 2253).
+10-26 01:17:17.030  6015  6038 W UiObject2: Clicking on non-clickable object: android.view.accessibility.AccessibilityNodeInfo@c3ca; boundsInParent: Rect(0, 0 - 0, 0); boundsInScreen: Rect(95, 2222 - 158, 2285); boundsInWindow: Rect(95, 2222 - 158, 2285); packageName: it.xonos.ma; className: android.view.View; text: null; error: null; maxTextLength: -1; stateDescription: null; contentDescription: Lyrics; tooltipText: null; containerTitle: null; viewIdResName: null; uniqueId: null; checkable: false; checked: false; focusable: false; focused: false; selected: false; clickable: false; longClickable: false; contextClickable: false; enabled: true; password: false; scrollable: false; importantForAccessibility: true; visible: true; actions: [AccessibilityAction: ACTION_NEXT_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY - null, AccessibilityAction: ACTION_ACCESSIBILITY_FOCUS - null, AccessibilityAction: ACTION_SET_SELECTION - null]; isTextSelectable: false
+10-26 01:17:17.040  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_DOWN, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1378809, downTime=1378809, deviceId=-1, source=0x1002, displayId=0, eventId=-523849820 }
+10-26 01:17:17.054  1197  1197 D TaplEvents: TIS / TouchInteractionService.onInputEvent: MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=126.0, y[0]=2253.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=1378828, downTime=1378809, deviceId=-1, source=0x1002, displayId=0, eventId=-94179483 }
+10-26 01:17:17.068  6015  6038 W GestureController: Gestures took longer than expected (37ms >> 16ms), device might be in a busy state.
+10-26 01:17:17.259 10202 10223 D EGL_emulation: app_time_stats: avg=250.03ms min=52.52ms max=778.82ms count=4
+10-26 01:17:20.038   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:21.039   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:21.069  6015  6038 D UiDevice: Pressing back button.
+10-26 01:17:21.074  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onKeyDown():2444 Received KEYCODE_BACK. isAllViewsInvisible=false
+10-26 01:17:21.132 10202 10223 D EGL_emulation: app_time_stats: avg=235.82ms min=38.40ms max=3038.65ms count=16
+10-26 01:17:22.090  6015  6038 W InteractionController: Timed out waiting 1000ms for command and events.
+10-26 01:17:22.090  6015  6038 D UiDevice: Waiting 5000ms for SearchCondition[gone=BySelector [RES='\Qplayer\E']].
+10-26 01:17:22.090  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:22.194  6015  6038 D UiDevice: Searching for node with selector: BySelector [RES='\Qplayer\E'].
+10-26 01:17:22.198  6015  6038 I PerfettoCapture: Stopping perfetto.
+10-26 01:17:22.199  1771  6660 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:22.210 10678 10678 I perfetto:    perfetto_cmd.cc:1265 SIGINT/SIGTERM received: disabling tracing.
+10-26 01:17:22.211   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=193)
+10-26 01:17:22.217  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1383 [CONTEXT service_id=218 ]
+10-26 01:17:22.219  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1383 [CONTEXT service_id=218 ]
+10-26 01:17:22.228  6015  6038 D Benchmark: kill -TERM command output - Output(stdout=, stderr=)
+10-26 01:17:22.247   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:22.355  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10678)] to die
+10-26 01:17:22.439   462   462 I perfetto:    ftrace_procfs.cc:445 disabled ftrace in /sys/kernel/tracing/
+10-26 01:17:22.444   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=194)
+10-26 01:17:22.444   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=195)
+10-26 01:17:22.444   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=196)
+10-26 01:17:22.444   462   462 I perfetto:  probes_producer.cc:454 Producer stop (id=197)
+10-26 01:17:22.449 10678 10678 I perfetto:    perfetto_cmd.cc:1210 Trace written into the output file
+10-26 01:17:22.449   463   463 I perfetto: ng_service_impl.cc:2553 Tracing session 25 ended, total sessions:0
+10-26 01:17:22.465  6015  6038 D Benchmark: Waiting 100 ms for [ProcessPid(processName=perfetto, pid=10678)] to die
+10-26 01:17:22.475  6015  6038 I PerfettoCapture: Writing to /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter004_2026-10-26-01-17-22.perfetto-trace.
+10-26 01:17:22.477  1771  6659 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:22.487  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1384 [CONTEXT service_id=218 ]
+10-26 01:17:22.490  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 5 uptime_millis: 5 exec_start_elapsed_seconds: 1384 [CONTEXT service_id=218 ]
+10-26 01:17:22.552  6015  6038 D Benchmark: Moving /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/PlayerBenchmark_open_none__iter004_2026-10-26-01-17-22.perfetto-trace to /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/PlayerBenchmark_open_none__iter004_2026-10-26-01-17-22.perfetto-trace
+10-26 01:17:22.555  6015  6038 D Benchmark: Iteration 4 captured UiState{highlight_process=HighlightProcess{cmdline=it.xonos.ma}}
+10-26 01:17:22.606 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /parse [body=4372548B, origin=""]
+10-26 01:17:22.666 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /notify_eof [body=0B, origin=""]
+10-26 01:17:22.674  6015  6026 W System  : A resource failed to call close.
+10-26 01:17:22.674  6015  6026 W System  : A resource failed to call close.
+10-26 01:17:22.758 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /status [body=0B, origin=""]
+10-26 01:17:22.761 10187 10187 I perfetto:      http_server.cc:271 [HTTP] POST /query [body=1394B, origin=""]
+10-26 01:17:22.776 10187 10187 I perfetto:      http_server.cc:271 [HTTP] GET /restore_initial_tables [body=0B, origin=""]
+10-26 01:17:22.799  6015  6038 D Benchmark: Force-stopping process it.xonos.ma
+10-26 01:17:22.800  1771  9679 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:22.813  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1384 [CONTEXT service_id=218 ]
+10-26 01:17:22.814  5075  9959 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1384 [CONTEXT service_id=218 ]
+10-26 01:17:22.865  1770  1902 I AiAiEcho: Predicting[0]:
+10-26 01:17:22.865  1770  1902 I AiAiEcho: EchoTargets:
+10-26 01:17:22.865  1770  1902 I AiAiEcho: Filtered by AiAi flag check:
+10-26 01:17:22.867   553  1841 W AppSearchIcing: icing-search-engine.cc:283: Error: 5, Message: Document (com.google.android.googlequicksearchbox$OneSearchZeroStateGoogleSuggestions/default, zp) not found.
+10-26 01:17:22.869  1197  2654 D OneSearchSuggestProvider: Created the binder channel successfully for end point service =com.google.android.apps.search.googleapp.search.suggest.plugins.onesearch.server.OneSearchSuggestService , mChannel=z1{delegate=s1{logId=29, target=directaddress:///AndroidComponentAddress%5BIntent%20%7B%20act=grpc.io.action.BIND%20cmp=com.google.android.googlequicksearchbox/com.google.android.apps.search.googleapp.search.suggest.plugins.onesearch.server.OneSearchSuggestService%20%7D%5D}} , mOneSearchConnection=X1.T@b514b37
+10-26 01:17:22.870  1770  1902 I AiAiEcho: Ranked targets strategy: SORT, count: 0, ranking metadata:
+10-26 01:17:22.879   364   364 I Zygote  : Process 10202 exited due to signal 9 (Killed)
+10-26 01:17:22.879   553  2294 W InputManager-JNI: Input channel object '7b004d8 it.xonos.ma/it.xonos.ma.phone.MainActivity (client)' was disposed without first being removed with the input manager!
+10-26 01:17:22.880  1147  1147 D CarrierSvcBindHelper: onHandleForceStop: [it.xonos.ma]
+10-26 01:17:22.883  1147  1147 D CarrierSvcBindHelper: No carrier app for: 0
+10-26 01:17:22.889   415   415 I BpBinder: onLastStrongRef automatically unlinking death recipients:
+10-26 01:17:22.891  1770  1902 I AiAiEcho: #postPredictionTargets: Sending updates to UISurface home with targets# 0 (types=[])
+10-26 01:17:22.894   553  2557 I ImeTracker: it.xonos.ma:2f782d7d: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_REMOVE_CLIENT
+10-26 01:17:22.894   553  2557 I ImeTracker: it.xonos.ma:2f782d7d: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-26 01:17:22.894   553  2082 D MediaSessionService: Media button session is changed to null
+10-26 01:17:22.894   553   844 D ConnectivityService: releasing NetworkRequest [ REQUEST id=162, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: it.xonos.ma UnderlyingNetworks: Null] ] (release request)
+10-26 01:17:22.900  1119  1119 W AudioMediaPlayerWrapper: The session was destroyed it.xonos.ma
+10-26 01:17:22.900  1119  1119 D MediaPlayerList: sessionUpdatedCallback(): packageName: it.xonos.ma
+10-26 01:17:22.901  1119  1119 D MediaPlayerList: sendMediaUpdate state=null
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updatePlayerState: playbackState= INACTIVE
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateMediaStateChar
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateMediaStateChar setting to state= 2
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature PLAYER_NAME(BIT 1) support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature PLAYER_ICON_URL(BIT 3) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature PLAYER_ICON_OBJ_ID(BIT 2) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature CURRENT_TRACK_SEGMENT_OBJ_ID(BIT 10) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature CURRENT_TRACK_OBJ_ID(BIT 11) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature NEXT_TRACK_OBJ_ID(BIT 12) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature CURRENT_GROUP_OBJ_ID(BIT 13) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature PARENT_GROUP_OBJ_ID(BIT 14) support: false
+10-26 01:17:22.902  1119  1119 D MediaControlGattService: updateObjectID
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature SEARCH_RESULT_OBJ_ID(BIT 20) support: false
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature TRACK_POSITION(BIT 7) support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature TRACK_POSITION_NOTIFY support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:17:22.902  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature PLAYBACK_SPEED(BIT 8) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature SEEKING_SPEED(BIT 9) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER_SUPPORTED(BIT 16) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature PLAYING_ORDER(BIT 15) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature MEDIA_CONTROL_POINT_OPCODES_SUPPORTED(BIT 19) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_POSITION(BIT 7) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_POSITION_NOTIFY support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_TITLE(BIT 5) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_TITLE_NOTIFY support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_DURATION(BIT 6) support: true
+10-26 01:17:22.903  1119  1119 W MediaControlGattService: Feature TRACK_DURATION_NOTIFY support: true
+10-26 01:17:22.909  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:17:22.909  1119  1119 D MediaControlGattService: updateMediaStateChar
+10-26 01:17:22.909  1119  1119 W MediaControlGattService: Feature MEDIA_STATE(BIT 17) support: true
+10-26 01:17:22.909  1119  1119 D MediaControlGattService: updateMediaStateChar setting to state= 0
+10-26 01:17:22.909  1119  1119 W MediaControlGattService: Feature TRACK_CHANGED(BIT 4) support: true
+10-26 01:17:22.909  1119  1119 W AudioMediaPlayerWrapper: The session was destroyed it.xonos.ma
+10-26 01:17:22.909  1119  1119 D MediaPlayerList: sessionUpdatedCallback(): packageName: it.xonos.ma
+10-26 01:17:22.909  1119  1119 D MediaPlayerList: sendMediaUpdate state=null
+10-26 01:17:22.909  1119  1119 D AvrcpTargetJni: sendMediaUpdateNative
+10-26 01:17:22.909  1119  1119 I bt_stack: [INFO:avrcp_service.cc(515)] virtual void bluetooth::avrcp::AvrcpService::SendMediaUpdate(bool, bool, bool) track_changed=1 :  play_state=1 :  queue=1
+10-26 01:17:22.909  1119  1119 V MediaPlayerList: onActiveSessionsChanged: number of controllers: 1
+10-26 01:17:22.909  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: com.google.android.googlequicksearchbox
+10-26 01:17:22.909  1119  1119 V MediaPlayerList: onActiveSessionsChanged: number of controllers: 1
+10-26 01:17:22.909  1119  1119 D MediaPlayerList: onActiveSessionsChanged: controller: com.google.android.googlequicksearchbox
+10-26 01:17:22.916  1823  1823 I GsaVoiceInteractionSrv: Handling ACTION_START_HOTWORD
+10-26 01:17:22.917  1823  2350 I GsaVoiceInteractionSrv: disregardVoiceMatch: false
+10-26 01:17:22.918  1823  2350 I GsaVoiceInteractionSrv: Cannot start hotword, hotword has been explicitly disabled.
+10-26 01:17:22.936   917  1002 D EGL_emulation: app_time_stats: avg=22908.25ms min=22908.25ms max=22908.25ms count=1
+10-26 01:17:22.973  1771  9778 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil:  query= size=15
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=lakers vs utah jazz,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=lakers vs utah jazz searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 1e7560a9-ac9a-4d09-919c-ef05b8f93799
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=mayor of kingstown season 5 cast,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=mayor of kingstown season 5 cast searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 58a4f9e5-6fc9-4485-9fb2-4bb26753b6e7
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=piranhas caught in us rivers,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=piranhas caught in us rivers searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 300ecac9-7906-4362-859f-5d1b754a2f56
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=nvidia rtx 30 gpu unlock mod,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=nvidia rtx 30 gpu unlock mod searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: ffa2c4ac-0764-4e8e-98f5-0edf5914a638
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=aspirin,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=aspirin searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 0cd2a0ed-99a8-4247-a1b8-752eabac4591
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=toyota mid engine sports car prototype,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=toyota mid engine sports car prototype searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 42e6a162-77d6-427a-8f5c-3b748f39c891
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=samsung one ui 9 driving report,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=samsung one ui 9 driving report searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: c068a713-0418-415d-9371-7508fb71ba4f
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=lulu ross elementary school fire,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=lulu ross elementary school fire searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 5504c289-3f9b-49f6-904a-66fd73894556
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=college football rankings,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=college football rankings searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 5cb8c9b9-bbac-4de8-928b-bab2a110cbb2
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=pit vipers,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=pit vipers searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: e52241bd-e950-4ba5-a6d2-110487760d70
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=when does daylight savings time start,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=when does daylight savings time start searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 055adcc0-4a44-4254-a54f-9b8aaa96172b
+10-26 01:17:23.025  1197  1197 D SearchTargetUtil: layoutType=extra_tall_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{bitmap_url=data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAFoAfAMBIgACEQEDEQH/xAAcAAEAAgIDAQAAAAAAAAAAAAAABgcEBQECCAP/xAA4EAABAwMCAwcBBQcFAAAAAAABAAIDBAURBiESEzEHIkFRYXGBkRQyQqHBFSMkkrHh8BYzQ4Ki/8QAGgEAAgMBAQAAAAAAAAAAAAAAAAMBBAUCBv/EACkRAAICAgEDAgUFAAAAAAAAAAABAhEDBDEFEiFBURMyYYHhInGhsdH/2gAMAwEAAhEDEQA/ALxREQAREQAREQARU5rrto/Z9ymtWl6aGolhcWSVk+THxDqGtHXHnn69VAqrtJ1Xc58m+VEYH4aZrYmj6DJ+pUN0SlZ6gReedL9sd6tsvJvHDc6fI+/hkrR44cOvyPkK9bBe6DUFsiuNrm5sEnmMFp8QR4FFg0bFERSQEREAEREAEREAEREAFAu2nUU1g0ZKyjcW1dwf9ljc3qwEEuP0BHuQp6qo7eIy8adL2ZhFTICfJ3CMfkHKG6VkpW6K/wBEaVga1s9XGJZXt3DxkNHlhWDTaatzASKGnyR15YWitdzp6aR0PBPK9uC5sEReR74UutVwo66B74JJQW7PbJGWkfBWc3KTtmvFRhHtREr9o22yxuLKWNj+rXMbgt/zyXz7Gq+osOs59PVDjyK+EvZnxkYM5H/Xiz7DyWzrr/DK6RlLQ3CZrOsgpzw/HifgLG0tJTz640/UDGTJKGkjcfun7eibhlJSp8CNiEZRtcl2IiK6ZwREQAREQAREQAREQAUD7XLYyvs0E0hA+zF8jC49HYBGPXY/mp4tVqS0ftq2Oo+NrCXZDnDI6EfquZq40hmKSjNNlUW6gbX0UXJmlpyQXP5LuEuJ8c/C2sTDRzOia55/clpL3cTvqevv6rE0xFLR080T8mWBxieB4FpLT/RZUMsjppKlpa0SNLcTRuA8tis6vQ2I1yYzrR9rEdSypqITy+HgZIeDr14emfDPksalt9PWaopoe6CzBGR95xcB9eq29skdHxUpL3FozksIG/6LJ0PZvt16rLkZsNppWRtbw5yRlx3+WrrHFuSQrLJQVllIiLRMgIiIAIiIAIiIAIiIAItRqHUlr09TGa5VLWOxlkLd5JPZv69FV927T7pdJhS0EbLfTSvDDK08UwaTuQeg29PlKyZYw5L2r07Y2lcF49z73mvdadYXR0jeGkln7rwNg4tGQfc5Pysyma2WR0tFPIOYMuDXd0+vuutDR/aYZoa4unMjncTpXFznb+JPVYY0vU0znNoK+SKPOQwjiA9lS7rdlqP6FR2qK+ntVPKeY4ySdeI5c49FNOzIO/0sx8sYZNJPI6Qeudv/ADwhQul04IZnVVZK6olaO6X9B7BYdVU3O001VXW64VFM+F4c1jXkxuyQDlh7p+i6hkWOVsiWF7DUE/LZdiKn9PdrNXDK2LUNO2aE7c+nbwvb6lucEe2PlWbZ9QWm9xh1sr4JyRngDsPHu07j6K5DLGfDKm1obGs6yR+/obNERMKYREQAWLc7hSWqhlra+YQ08Qy95BOPgdVlKvO0d13u1vmjs9PBWUDDwudE/MrHt4g/A6Hbu7bjfz25nLti2P1sKzZYwbpN88GHdu2KhheWWm2z1ONuZM4Rt9wNyfnCh1x7SdVXEkMq4qKI/gpYgD/M7JHwoq5j2SObIxzHN2LXDBC5WdLPkfqe11+jakKfbf7nMjnyyPlme+SV5y973FznHzJPVPBcLkJJrxioqkWxpuvgudthqOY0T44ZWk7hw6/Xr8rfRs4gC0jKqHTd6dZ63ie0yU0m0rP1HqFZlBdYapkb6dj3RPcWtkaNtsfT+ydB2eR6jpvXyWvlfH+GZVMa0d5w9VC9dVsUVrFLE08U7xknbZu/9cKTXatdBGXjlxxMBMkkhxwgEdPPO+P8Cqu8XCW51bppXuc0d1gd4D28M9VGTgZ0rWllzd9eI/36GvcMhdOHDg5pIc05BGxBX0RKR6mUVLkkNo19qe04EVwNVEP+KsHMH833vzU90/2tUtZPDTXmhdSPkcGc+J4fGM+Ls4LR9VT5C2mnbBW36ofFS8DIo8c6Z52jB9Op6H6J+PNkul5Mbc6ZpOLnkXb9UelgQQCDkHxXKgOmtS2201NFpxl1qLxK93AZ2x8TYTjYZH4fk43ycdJ8tCMlJHjM2CWGVS4fHpa9zS6uv0GnbO6tqI5pGl4j4YRlwz1PpgZ6+ire22IVbpa7QN+5We8+hmfufcH9QfdWvcgHUz2uAILSCD4rz1qn+B1NWfYv4flyZZye5w7eGOiRnfb5Zq9Hx/GcscXT590/o0ZGtRdHXSOW824UdS6IMdwfclLfxA5I6Y8VHlNtayyVGltPT1Ej5ZnCXMkjuJx+74lQkqlkVSPW6E+7XXiqteOPDoIgRcFw7saXuDW7uJwAttRG5UGWtjfys8RjL9s+fXqtMpVbR3KV/wCN0Ry7xOwTcMe6aRR6lkWPXk5RUlXDPnfqu43QsjIdHSs/243vGT6nfc7qPTRuheY344h1wcqTVTQyvnawBoHMwBt4BRXJO5OSV1sY/hzaF9JzfF1ouMVFe33/AAcLhdl1KQaLOFJtLx089trWXW8y0NtY9rn08TgHVDiOnmcAdMHr4KMBbWwAc6qfjvR0kr2O8WuA2I8j6ruHzFPcXdhfmieMN5tNtL9Nadp7TTSYBrKyVvMx5uBOR859laNqE4tlIKuUS1AgZzZAMB7uEZPyV55sVwra3Ulno6ysqKilfWxB8Esrnsd3h1aTgr0gr2CSkrR4/q2GWDIoSpv38/y22z//2Q==,suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=true,is_personal=false,suggest_raw_text=eddy pineiro,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=Eddy Pineiro searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 68e29cab-4d75-4cb8-b78c-cfb18155e0ce
+10-26 01:17:23.026  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=flock cameras map,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=flock cameras map searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 31c9f8b9-9e57-4363-861d-46a2b081f0b8
+10-26 01:17:23.026  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=mini crossword answers,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=mini crossword answers searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 63b309c2-3a1e-4c47-813d-07485b9762e5
+10-26 01:17:23.026  1197  1197 D SearchTargetUtil: layoutType=short_icon_row resultType=131072 packageName=com.google.android.googlequicksearchbox extras=Bundle{suggestion_type=33,suggest_truncate_start=false,is_answer=false,is_entity=false,is_personal=false,suggest_raw_text=g shock gmc 2500 series,group_id=web305497,response_id=76c3c143-6dd3-45fe-8bd2-7af7fef86609,support_query_builder=false,} searchAction=g shock gmc 2500 series searchActionExtras=Bundle{learn_more_url=https://support.google.com/websearch/answer/106230?hl=106230,suggestion_action_text=Report this,should_start_for_result=true,allow_pinning=true,skip_logging_in_target_handler=false,suggestion_action_rpc=2,}ParentID: null targetID: 77d7986c-b759-4b93-a814-41fdd0862d93
+10-26 01:17:23.044   917   917 D StatusBarIconController: ignoring old pipeline callbacks, because the new mobile icons are enabled
+10-26 01:17:23.076   553  2774 I ImeTracker: com.google.android.apps.nexuslauncher:fc7a15b1: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+10-26 01:17:23.076   553  2774 I ImeTracker: com.google.android.apps.nexuslauncher:fc7a15b1: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-26 01:17:23.077  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3227
+10-26 01:17:23.082  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 0, unlocked = true
+10-26 01:17:23.082  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=com.google.android.apps.nexuslauncher fieldId=0 fieldName=null extras=null}, false)
+10-26 01:17:23.083  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.shouldHideHeaderOnInitialState():4008 ShouldHideHeaderOnInitialState = false
+10-26 01:17:23.085 10751 10751 I artd    : Starting artd
+10-26 01:17:23.085 10751 10751 I AidlLazyServiceRegistrar: Registering service artd
+10-26 01:17:23.093  1669  1669 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2087 repeatCheckTimes = 2, unlocked = true
+10-26 01:17:23.101 10751 10752 I AidlLazyServiceRegistrar: Process has 1 (of 1 available) client(s) in use after notification artd has clients: 1
+10-26 01:17:23.123 10751 10752 I artd    : Merge skipped because there are no existing profiles
+10-26 01:17:23.132 10751 10752 W ziparchive: Unable to open '/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.dm': No such file or directory
+10-26 01:17:23.139 10751 10752 W ziparchive: Unable to open '/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.dm': No such file or directory
+10-26 01:17:23.167 10751 10752 I artd    : Running dex2oat: /apex/com.android.art/bin/art_exec --drop-capabilities --set-task-profile=Dex2OatBootComplete --set-priority=background --keep-fds=7:8:9:10 -- /apex/com.android.art/bin/dex2oat64 --zip-fd=7 --zip-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk --oat-fd=8 --oat-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex --output-vdex-fd=9 --swap-fd=10 --class-loader-context=PCL[] --classpath-dir=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q== --instruction-set=x86_64 --instruction-set-features=default --instruction-set-variant=x86_64 --compiler-filter=verify --compilation-reason=install --compact-dex-level=none --max-image-block-size=524288 --resolve-startup-const-strings=true --generate-mini-debug-info --runtime-arg -Xtarget-sdk-version:34 --runtime-arg -Xhidden-api-policy:enabled --runtime-arg -Xms64m --runtime-arg -Xmx512m --comments=app-version-name:0.1.37,app-version-code:37,art-version:340818082
+10-26 01:17:23.167 10751 10752 I artd    : Opened FDs: 7:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk 8:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex.tKHZJU.tmp 9:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.vdex.WFkS8J.tmp 10:/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex.swap.0FdM3n.tmp
+10-26 01:17:23.237 10753 10753 W dex2oat64: Unexpected CPU variant for x86: x86_64.
+10-26 01:17:23.237 10753 10753 W dex2oat64: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, tremont, kabylake, default
+10-26 01:17:23.241  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1384 [CONTEXT service_id=218 ]
+10-26 01:17:23.244 10753 10753 W dex2oat64: Mismatch between dex2oat instruction set features to use (ISA: X86_64 Feature string: -ssse3,-sse4.1,-sse4.2,-avx,-avx2,-popcnt) and those from CPP defines (ISA: X86_64 Feature string: ssse3,sse4.1,sse4.2,-avx,-avx2,popcnt) for the command line:
+10-26 01:17:23.244 10753 10753 W dex2oat64: /apex/com.android.art/bin/dex2oat64 --zip-fd=7 --zip-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk --oat-fd=8 --oat-location=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/oat/x86_64/base.odex --output-vdex-fd=9 --swap-fd=10 --class-loader-context=PCL[] --classpath-dir=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q== --instruction-set=x86_64 --instruction-set-features=default --instruction-set-variant=x86_64 --compiler-filter=verify --compilation-reason=install --compact-dex-level=none --max-image-block-size=524288 --resolve-startup-const-strings=true --generate-mini-debug-info --runtime-arg -Xtarget-sdk-version:34 --runtime-arg -Xhidden-api-policy:enabled --runtime-arg -Xms64m --runtime-arg -Xmx512m --comments=app-version-name:0.1.37,app-version-code:37,art-version:340818082
+10-26 01:17:23.246  5075 10066 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 37 uptime_millis: 37 exec_start_elapsed_seconds: 1384 [CONTEXT service_id=218 ]
+10-26 01:17:23.274 10753 10753 I dex2oat64: /apex/com.android.art/bin/dex2oat64 --output-vdex-fd=9 --class-loader-context=PCL[] --classpath-dir=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q== --compiler-filter=verify --compilation-reason=install --compact-dex-level=none --max-image-block-size=524288 --resolve-startup-const-strings=true --generate-mini-debug-info --comments=app-version-name:0.1.37,app-version-code:37,art-version:340818082
+10-26 01:17:23.341   553  2216 I Process : Sending signal. PID: 10202 SIG: 9
+10-26 01:17:23.398 10753 10753 I dex2oat64: Using CollectorTypeCC GC.
+10-26 01:17:23.415   415   415 E BpTransactionCompletedListener: Failed to transact (-32)
+10-26 01:17:23.575 10753 10753 I dex2oat64: dex2oat took 338.840ms (304.812ms cpu) (threads: 4) arena alloc=0B (0B) java alloc=2606KB (2668592B) native alloc=2096KB (2146608B) free=1350KB (1382912B)
+10-26 01:17:23.579 10751 10752 I artd    : dex2oat returned code 0
+10-26 01:17:23.579   553  1311 I ArtService: Dexopt result: [packageName = it.xonos.ma] DexContainerFileDexoptResult{dexContainerFile=/data/app/~~CLjEssRyZ69peKvPRL48xQ==/it.xonos.ma-DF5mkDMXXVZ9sJ5pnZPF9Q==/base.apk, primaryAbi=true, abi=x86_64, actualCompilerFilter=verify, status=PERFORMED, dex2oatWallTimeMillis=417, dex2oatCpuTimeMillis=310, sizeBytes=4438920, sizeBeforeBytes=0}
+10-26 01:17:23.593  6015  6038 I System.out: stopserver
+10-26 01:17:23.594  6015  6038 I System.out: stop, processId=10187
+10-26 01:17:23.595   363   422 I netd    : tetherGetStats() -> {[]} <0.34ms>
+10-26 01:17:23.595  1771  9466 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:23.597   363   422 I netd    : bandwidthSetGlobalAlert(2097152) <0.08ms>
+10-26 01:17:23.598   363   422 I netd    : bandwidthRemoveInterfaceQuota(eth0) <0.37ms>
+10-26 01:17:23.598   363   422 I netd    : bandwidthSetInterfaceQuota(eth0, 9223372036854775807) <0.41ms>
+10-26 01:17:23.606  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1385 [CONTEXT service_id=218 ]
+10-26 01:17:23.614  5075 10037 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 8 uptime_millis: 8 exec_start_elapsed_seconds: 1385 [CONTEXT service_id=218 ]
+10-26 01:17:23.631  6015  6038 I Benchmark: Perfetto trace processor shell server stopped (pid=10187).
+10-26 01:17:23.632  6015  6038 W Benchmark: WARNING: Running on Emulator
+10-26 01:17:23.632  6015  6038 W Benchmark:     Benchmark is running on an emulator, which is not representative of
+10-26 01:17:23.632  6015  6038 W Benchmark:     real user devices. Use a physical device to benchmark. Emulator
+10-26 01:17:23.632  6015  6038 W Benchmark:     benchmark improvements might not carry over to a real user's
+10-26 01:17:23.632  6015  6038 W Benchmark:     experience (or even regress real device performance).
+10-26 01:17:23.632  6015  6038 W Benchmark:
+10-26 01:17:23.635  6015  6038 D Benchmark: writing results to /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/it.xonos.ma.baselineprofile-benchmarkData.json
+10-26 01:17:23.636  1771  9776 W MediaProvider: isAppCloneUserPair for user 0: false
+10-26 01:17:23.645  5075  9977 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService started execution. cause:9 exec_start_elapsed_seconds: 1385 [CONTEXT service_id=218 ]
+10-26 01:17:23.647  5075 10773 I NetworkScheduler.Stats: Task com.google.android.gms/com.google.android.gms.ipa.base.IpaGcmTaskService finished executing. cause:9 result: 1 elapsed_millis: 4 uptime_millis: 4 exec_start_elapsed_seconds: 1385 [CONTEXT service_id=218 ]
+10-26 01:17:23.736  6015  6038 D Benchmark: Moving /storage/emulated/0/Android/media/it.xonos.ma.baselineprofile/it.xonos.ma.baselineprofile-benchmarkData.json to /sdcard/Android/media/it.xonos.ma.baselineprofile/additional_test_output/it.xonos.ma.baselineprofile-benchmarkData.json
+10-26 01:17:23.737  1771  9777 I MediaProvider: Deleted 1 0 0 0 0 0 0 items on external_primary due to it.xonos.ma.baselineprofile
+10-26 01:17:23.741  6015  6038 I TestRunner: finished: open[none](it.xonos.ma.baselineprofile.PlayerBenchmark)
