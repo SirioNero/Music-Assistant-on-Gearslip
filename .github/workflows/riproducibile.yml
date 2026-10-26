@@ -1,0 +1,74 @@
+name: Riproducibile
+
+# Compila Xonos come lo compila F-Droid (la stessa immagine Docker e lo stesso JDK delle prove di
+# fdroiddata, senza tools/ e senza chiave) e confronta l'APK con quello firmato della release: se è
+# identico a parte la firma, F-Droid può pubblicare l'APK con la nostra firma (build riproducibili),
+# e chi passa da GitHub/Obtainium a F-Droid non deve disinstallare. Parte a mano, o quando cambia
+# questo file su un ramo claude/**.
+on:
+  push:
+    branches: ["claude/**"]
+    paths: [".github/workflows/riproducibile.yml"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versione della release da confrontare (vuoto = quella del sorgente)"
+        type: string
+        default: ""
+
+jobs:
+  confronta:
+    runs-on: ubuntu-latest
+    container: registry.gitlab.com/fdroid/fdroidserver:buildserver-trixie
+    env:
+      ANDROID_HOME: /opt/android-sdk
+    steps:
+      - name: Prepara come il buildserver di F-Droid
+        run: |
+          apt-get update -q
+          apt-get install -qy --no-install-recommends openjdk-21-jdk-headless git curl apksigcopier diffoscope-minimal unzip
+          update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+          java -version
+
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Versione e commit
+        run: |
+          git config --global --add safe.directory "$PWD"
+          VERSION="${{ inputs.version }}"
+          [ -n "$VERSION" ] || VERSION=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)
+          git checkout -q "v$VERSION"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Release v$VERSION, commit $(git rev-parse HEAD)"
+
+      - name: Compila come F-Droid
+        run: |
+          rm -rf tools
+          GRADLEW=$(find / -name gradlew-fdroid -type f 2>/dev/null | head -n 1)
+          echo "gradlew-fdroid: $GRADLEW"
+          cd app
+          "$GRADLEW" assembleRelease --no-daemon
+
+      - name: Confronta con l'APK firmato della release
+        run: |
+          curl -sSfL -o signed.apk "https://github.com/${{ github.repository }}/releases/download/v$VERSION/Xonos.apk"
+          UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
+          ls -l signed.apk "$UNSIGNED"
+          if apksigcopier compare signed.apk "$UNSIGNED"; then
+            echo "Riproducibile: l'APK di F-Droid sarebbe identico a quello firmato della v$VERSION."
+          else
+            echo "::error title=Non riproducibile::L'APK compilato come F-Droid è diverso da quello della release v$VERSION."
+            mkdir -p diff/signed diff/fdroid
+            unzip -q signed.apk -d diff/signed
+            unzip -q "$UNSIGNED" -d diff/fdroid
+            # Quali file cambiano (la firma della release a parte).
+            (cd diff/signed && find . -type f -exec sha256sum {} + | sort -k2) > diff/signed.txt
+            (cd diff/fdroid && find . -type f -exec sha256sum {} + | sort -k2) > diff/fdroid.txt
+            diff diff/signed.txt diff/fdroid.txt || true
+            diffoscope --max-report-size 200000 --text diff/report.txt signed.apk "$UNSIGNED" || true
+            head -c 20000 diff/report.txt || true
+            exit 1
+          fi
