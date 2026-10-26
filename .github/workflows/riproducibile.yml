@@ -40,6 +40,8 @@ jobs:
           git config --global --add safe.directory "$PWD"
           VERSION="${{ inputs.version }}"
           [ -n "$VERSION" ] || VERSION=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)
+          # Lo script del confronto è di questo ramo: la release può essere più vecchia.
+          cp .github/scripts/senza_firma.py /tmp/
           git checkout -q "v$VERSION"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "Release v$VERSION, commit $(git rev-parse HEAD)"
@@ -62,7 +64,7 @@ jobs:
           UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
           ls -l signed.apk "$UNSIGNED"
           # Il confronto che conta: l'APK della release senza il suo blocco di firma, byte per byte.
-          python3 .github/scripts/senza_firma.py signed.apk stripped.apk
+          python3 /tmp/senza_firma.py signed.apk stripped.apk
           if cmp stripped.apk "$UNSIGNED"; then
             echo "Byte per byte: identici, firma a parte."
           else
