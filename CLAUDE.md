@@ -50,7 +50,8 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   senza `tools/`) e la confronta byte per byte con l'APK della release tolta la firma: per la 0.1.38
   identici. Così la ricetta ha `Binaries` e `AllowedAPKSigningKeys` (SHA-256 del certificato
   `18ef3fc3…2c836`): F-Droid pubblica l'APK con la nostra firma e si passa da GitHub/Obtainium a F-Droid
-  senza disinstallare. Il modello delle richieste di fdroiddata vuole in `commit` l'hash completo e
+  senza disinstallare. Dopo ogni release va lanciato a mano "Riproducibile": una versione non identica
+  F-Droid non la pubblica. Il modello delle richieste di fdroiddata vuole in `commit` l'hash completo e
   chiede di decidere le build riproducibili prima dell'inclusione (dopo non si può). `apksigcopier`
   di Debian non verifica gli APK firmati solo v2 (cerca `META-INF/MANIFEST.MF`).
 - Strumenti: AGP 8.11.1, Kotlin 2.2.0, Gradle 8.14.3, compileSdk 36, targetSdk 34, minSdk 26,
