@@ -88,7 +88,7 @@ Home Assistant Cloud (Nabu Casa) only reaches Home Assistant, not Music Assistan
 
 ### Building
 
-Every push builds the app on GitHub Actions. On the `main` branch, if the `XONOS_KEYSTORE` secret (the signing key, base64-encoded) is set, it also publishes a release with the APK; other branches and pull requests are built only as a check. Plancia’s key works too: set the same value as `PLANCIA_KEYSTORE` and the workflow reads its alias. If the key has its own password, put it in `XONOS_KEYSTORE_PASSWORD`.
+Every push builds the app on GitHub Actions. On the `main` branch, if the `XONOS_KEYSTORE` secret (the signing key, base64-encoded) is set, it also publishes a release with the APK; other branches and pull requests are built only as a check. The key’s password goes in the `XONOS_KEYSTORE_PASSWORD` secret, never in the repository. Plancia’s key works too: set the same value as `PLANCIA_KEYSTORE` and the workflow reads its alias.
 
 The version lives in `app/build.gradle.kts` (`versionCode` and `versionName`) and goes up with every release: the release is tagged `v<versionName>`, and the notes come from `fastlane/metadata/android/*/changelogs/<versionCode>.txt`. If the tag already exists, the workflow refuses to publish.
 
@@ -213,7 +213,7 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 
 ### Compilare
 
-Ogni push compila l’app su GitHub Actions. Sul ramo `main`, se è configurato il secret `XONOS_KEYSTORE` (la chiave di firma in base64), pubblica anche una release con l’APK; gli altri rami e le pull request vengono compilati solo per controllo. Va bene anche la chiave di Plancia: metti lo stesso valore come `PLANCIA_KEYSTORE` e il workflow ne legge l’alias. Se la chiave ha una password sua, mettila in `XONOS_KEYSTORE_PASSWORD`.
+Ogni push compila l’app su GitHub Actions. Sul ramo `main`, se è configurato il secret `XONOS_KEYSTORE` (la chiave di firma in base64), pubblica anche una release con l’APK; gli altri rami e le pull request vengono compilati solo per controllo. La password della chiave va nel secret `XONOS_KEYSTORE_PASSWORD`, mai nel repository. Va bene anche la chiave di Plancia: metti lo stesso valore come `PLANCIA_KEYSTORE` e il workflow ne legge l’alias.
 
 La versione sta in `app/build.gradle.kts` (`versionCode` e `versionName`) e si alza a ogni release: la release ha il tag `v<versionName>`, e le note vengono da `fastlane/metadata/android/*/changelogs/<versionCode>.txt`. Se il tag c’è già, il workflow non pubblica.
 

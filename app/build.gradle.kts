@@ -7,12 +7,13 @@ plugins {
     id("androidx.baselineprofile")
 }
 
-// La chiave di firma NON sta nel repository: la compilazione su GitHub la ricrea dal secret XONOS_KEYSTORE.
+// La chiave di firma NON sta nel repository: la compilazione su GitHub la ricrea dal secret XONOS_KEYSTORE,
+// e la password arriva dal secret XONOS_KEYSTORE_PASSWORD (il repository è pubblico: qui non si scrive).
 // Senza chiave la release non è firmata (F-Droid la firma da sé); con XONOS_DEBUG_SIGNING=true (le misure
 // sull'emulatore) si firma con la chiave di debug di Android, così si installa lo stesso.
 val xonosKeystore = file("xonos.keystore")
 val hasXonosKey = xonosKeystore.exists()
-val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "xonos-android"
+val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null }
 val debugSigning = System.getenv("XONOS_DEBUG_SIGNING") == "true"
 
 android {
@@ -33,7 +34,7 @@ android {
         if (hasXonosKey) {
             create("xonos") {
                 storeFile = xonosKeystore
-                storePassword = keystorePassword
+                storePassword = keystorePassword ?: error("Manca XONOS_KEYSTORE_PASSWORD, la password di xonos.keystore")
                 // Il workflow legge l'alias dalla chiave stessa: va bene anche quella di Plancia.
                 keyAlias = System.getenv("XONOS_KEY_ALIAS")?.ifBlank { null } ?: "xonos"
                 keyPassword = keystorePassword

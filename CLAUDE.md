@@ -36,10 +36,11 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   v0.1.36 il numero era quello del workflow; la prima scritta nel sorgente è la 37). Insieme si scrivono
   le note `fastlane/metadata/android/{en-US,it-IT}/changelogs/<versionCode>.txt` (massimo 500 caratteri),
   che diventano anche il testo della release. Se il tag c'è già il workflow si ferma con un errore.
-- La chiave è nel secret `XONOS_KEYSTORE`: è quella di Plancia (alias `plancia`, password
-  `plancia-android`); il workflow prova da sé le password `xonos-android` e `plancia-android`. Senza
-  chiave la release resta non firmata (come la vuole F-Droid); con `XONOS_DEBUG_SIGNING=true` (le
-  misure) si firma con la chiave di debug.
+- La chiave è nel secret `XONOS_KEYSTORE` (è quella di Plancia, alias `plancia`), la sua password nel
+  secret `XONOS_KEYSTORE_PASSWORD`: senza, la compilazione si ferma. Repository e log dei workflow sono
+  pubblici: le password non si scrivono nei file e non passano da `GITHUB_ENV` (nei log un secret
+  diventa `***`, una variabile no). Senza chiave la release resta non firmata (come la vuole F-Droid);
+  con `XONOS_DEBUG_SIGNING=true` (le misure) si firma con la chiave di debug.
 - Licenza AGPL-3.0-or-later (`LICENSE`). Tutte le librerie sono Apache 2.0, compatibili. F-Droid: testi,
   icona e schermate in `fastlane/metadata/android/` (inglese e italiano), ricetta da proporre a
   fdroiddata in `tools/fdroid/it.xonos.ma.yml` (toglie `tools/` prima di compilare: le prove usano un
