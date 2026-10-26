@@ -61,18 +61,25 @@ jobs:
           curl -sSfL -o signed.apk "https://github.com/${{ github.repository }}/releases/download/v$VERSION/Xonos.apk"
           UNSIGNED=app/build/outputs/apk/release/app-release-unsigned.apk
           ls -l signed.apk "$UNSIGNED"
-          if apksigcopier compare signed.apk "$UNSIGNED"; then
-            echo "Riproducibile: l'APK di F-Droid sarebbe identico a quello firmato della v$VERSION."
+          # Il confronto che conta: l'APK della release senza il suo blocco di firma, byte per byte.
+          python3 .github/scripts/senza_firma.py signed.apk stripped.apk
+          if cmp stripped.apk "$UNSIGNED"; then
+            echo "Byte per byte: identici, firma a parte."
           else
             echo "::error title=Non riproducibile::L'APK compilato come F-Droid è diverso da quello della release v$VERSION."
             mkdir -p diff/signed diff/fdroid
             unzip -q signed.apk -d diff/signed
             unzip -q "$UNSIGNED" -d diff/fdroid
-            # Quali file cambiano (la firma della release a parte).
             (cd diff/signed && find . -type f -exec sha256sum {} + | sort -k2) > diff/signed.txt
             (cd diff/fdroid && find . -type f -exec sha256sum {} + | sort -k2) > diff/fdroid.txt
             diff diff/signed.txt diff/fdroid.txt || true
-            diffoscope --max-report-size 200000 --text diff/report.txt signed.apk "$UNSIGNED" || true
-            head -c 20000 diff/report.txt || true
+            zipinfo -v stripped.apk > diff/a.txt; zipinfo -v "$UNSIGNED" > diff/b.txt
+            diff diff/a.txt diff/b.txt | head -n 80 || true
             exit 1
           fi
+          # Come lo controlla F-Droid: la firma della release copiata sull'APK compilato qui, poi verificata
+          # (con l'apksigner dell'SDK: quello di Debian vuole anche la firma v1, che con minSdk 26 non c'è).
+          export PATH="$ANDROID_HOME/build-tools/35.0.0:$PATH"
+          apksigner --version
+          apksigcopier compare signed.apk "$UNSIGNED"
+          echo "Riproducibile: F-Droid può pubblicare l'APK con la firma della release v$VERSION."
