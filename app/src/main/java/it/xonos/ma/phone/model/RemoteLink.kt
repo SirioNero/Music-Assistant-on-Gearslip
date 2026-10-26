@@ -177,6 +177,7 @@ class RemoteLink internal constructor(
             favorite = current.uri?.let { favorites[it] } ?: current.favorite,
             queue = window.map { QueueEntry(it.title, it.artist, image(it.image, 256)) },
             queueIndex = index,
+            queueEditableFrom = q.firstEditable - windowStart,
         )
     }
 
@@ -280,6 +281,30 @@ class RemoteLink internal constructor(
         val target = synchronized(lock) { (windowStart + index).also { pendingIndex = it } }
         publish()
         jumpTo(target, gather = false)
+    }
+
+    override fun removeFromQueue(index: Int) {
+        // Sparisce subito; la coda vera arriva poi con gli eventi.
+        val id = synchronized(lock) {
+            window.getOrNull(index)?.id?.also { window = window.filterIndexed { i, _ -> i != index } }
+        } ?: return
+        publish()
+        send("delete_item") { put("item_id_or_index", id) }
+    }
+
+    override fun playNextInQueue(index: Int) {
+        val id = synchronized(lock) {
+            val item = window.getOrNull(index) ?: return
+            val next = ((queue?.currentIndex ?: return) - windowStart + 1).coerceIn(0, window.size - 1)
+            window = window.toMutableList().apply { add(next, removeAt(index)) }
+            item.id
+        }
+        publish()
+        // Per Music Assistant uno spostamento di 0 vuol dire "in testa ai prossimi".
+        send("move_item") {
+            put("queue_item_id", id)
+            put("pos_shift", 0)
+        }
     }
 
     fun setVolume(level: Int) {

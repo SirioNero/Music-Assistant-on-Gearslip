@@ -165,6 +165,7 @@
     <string name="favorite_remove">Убрать из избранного</string>
     <string name="play_next">Воспроизвести следующим</string>
     <string name="add_to_queue">Добавить в очередь</string>
+    <string name="remove_from_queue">Убрать из очереди</string>
     <string name="go_to_album">Перейти к альбому</string>
     <string name="go_to_artist">Перейти к исполнителю</string>
     <string name="add_to_playlist">Добавить в плейлист</string>

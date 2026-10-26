@@ -36,6 +36,8 @@ data class NowPlaying(
     val queue: List<QueueEntry>,
     /** Il brano in corso dentro [queue]. */
     val queueIndex: Int,
+    /** Da qui in poi, in [queue], i brani si possono togliere o spostare (prima: già suonati, in corso o nel buffer). */
+    val queueEditableFrom: Int = Int.MAX_VALUE,
 )
 
 /** Il lettore del telefono visto dallo schermo: sul telefono il MediaController del servizio. */
@@ -59,4 +61,10 @@ interface PlayerLink {
 
     /** Salta al brano numero [index] di [NowPlaying.queue]. */
     fun skipTo(index: Int)
+
+    /** Toglie dalla coda il brano numero [index] di [NowPlaying.queue] (vedi [NowPlaying.queueEditableFrom]). */
+    fun removeFromQueue(index: Int) {}
+
+    /** Sposta il brano numero [index] di [NowPlaying.queue] subito dopo quello in corso. */
+    fun playNextInQueue(index: Int) {}
 }

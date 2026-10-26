@@ -145,6 +145,7 @@
     <string name="favorite_remove">Quitar de favoritos</string>
     <string name="play_next">Reproducir a continuación</string>
     <string name="add_to_queue">Añadir a la cola</string>
+    <string name="remove_from_queue">Quitar de la cola</string>
     <string name="go_to_album">Ir al álbum</string>
     <string name="go_to_artist">Ir al artista</string>
     <string name="add_to_playlist">Añadir a una playlist</string>

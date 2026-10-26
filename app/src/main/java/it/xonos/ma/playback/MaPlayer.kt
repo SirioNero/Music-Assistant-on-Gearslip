@@ -90,6 +90,14 @@ class MaPlayer(
     /** L'inizio della finestra della coda usata nell'ultimo stato pubblicato: serve a tradurre gli indici. */
     private var stateStart = 0
 
+    /** I brani dell'ultimo stato pubblicato, nell'ordine dei suoi indici, e quello in corso. */
+    private var stateItems: List<QueueItem> = emptyList()
+    private var stateCurrent = 0
+
+    // Le modifiche alla coda in attesa: finiscono quando la finestra della coda le mostra.
+    private class WindowExpectation(val test: (List<QueueItem>, Int) -> Boolean, val future: SettableFuture<Void?>)
+    private val windowExpectations = mutableListOf<WindowExpectation>()
+
     /** Quando la rete cade a metà di un brano: per riprendere lì appena torna. */
     private class Drop(val index: Int, val positionMs: Long, val at: Long)
     private var drop: Drop? = null
@@ -157,14 +165,16 @@ class MaPlayer(
 
         val (start, items) = visibleWindow(q)
         stateStart = start
+        stateItems = items
         if (q == null || items.isEmpty()) {
             builder.setPlaylist(emptyList()).setPlaybackState(Player.STATE_IDLE)
             problem?.let { builder.setPlayerError(PlaybackException(it, null, PlaybackException.ERROR_CODE_REMOTE_ERROR)) }
             return builder.build()
         }
         val current = ((q.currentIndex ?: start) - start).coerceIn(0, items.size - 1)
+        stateCurrent = current
         builder
-            .setPlaylist(items.mapIndexed { i, item -> itemData(item, i == current, q) })
+            .setPlaylist(items.mapIndexed { i, item -> itemData(item, i == current, q, q.firstEditable - start) })
             .setCurrentMediaItemIndex(current)
             .setContentPositionMs(positionSupplier(q, items[current]))
             .setPlaybackState(if (q.playing && !audible) Player.STATE_BUFFERING else Player.STATE_READY)
@@ -199,7 +209,7 @@ class MaPlayer(
         return builder.build()
     }
 
-    private fun itemData(item: QueueItem, isCurrent: Boolean, q: QueueState): MediaItemData {
+    private fun itemData(item: QueueItem, isCurrent: Boolean, q: QueueState, editableFrom: Int): MediaItemData {
         val radio = item.mediaType == "radio"
         val streamTitle = q.streamTitle?.takeIf { isCurrent && radio && it.isNotBlank() }
         val favorite = favorites[item.id] ?: item.favorite
@@ -227,6 +237,8 @@ class MaPlayer(
                     putString(EXTRA_TYPE, item.mediaType)
                     putString(EXTRA_ALBUM, item.albumRef?.uri)
                     putString(EXTRA_ARTIST, item.artistRef?.uri)
+                    // Sul brano in corso: da dove in poi la coda si può cambiare.
+                    if (isCurrent) putInt(EXTRA_EDITABLE_FROM, editableFrom)
                 },
             )
             .apply { if (item.durationSec > 0) setDurationMs(item.durationSec * 1000L) }
@@ -322,6 +334,7 @@ class MaPlayer(
             windowStart = start
             favorites.clear()
             invalidateState()
+            windowExpectations.removeAll { e -> e.test(window, windowStart).also { if (it) e.future.set(null) } }
         }
     }
 
@@ -496,6 +509,56 @@ class MaPlayer(
         return done
     }
 
+    // ---------- Modifiche alla coda (dallo schermo del telefono) ----------
+
+    override fun handleRemoveMediaItems(fromIndex: Int, toIndex: Int): ListenableFuture<*> {
+        val ids = stateItems.subList(fromIndex.coerceIn(0, stateItems.size), toIndex.coerceIn(0, stateItems.size)).map { it.id }
+        if (ids.isEmpty()) return Futures.immediateVoidFuture()
+        return windowCommand({ window, _ -> window.none { it.id in ids } }) {
+            for (id in ids) {
+                repo.command("player_queues/delete_item") {
+                    put("queue_id", queueId)
+                    put("item_id_or_index", id)
+                }
+            }
+        }
+    }
+
+    /** Si sposta un brano alla volta: subito dopo quello in corso ("suona dopo") o di qualche posto. */
+    override fun handleMoveMediaItems(fromIndex: Int, toIndex: Int, newIndex: Int): ListenableFuture<*> {
+        val item = stateItems.getOrNull(fromIndex)
+        if (item == null || toIndex != fromIndex + 1 || newIndex == fromIndex) return Futures.immediateVoidFuture()
+        // Per Music Assistant uno spostamento di 0 vuol dire "in testa ai prossimi".
+        val shift = if (newIndex == stateCurrent + 1) 0 else newIndex - fromIndex
+        val target = stateStart + newIndex
+        return windowCommand({ window, start -> window.indexOfFirst { it.id == item.id }.let { it >= 0 && start + it == target } }) {
+            repo.command("player_queues/move_item") {
+                put("queue_id", queueId)
+                put("queue_item_id", item.id)
+                put("pos_shift", shift)
+            }
+        }
+    }
+
+    // Aggiungere si fa dal menu (suona dopo, in coda), non da qui.
+    override fun handleAddMediaItems(index: Int, mediaItems: List<MediaItem>): ListenableFuture<*> = Futures.immediateVoidFuture()
+
+    private fun windowCommand(test: (List<QueueItem>, Int) -> Boolean, send: suspend () -> Unit): ListenableFuture<*> {
+        val future = SettableFuture.create<Void?>()
+        val expectation = WindowExpectation(test, future)
+        windowExpectations += expectation
+        handler.postDelayed({ if (windowExpectations.remove(expectation)) future.set(null) }, EXPECT_TIMEOUT_MS)
+        scope.launch {
+            try {
+                send()
+            } catch (e: Exception) {
+                Log.w(TAG, "Coda non cambiata: ${e.message}")
+                if (windowExpectations.remove(expectation)) future.set(null)
+            }
+        }
+        return future
+    }
+
     override fun handleRelease(): ListenableFuture<*> {
         repo.removeEventListener(listener)
         scope.cancel()
@@ -576,6 +639,7 @@ class MaPlayer(
     companion object {
         /** Negli extra dei metadati: l'uri di Music Assistant del brano, il suo tipo, il suo album e il suo artista. */
         const val EXTRA_URI = "xonos.uri"
+        const val EXTRA_EDITABLE_FROM = "xonos.editable_from"
         const val EXTRA_TYPE = "xonos.type"
         const val EXTRA_ALBUM = "xonos.album"
         const val EXTRA_ARTIST = "xonos.artist"
@@ -619,6 +683,7 @@ class MaPlayer(
             Player.COMMAND_GET_TIMELINE,
             Player.COMMAND_GET_METADATA,
             Player.COMMAND_SET_MEDIA_ITEM,
+            Player.COMMAND_CHANGE_MEDIA_ITEMS,
             Player.COMMAND_GET_AUDIO_ATTRIBUTES,
         )
     }

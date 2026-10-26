@@ -370,7 +370,8 @@ private val SCENES = listOf(
         playerOpen = true
         playerPanel = PlayerPanel.LYRICS
     },
-    "queue" to Scene {
+    // Dal brano dopo quello in corso la coda si può cambiare: i tre puntini.
+    "queue" to Scene(now = PLAYING.copy(queueEditableFrom = 2)) {
         (page as HomePage).started = true
         playerOpen = true
         playerPanel = PlayerPanel.QUEUE

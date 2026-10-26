@@ -78,6 +78,7 @@ class ControllerLink : PlayerLink, Player.Listener {
             favorite = (metadata.userRating as? HeartRating)?.isHeart == true,
             queue = queue,
             queueIndex = c.currentMediaItemIndex,
+            queueEditableFrom = extras?.getInt(MaPlayer.EXTRA_EDITABLE_FROM, Int.MAX_VALUE) ?: Int.MAX_VALUE,
         )
     }
 
@@ -118,5 +119,14 @@ class ControllerLink : PlayerLink, Player.Listener {
 
     override fun skipTo(index: Int) {
         controller?.seekToDefaultPosition(index)
+    }
+
+    override fun removeFromQueue(index: Int) {
+        controller?.removeMediaItem(index)
+    }
+
+    override fun playNextInQueue(index: Int) {
+        val c = controller ?: return
+        c.moveMediaItem(index, c.currentMediaItemIndex + 1)
     }
 }

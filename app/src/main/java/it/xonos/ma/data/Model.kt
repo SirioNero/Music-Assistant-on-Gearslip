@@ -3,6 +3,7 @@ package it.xonos.ma.data
 import android.os.Trace
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.math.max
 
 /** Lo stato del collegamento con Music Assistant. */
 sealed interface Connection {
@@ -301,8 +302,13 @@ data class QueueState(
     val current: QueueItem?,
     /** Per le radio: il titolo che la stazione sta trasmettendo. */
     val streamTitle: String?,
+    /** Il brano che il server sta già mandando al lettore: fin lì la coda non si può cambiare. */
+    val indexInBuffer: Int? = null,
 ) {
     val playing: Boolean get() = state == "playing"
+
+    /** Il primo brano che si può togliere o spostare: quelli già in corso o nel buffer no. */
+    val firstEditable: Int get() = max(currentIndex ?: -1, indexInBuffer ?: -1) + 1
 
     companion object {
         fun from(o: JSONObject?): QueueState? {
@@ -317,6 +323,7 @@ data class QueueState(
                 repeat = o.str("repeat_mode") ?: "off",
                 current = QueueItem.from(current),
                 streamTitle = current?.optJSONObject("streamdetails")?.str("stream_title"),
+                indexInBuffer = if (o.isNull("index_in_buffer")) null else o.optInt("index_in_buffer"),
             )
         }
     }

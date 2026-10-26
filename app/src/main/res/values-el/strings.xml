@@ -145,6 +145,7 @@
     <string name="favorite_remove">Αφαίρεση από τα αγαπημένα</string>
     <string name="play_next">Αναπαραγωγή μετά</string>
     <string name="add_to_queue">Προσθήκη στην ουρά</string>
+    <string name="remove_from_queue">Αφαίρεση από την ουρά</string>
     <string name="go_to_album">Μετάβαση στο άλμπουμ</string>
     <string name="go_to_artist">Μετάβαση στον καλλιτέχνη</string>
     <string name="add_to_playlist">Προσθήκη σε λίστα αναπαραγωγής</string>

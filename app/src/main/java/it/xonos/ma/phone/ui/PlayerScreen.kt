@@ -464,8 +464,34 @@ private fun QueuePanel(now: NowPlaying, player: PlayerLink) {
                             Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
                     }
-                    if (current) Icon(XIcons.Equalizer, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                    when {
+                        current -> Icon(XIcons.Equalizer, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.primary)
+                        i >= now.queueEditableFrom -> QueueEntryMenu(i, now, player)
+                    }
                 }
+            }
+        }
+    }
+}
+
+/** I tre puntini di un brano in arrivo: suona dopo (se non è già il prossimo) e togli dalla coda. */
+@Composable
+private fun QueueEntryMenu(index: Int, now: NowPlaying, player: PlayerLink) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { open = true }, modifier = Modifier.size(36.dp).testTag("queue_menu")) {
+            Icon(XIcons.More, stringResource(R.string.more), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            if (index > now.queueIndex + 1) {
+                MenuEntry(XIcons.PlayNext, stringResource(R.string.play_next)) {
+                    open = false
+                    player.playNextInQueue(index)
+                }
+            }
+            MenuEntry(XIcons.Close, stringResource(R.string.remove_from_queue)) {
+                open = false
+                player.removeFromQueue(index)
             }
         }
     }

@@ -179,6 +179,32 @@ private fun checks(): Unit = runBlocking {
     until { devices.targets(phone.id).firstOrNull { it.id == speaker.id }?.volume == 30 }
     check("Volume della cassa", devices.targets(phone.id).firstOrNull { it.id == speaker.id }?.volume == 30 && remote.volume.value == 30)
 
+    // La coda della cassa dallo schermo: un brano in arrivo tolto, un altro portato subito dopo quello in corso.
+    val bollicine = library.search("Bollicine").values.flatten().first { it.mediaType == "album" && it.name == "Bollicine" }
+    val eight = (library.albumTracks(album) + library.albumTracks(bollicine)).map { it.uri }
+    library.playMedia(speaker.id, eight)
+    until { queue(speaker.id)?.items == 8 && remote.nowPlaying.value?.queue?.size == 8 }
+    val listed = remote.nowPlaying.value!!
+    val q8 = queue(speaker.id)!!
+    check(
+        "Coda: si cambia solo dopo il brano in corso e quello nel buffer",
+        listed.queueEditableFrom == maxOf(q8.currentIndex ?: 0, q8.indexInBuffer ?: 0) + 1,
+        "da ${listed.queueEditableFrom}, in corso ${q8.currentIndex}, nel buffer ${q8.indexInBuffer}",
+    )
+    val dropped = listed.queue[4].title
+    remote.removeFromQueue(4)
+    check("Togli dalla coda: sparisce subito dallo schermo", remote.nowPlaying.value?.queue?.let { it.size == 7 && it.none { e -> e.title == dropped } } == true)
+    until { queue(speaker.id)?.items == 7 }
+    check("E dalla coda della cassa", queue(speaker.id)?.items == 7 && devices.items(speaker.id, 0, 10).none { it.title == dropped })
+    until { remote.nowPlaying.value?.queue?.size == 7 }
+    val shownNow = remote.nowPlaying.value!!
+    val last = shownNow.queue.last().title
+    remote.playNextInQueue(shownNow.queue.lastIndex)
+    check("Suona dopo: subito dopo quello in corso, sullo schermo", remote.nowPlaying.value?.queue?.getOrNull(shownNow.queueIndex + 1)?.title == last)
+    val nextUp = suspend { (queue(speaker.id)?.currentIndex ?: 0).let { devices.items(speaker.id, it + 1, 1).firstOrNull()?.title } }
+    until { nextUp() == last }
+    check("E nella coda della cassa", nextUp() == last, "${nextUp()}")
+
     // Con la cassa scelta, "suona" va alla cassa.
     val track = library.albumTracks(album)[2]
     model.play(track)
