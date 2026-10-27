@@ -91,6 +91,7 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 | `data/Account.kt` | Accesso con nome utente e password (auth/login, poi un token suo con auth/token/create), primo account (POST /setup) |
 | `data/Services.kt` | I servizi (provider) di MA: elenco, tipi, icone, opzioni, pulsanti, flussi a passi; i campi come `ConfigField` |
 | `data/Devices.kt` | I lettori di MA su cui suonare ("Suona su"), il passaggio della coda, i comandi a una coda |
+| `data/AccountProvider.kt` | L'account (indirizzi, token, nome utente) per myCar, che ha Xonos dentro di sé: `content://it.xonos.ma.account`, metodo `account`; risponde solo a `io.github.sirionero.mycar` (e `.dev`) firmati col certificato di myCar (SHA-256 `e477a479…cccc31`), a nessun altro |
 | `phone/MainActivity.kt` | L'app sul telefono: Compose, lingua, MediaController verso il servizio finché è in vista |
 | `phone/ControllerLink.kt` | `PlayerLink` dal MediaController: lo stesso `MaPlayer` che vede Gearslip |
 | `phone/model/` | `PhoneModel` (schede con pile di pagine, caricamenti, ricerca, suona/dopo/in coda, preferiti, testi, impostazioni, "Suona su"), `Pages.kt`, `Player.kt` (`NowPlaying`, `PlayerLink`), `ConnectionCheck.kt`, `Discovery.kt` (server trovati con mDNS), `ServicesModel.kt` e `ServicePages.kt` (i servizi), `RemoteLink.kt` (un lettore di MA comandato dallo schermo). Senza Android: si prova sulla JVM |
@@ -213,6 +214,14 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 - Non è un'app di sistema: Media3 gli darebbe solo la lettura, serve `onConnectAsync` con tutti i comandi.
 - Le copertine `http://` non le carica (targetSdk 37): passano da `content://`.
 - La vista doppia compare solo con un brano attivo. I testi li cerca Gearslip da sé.
+
+## myCar
+
+- myCar (`SirioNero/MyCar`, il fork di Gearslip) ha Xonos dentro di sé dalla 0.5.11: lo stesso motore
+  (`data/`, `sendspin/`, `playback/`) copiato nel suo pacchetto `xonos`, senza le schermate del telefono,
+  con il PCM che va dritto nel canale musicale di Android Auto quando l'audio passa da myCar. L'app Xonos
+  resta per Gearslip e per chi la preferisce. Le correzioni al motore qui vanno portate anche là.
+- Dalla 0.1.39 Xonos passa a myCar il suo account (`AccountProvider`), così in myCar non si riscrive niente.
 
 ## L'app sul telefono
 
