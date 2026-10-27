@@ -253,6 +253,9 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `MaPlayer` le riceve come modifiche di Media3 (`COMMAND_CHANGE_MEDIA_ITEMS`) e mette negli extra del
   brano in corso da dove la coda si può cambiare (`EXTRA_EDITABLE_FROM`).
 - Impostazioni: i server trovati in rete, accesso con nome utente e password (o token), primo account.
+  In fondo le donazioni in bitcoin (`DONATION_ADDRESS` in `SettingsScreen.kt`, lo stesso indirizzo del
+  README e del campo `Bitcoin` della ricetta di F-Droid): "Copia" e "Apri nel portafoglio" (`bitcoin:`;
+  senza un portafoglio installato copia). La copia negli appunti è in `Platform.kt` (`rememberCopy`).
   I servizi di MA solo per gli admin (Impostazioni, e la Home vuota).
 - "Suona su": `PhoneModel.remote` è il lettore di MA comandato dallo schermo (null: il telefono); "suona"
   va lì. In auto non cambia niente: il menu suona sempre sulla coda del telefono. Se il telefono comincia
@@ -307,7 +310,7 @@ i valori assoluti; le prove usano gli id dei testTag (`Modifier.automationIds()`
 Fatte: app sul telefono con grafica moderna (riproduzione, mini-lettore, libreria, ricerca), testi
 sincronizzati sul telefono, fluidità (R8, Baseline Profile, elenchi fuori dal thread principale, meno
 ricomposizioni, schermate salvate), server trovati in rete e accesso con nome utente e password,
-gestione dei servizi di MA per gli admin, "Suona su" con passaggio della coda, playlist modificabili
+gestione dei servizi di MA per gli admin, donazioni in bitcoin, "Suona su" con passaggio della coda, playlist modificabili
 (aggiungi, togli, nuova, elimina) e coda modificabile (suona dopo, togli). Studiato, in attesa
 della scelta dell'utente: un server MA sul telefono stesso (Termux, proot dentro l'app, Chaquopy).
 Proposto, non fatto: cercare dal telefono con mDNS/SSDP le casse che MA non vede e suggerire il

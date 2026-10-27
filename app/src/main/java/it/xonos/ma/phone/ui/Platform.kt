@@ -1,5 +1,7 @@
 package it.xonos.ma.phone.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.runtime.Composable
@@ -10,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import coil3.SingletonImageLoader
@@ -32,6 +35,15 @@ internal fun PlatformBackHandler(enabled: Boolean, onBack: () -> Unit) = BackHan
  */
 @Composable
 internal fun PlatformReportReady(ready: () -> Boolean) = ReportDrawnWhen(ready)
+
+/** Copia un testo negli appunti di Android. */
+@Composable
+internal fun rememberCopy(): (String) -> Unit {
+    val context = LocalContext.current
+    return remember(context) {
+        { text -> context.getSystemService(ClipboardManager::class.java)?.setPrimaryClip(ClipData.newPlainText("Xonos", text)) }
+    }
+}
 
 /** I testTag diventano gli id che vedono le prove automatiche (UiAutomator, nel modulo baselineprofile). */
 @OptIn(ExperimentalComposeUiApi::class)

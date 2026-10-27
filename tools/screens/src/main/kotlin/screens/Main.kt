@@ -127,7 +127,8 @@ private fun watchdog(name: String, block: () -> Unit) {
 }
 
 private const val WIDTH = 1080
-private const val HEIGHT = 2340
+// Più alta con -Dxonos.height, per vedere intere le pagine lunghe (le impostazioni).
+private val HEIGHT = System.getProperty("xonos.height")?.toIntOrNull() ?: 2340
 private const val DENSITY = 2.625f
 
 /** Una scena: prepara il modello (schede, pagine, lettore) e dice cosa sta suonando. */

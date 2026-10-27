@@ -37,6 +37,10 @@
     <string name="battery_ok">✓ Android lets Xonos play with the screen off too.</string>
     <string name="battery_button">Allow in background</string>
     <string name="help_car">In the car, open Gearslip: Xonos is among the music apps.</string>
+    <string name="donate_text">Xonos is free and has no ads. If it’s useful to you, you can support it with a bitcoin donation.</string>
+    <string name="donate_copy">Copy</string>
+    <string name="donate_copied">Copied</string>
+    <string name="donate_open">Open in wallet</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Enter at least one address and the token.</string>

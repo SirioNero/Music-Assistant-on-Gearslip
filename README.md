@@ -123,6 +123,16 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 
 `tools/` has what’s needed to check Xonos without a phone: a test Music Assistant in Docker, a JVM harness that does what the car and the phone app do, and `tools/screens`, which draws the phone’s screens to PNG with Compose Desktop (see `tools/README.md`).
 
+### Donations
+
+Xonos is free and has no ads. If it’s useful to you, you can support it with bitcoin:
+
+```
+bc1qu8q2sc5kuccjj3zpzzfpj85xn7szp73nae9xlx
+```
+
+The same address is in the app, at the bottom of Settings, with buttons to copy it or open your wallet.
+
 ### License
 
 Xonos is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3 or (at your option) any later version. See [LICENSE](LICENSE).
@@ -247,6 +257,16 @@ Segnalazioni e pull request sono benvenute, soprattutto da chi prova Xonos in au
 | `res/values*/strings.xml` | Tutti i testi, in inglese (`values`) e in ogni lingua (`values-it`, `values-es`…) |
 
 In `tools/` c’è ciò che serve per provare Xonos senza telefono: un Music Assistant di prova in Docker, un banco di prova sulla JVM che fa ciò che fanno l’auto e l’app del telefono, e `tools/screens`, che disegna in PNG le schermate del telefono con Compose Desktop (vedi `tools/README.md`).
+
+### Donazioni
+
+Xonos è gratuito e senza pubblicità. Se ti è utile, puoi sostenerlo con dei bitcoin:
+
+```
+bc1qu8q2sc5kuccjj3zpzzfpj85xn7szp73nae9xlx
+```
+
+Lo stesso indirizzo è nell’app, in fondo alle Impostazioni, con i pulsanti per copiarlo o aprire il tuo portafoglio.
 
 ### Licenza
 

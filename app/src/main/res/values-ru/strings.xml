@@ -34,6 +34,10 @@
     <string name="battery_ok">✓ Android позволяет Xonos играть и при выключенном экране.</string>
     <string name="battery_button">Разрешить работу в фоне</string>
     <string name="help_car">В машине откройте Gearslip: Xonos есть среди музыкальных приложений.</string>
+    <string name="donate_text">Xonos бесплатный и без рекламы. Если он вам полезен, вы можете поддержать его пожертвованием в биткоинах.</string>
+    <string name="donate_copy">Копировать</string>
+    <string name="donate_copied">Скопировано</string>
+    <string name="donate_open">Открыть в кошельке</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Нужны хотя бы один адрес и токен.</string>

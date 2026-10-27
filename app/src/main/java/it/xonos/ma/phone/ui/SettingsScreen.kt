@@ -3,6 +3,8 @@ package it.xonos.ma.phone.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -43,9 +46,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -67,8 +72,9 @@ internal fun Onboarding(model: PhoneModel, host: Host, onDone: () -> Unit) {
 
 /**
  * Le impostazioni: lingua, i Music Assistant trovati nella rete, indirizzi, accesso (nome utente
- * e password, o un token), nome del lettore, la prova della connessione, la batteria e come si
- * usa in auto. Su un Music Assistant appena installato propone di creare il primo account.
+ * e password, o un token), nome del lettore, la prova della connessione, la batteria, come si
+ * usa in auto e come sostenere Xonos. Su un Music Assistant appena installato propone di creare il
+ * primo account.
  */
 @Composable
 internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, onboarding: Boolean, onDone: () -> Unit) {
@@ -194,6 +200,7 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
                 if (restricted) ({ Button(onClick = host::askBatteryExemption) { Text(stringResource(R.string.battery_button)) } }) else null,
             )
             InfoCard(XIcons.Car, stringResource(R.string.help_car))
+            if (!onboarding) Donation()
             Text(
                 stringResource(R.string.version, host.version),
                 style = MaterialTheme.typography.bodySmall,
@@ -433,4 +440,50 @@ private fun InfoCard(icon: ImageVector, text: String, action: (@Composable () ->
             if (action != null) Box(Modifier.padding(start = 40.dp, top = 12.dp)) { action() }
         }
     }
+}
+
+/** L'indirizzo bitcoin per le donazioni: lo stesso del README e della ricetta di F-Droid. */
+private const val DONATION_ADDRESS = "bc1qu8q2sc5kuccjj3zpzzfpj85xn7szp73nae9xlx"
+
+/** Chi vuole sostenere Xonos: l'indirizzo bitcoin, da copiare o da aprire nel portafoglio. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Donation() {
+    val uri = LocalUriHandler.current
+    val copy = rememberCopy()
+    var copied by remember { mutableStateOf(false) }
+    LaunchedEffect(copied) {
+        if (copied) {
+            delay(2_000)
+            copied = false
+        }
+    }
+    val copyAddress = {
+        copy(DONATION_ADDRESS)
+        copied = true
+    }
+    InfoCard(XIcons.Favorite, stringResource(R.string.donate_text), {
+        Column {
+            // In due righe uguali, che stanno in ogni schermo: da qui non si copia (andrebbe a capo
+            // anche la copia), c'è il pulsante.
+            Text(
+                DONATION_ADDRESS.chunked((DONATION_ADDRESS.length + 1) / 2).joinToString("\n"),
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilledTonalButton(onClick = copyAddress, modifier = Modifier.testTag("donate_copy")) {
+                    Text(stringResource(if (copied) R.string.donate_copied else R.string.donate_copy))
+                }
+                // Senza un portafoglio sul telefono non si apre niente: allora l'indirizzo si copia.
+                TextButton(
+                    onClick = { if (runCatching { uri.openUri("bitcoin:$DONATION_ADDRESS") }.isFailure) copyAddress() },
+                    modifier = Modifier.testTag("donate_open"),
+                ) {
+                    Text(stringResource(R.string.donate_open))
+                }
+            }
+        }
+    })
 }

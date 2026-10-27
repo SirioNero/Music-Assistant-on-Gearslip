@@ -34,6 +34,10 @@
     <string name="battery_ok">✓ Το Android αφήνει το Xonos να παίζει και με σβηστή οθόνη.</string>
     <string name="battery_button">Να επιτρέπεται στο παρασκήνιο</string>
     <string name="help_car">Στο αυτοκίνητο ανοίξτε το Gearslip: το Xonos είναι στις εφαρμογές μουσικής.</string>
+    <string name="donate_text">Το Xonos είναι δωρεάν και χωρίς διαφημίσεις. Αν σας είναι χρήσιμο, μπορείτε να το στηρίξετε με μια δωρεά σε bitcoin.</string>
+    <string name="donate_copy">Αντιγραφή</string>
+    <string name="donate_copied">Αντιγράφηκε</string>
+    <string name="donate_open">Άνοιγμα στο πορτοφόλι</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Χρειάζονται τουλάχιστον μία διεύθυνση και το διακριτικό.</string>

@@ -34,6 +34,10 @@
     <string name="battery_ok">✓ Android laisse Xonos jouer même écran éteint.</string>
     <string name="battery_button">Autoriser en arrière-plan</string>
     <string name="help_car">En voiture, ouvrez Gearslip : Xonos figure parmi les apps de musique.</string>
+    <string name="donate_text">Xonos est gratuit et sans publicité. S’il vous est utile, vous pouvez le soutenir par un don en bitcoins.</string>
+    <string name="donate_copy">Copier</string>
+    <string name="donate_copied">Copié</string>
+    <string name="donate_open">Ouvrir dans le portefeuille</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Il faut au moins une adresse et le jeton.</string>

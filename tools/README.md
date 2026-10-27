@@ -60,7 +60,8 @@ JAVA_OPTS="-Dxonos.out=/tmp/shots -Dxonos.lang=it -Dxonos.only=home,player" buil
 Le scene: `home`, `library`, `album`, `artist`, `artist-more`, `search`, `player`, `lyrics`, `queue`,
 `podcast`, `settings`, `welcome`, `services`, `add-service`, `service-flow`, `service-login`, `service`,
 `play-on`, `remote`, `remote-mini`, `add-to-playlist`
-(1080×2340, densità 2,625). Le scritte sono nella lingua di `-Dxonos.lang`.
+(1080×2340, densità 2,625). Le scritte sono nella lingua di `-Dxonos.lang`. Con `-Dxonos.height=5400`
+la schermata è più alta e si vedono intere le pagine lunghe (le impostazioni).
 
 ## Il Music Assistant di prova (`ma-test/`)
 

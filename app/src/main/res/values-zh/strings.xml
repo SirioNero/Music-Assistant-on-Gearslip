@@ -34,6 +34,10 @@
     <string name="battery_ok">✓ Android 允许 Xonos 在熄屏时继续播放。</string>
     <string name="battery_button">允许后台运行</string>
     <string name="help_car">在车上打开 Gearslip：Xonos 会出现在音乐应用中。</string>
+    <string name="donate_text">Xonos 免费且没有广告。如果它对你有帮助，可以用比特币捐赠来支持它。</string>
+    <string name="donate_copy">复制</string>
+    <string name="donate_copied">已复制</string>
+    <string name="donate_open">在钱包中打开</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">至少需要一个地址和令牌。</string>
