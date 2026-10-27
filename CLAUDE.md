@@ -11,7 +11,10 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 ## Regole
 
 - Codice, commenti, commit e log in italiano, con frasi semplici come nel resto del codice. README in
-  inglese e italiano. L'interfaccia è in 9 lingue (vedi sotto), con l'inglese come predefinita.
+  inglese, poi spagnolo, francese, tedesco, italiano e portoghese: stesse sezioni, con i nomi dei menu e
+  dei tasti presi dalle stringhe dell'app in quella lingua; come si compila e la mappa del codice solo in
+  inglese (le altre lingue ci rimandano). Un cambio al README va fatto in tutte e sei. L'interfaccia è
+  in 9 lingue (vedi sotto), con l'inglese come predefinita.
 - Si lavora su un ramo `claude/...`. In `main` si pubblica solo quando l'utente lo chiede (anche con
   "fai un aggiornamento"): ogni push in `main` che cambia l'app crea una release.
 - Niente pull request se non richiesta.
