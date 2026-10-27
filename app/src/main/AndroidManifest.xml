@@ -40,6 +40,12 @@
             android:authorities="${applicationId}.art"
             android:exported="true" />
 
+        <!-- L'account di Music Assistant per myCar, che ha Xonos dentro di sé: risponde solo a myCar (vedi AccountProvider). -->
+        <provider
+            android:name=".data.AccountProvider"
+            android:authorities="it.xonos.ma.account"
+            android:exported="true" />
+
         <!-- L'app sul telefono: libreria, ricerca, lettore e impostazioni. -->
         <activity
             android:name=".phone.MainActivity"
