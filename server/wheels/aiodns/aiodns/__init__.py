@@ -18,7 +18,7 @@ from typing import Any
 
 from . import error
 
-__version__ = "3.2.0+xonos"
+__version__ = "4.0.4+xonos"
 
 RADIO_BROWSER_SRV = "_api._tcp.radio-browser.info"
 RADIO_BROWSER_ALL = "all.api.radio-browser.info"
@@ -26,7 +26,7 @@ RADIO_BROWSER_ALL = "all.api.radio-browser.info"
 
 @dataclass
 class SrvRecord:
-    """Like pycares' SRV answer."""
+    """Come la risposta SRV di pycares."""
 
     host: str
     port: int
@@ -38,7 +38,7 @@ class SrvRecord:
 
 @dataclass
 class AddressRecord:
-    """Like pycares' A and AAAA answers."""
+    """Come le risposte A e AAAA di pycares."""
 
     host: str
     ttl: int = 0
@@ -46,13 +46,13 @@ class AddressRecord:
 
 
 class DNSResolver:
-    """A resolver that asks the phone's own DNS."""
+    """Un risolutore che chiede al DNS del telefono."""
 
     def __init__(self, nameservers: Any = None, loop: asyncio.AbstractEventLoop | None = None, **_: Any) -> None:
         self.nameservers = nameservers or []
 
     async def query(self, host: str, qtype: str, qclass: Any = None) -> Any:
-        """Answer A, AAAA, and the one SRV name that is needed."""
+        """Risponde ad A, AAAA e all'unico nome SRV che serve."""
         kind = qtype.upper()
         if kind == "SRV" and host.rstrip(".").lower() == RADIO_BROWSER_SRV:
             return await asyncio.to_thread(_radio_browser_servers)
@@ -63,10 +63,10 @@ class DNSResolver:
         raise error.DNSError(4, f"{kind} queries aren't available on the phone")
 
     async def close(self) -> None:
-        """Nothing to close."""
+        """Niente da chiudere."""
 
     def cancel(self) -> None:
-        """Nothing to cancel."""
+        """Niente da annullare."""
 
 
 async def _addresses(host: str, family: int) -> list[Any]:
