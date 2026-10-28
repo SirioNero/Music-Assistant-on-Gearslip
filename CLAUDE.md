@@ -378,11 +378,16 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   esempio dopo un INVALID_CREDENTIALS di librespot, che lo scarica). Con l'app della persona Spotify non dà più
   `country`/`product` dell'account: probabile che `is_playable` (con `market=from_token`) venga falso. Quindi
   (`_xonos_playable` in `parsers.py`) un brano "non suonabile" si prova comunque, con un avviso nel registro (i primi
-  5), tranne `restrictions.reason == "explicit"` (il filtro della persona); all'avvio del servizio
-  `_xonos_playable_again` rimette `available = 1` alle tracce Spotify di quell'istanza in `provider_mappings` e
-  svuota una volta la sua cache (segno `.xonos-playable-<istanza>` nei dati). E `xonos_service_down` dice quale
-  servizio non è caricato. Provato col server sul computer (servizio dei file spento: "Filesystem (local disk)
-  isn't working right now", anche in italiano) e con la rete finta. Da confermare col registro dell'utente.
+  5), tranne `restrictions.reason == "explicit"` (il filtro della persona). Non scavalca i limiti per paese:
+  librespot li controlla da sé col paese e il catalogo dell'account (`available_for_user` in `metadata`, poi
+  "is not available"); il filtro degli espliciti invece con `--single-track` no, per questo resta qui. Al primo avvio
+  del servizio `_xonos_playable_again` rimette `available = 1` alle tracce Spotify di quell'istanza in
+  `provider_mappings`, tranne quelle esplicite (`json_extract(metadata, '$.explicit') = 1`: le rivede la
+  sincronizzazione), e svuota la sua cache, solo quella volta (segno `.xonos-playable-<istanza>` nei dati); se non
+  riesce lo scrive nel registro e il servizio parte lo stesso. E `xonos_service_down` dice quale servizio non è caricato.
+  Provato col server sul computer (servizio dei file spento: "Filesystem (local disk) isn't working right now", anche
+  in italiano), con la rete finta e col database vero di Music Assistant (`DatabaseConnection`). Da confermare col
+  registro dell'utente.
 - **Spotify**: il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`, 0.8.0)
   compilato per Android in `server/librespot/build.sh` (Rust con cargo-ndk, rustls al posto di OpenSSL, senza
   uscite audio), nel pacchetto `bin/librespot`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
