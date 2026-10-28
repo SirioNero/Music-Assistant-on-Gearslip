@@ -597,16 +597,23 @@ def _spotify(root: Path) -> None:
         provider,
         "    async def unload(self, is_removed: bool = False) -> None:\n",
         "    async def _xonos_playable_again(self) -> None:\n"
-        '        """Xonos: i brani salvati "non suonabili" prima di parsers._xonos_playable tornano da provare."""\n'
-        "        await self.mass.music.database.execute_write(\n"
-        '            "UPDATE provider_mappings SET available = 1 "\n'
-        "            \"WHERE provider_instance = :instance AND media_type = 'track' AND available = 0\",\n"
-        '            {"instance": self.instance_id},\n'
-        "        )\n"
+        '        """Xonos: una volta, i brani salvati "non suonabili" prima di parsers._xonos_playable tornano da provare."""\n'
         '        marker = Path(self.mass.storage_path) / f".xonos-playable-{self.instance_id}"\n'
-        "        if not marker.exists():\n"
+        "        if marker.exists():\n"
+        "            return\n"
+        "        # Gli espliciti no: possono essere fuori per il filtro della persona; li rivede la sincronizzazione.\n"
+        "        try:\n"
+        "            await self.mass.music.database.execute_write(\n"
+        '                "UPDATE provider_mappings SET available = 1 "\n'
+        "                \"WHERE provider_instance = :instance AND media_type = 'track' AND available = 0 \"\n"
+        "                \"AND item_id NOT IN (SELECT item_id FROM tracks WHERE json_extract(metadata, '$.explicit') = 1)\",\n"
+        '                {"instance": self.instance_id},\n'
+        "            )\n"
         "            await self.mass.cache.clear(provider_filter=self.instance_id)\n"
-        "            marker.touch()\n\n"
+        "        except Exception as err:\n"
+        '            self.logger.warning("Could not make the saved tracks playable again: %s", err)\n'
+        "            return\n"
+        "        marker.touch()\n\n"
         "    async def unload(self, is_removed: bool = False) -> None:\n",
     )
     # Con un'app personale (Development Mode) Spotify dà i brani solo delle playlist della persona: per le
