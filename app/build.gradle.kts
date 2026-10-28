@@ -18,6 +18,7 @@ val debugSigning = System.getenv("XONOS_DEBUG_SIGNING") == "true"
 // La versione con Music Assistant sul telefono (Xonos-server.apk): gradle -PxonosServer. Senza la proprietà,
 // come per Xonos.apk e F-Droid, l'app è quella di sempre e PhoneServer dice che il server non c'è.
 val withServer = providers.gradleProperty("xonosServer").isPresent && findProject(":server") != null
+val serverAbis = providers.gradleProperty("xonosServerAbis").get().split(',').map(String::trim)
 
 android {
     namespace = "it.xonos.ma"
@@ -31,6 +32,9 @@ android {
         // Obtainium confronta con l'app installata, e F-Droid compila da quel tag.
         versionCode = 40
         versionName = "0.1.40"
+        // Con il server solo le sue ABI, a 64 bit: un telefono a 32 bit non installa Xonos-server.apk,
+        // invece di avere un server che non parte.
+        if (withServer) ndk { abiFilters += serverAbis }
     }
 
     signingConfigs {

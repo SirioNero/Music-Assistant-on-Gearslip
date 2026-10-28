@@ -45,7 +45,7 @@ val nativeTools = listOf("ffmpeg", "librespot")
 val androidNdk: Provider<String> = providers.environmentVariable("ANDROID_NDK")
     .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
     .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
-val serverAbis = listOf("arm64-v8a", "x86_64")
+val serverAbis = providers.gradleProperty("xonosServerAbis").get().split(',').map(String::trim)
 val buildTools = nativeTools.flatMap { tool ->
     serverAbis.map { abi ->
         val suffix = (listOf(tool) + abi.split('-', '_')).joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }
@@ -70,7 +70,7 @@ android {
 
     defaultConfig {
         minSdk = 26
-        // I telefoni (arm64) e l'emulatore delle prove (x86_64): Python 3.13 per Android c'è solo a 64 bit.
+        // Le ABI di xonosServerAbis (gradle.properties): Python 3.13 per Android c'è solo a 64 bit.
         ndk {
             abiFilters += serverAbis
         }

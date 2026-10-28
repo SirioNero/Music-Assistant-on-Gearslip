@@ -127,7 +127,11 @@ jobs:
             NOTE="fastlane/metadata/android/$LANG/changelogs/$CODE.txt"
             [ -f "$NOTE" ] && { cat "$NOTE"; echo; } >> notes.md
           done
-          echo "Installa Xonos.apk sul telefono; in auto la trovi tra le app musicali di Gearslip." >> notes.md
+          cat >> notes.md <<'NOTE'
+          Two APKs: `Xonos.apk` is the app, the same as on F-Droid. `Xonos-server.apk` also has Music Assistant inside, for those without a server (Music Assistant on this phone, in the settings); 64-bit phones only. With Obtainium, pick one by writing `Xonos-server` or `Xonos\.apk$` in "Filter APKs by regular expression".
+
+          Due APK: `Xonos.apk` è l'app, la stessa di F-Droid. `Xonos-server.apk` ha anche Music Assistant dentro di sé, per chi non ha un server (Music Assistant su questo telefono, nelle impostazioni); solo telefoni a 64 bit. Con Obtainium se ne sceglie uno scrivendo `Xonos-server` o `Xonos\.apk$` in "Filter APKs by regular expression". In auto Xonos è tra le app musicali di Gearslip e di myCar.
+          NOTE
 
       # Solo il ramo main pubblica una release: gli altri rami si compilano per controllo.
       - name: Rinomina l'APK
@@ -135,6 +139,43 @@ jobs:
         run: |
           mkdir -p apk
           cp app/build/outputs/apk/release/app-release.apk apk/Xonos.apk
+
+      # La versione completa, Xonos-server.apk: la stessa app con Music Assistant dentro (server/), solo per
+      # la release (VERSION c'è solo allora) e solo arm64, i telefoni. Serve Python 3.13 come quello dell'app;
+      # ffmpeg e librespot si compilano con l'NDK e Rust della macchina e si tengono finché gli script non
+      # cambiano. Se non si compila, la release non parte: le due versioni escono insieme.
+      - name: Prepara Python 3.13
+        if: env.VERSION != ''
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: ffmpeg già compilato
+        if: env.VERSION != ''
+        uses: actions/cache@v4
+        with:
+          path: server/build/ffmpeg
+          key: ffmpeg-arm64-v8a-${{ hashFiles('server/ffmpeg/build.sh') }}
+
+      - name: librespot già compilato
+        if: env.VERSION != ''
+        uses: actions/cache@v4
+        with:
+          path: server/build/librespot
+          key: librespot-arm64-v8a-${{ hashFiles('server/librespot/build.sh') }}
+
+      - name: Compila Xonos-server.apk
+        if: env.VERSION != ''
+        run: |
+          export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          if ! gradle :app:assembleRelease -PxonosServer -PxonosServerAbis=arm64-v8a --no-daemon --stacktrace > build-server.log 2>&1; then
+            tail -n 200 build-server.log
+            errors=$(grep -E "^e: |error:|ERROR|What went wrong" -A3 build-server.log | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+            echo "::error title=Xonos-server.apk non compilato::$errors"
+            exit 1
+          fi
+          cp app/build/outputs/apk/release/app-release.apk apk/Xonos-server.apk
+          ls -l apk
 
       - name: Pubblica la release
         if: env.SIGNED == 'true' && env.APP_CHANGED != 'false' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
