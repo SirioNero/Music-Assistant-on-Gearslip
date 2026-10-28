@@ -13,10 +13,12 @@ quel codice, lo script si ferma e lo dice, invece di produrre un server rotto.
 from __future__ import annotations
 
 import argparse
+import ast
 import io
 import shutil
 import sys
 import tarfile
+import tokenize
 import urllib.request
 from pathlib import Path
 
@@ -73,8 +75,12 @@ def main() -> None:
         shutil.rmtree(target)
     shutil.copytree(package, target, ignore=_ignore(package))
     _patch(target)
+    rewritten = _python313(target)
     marker.write_text(_fingerprint(args.version))
-    print(f"Music Assistant {args.version} per Xonos in {target} ({len(PROVIDERS)} servizi)")
+    print(
+        f"Music Assistant {args.version} per Xonos in {target} ({len(PROVIDERS)} servizi,"
+        f" {rewritten} file riscritti per Python 3.13)"
+    )
 
 
 def _fingerprint(version: str) -> str:
@@ -106,6 +112,98 @@ def _ignore(package: Path):
         return skipped
 
     return ignore
+
+
+def _python313(root: Path) -> int:
+    """
+    Riscrive quello che Python 3.13 non legge e controlla che legga ogni file.
+
+    Music Assistant è scritto per Python 3.14, ma i pacchetti con parti native (Pillow,
+    cryptography) per Android ci sono compilati solo fino al 3.13. Del 3.14 il suo codice usa due
+    cose: `except A, B:` senza parentesi (PEP 758), che qui diventa `except (A, B):`, e le
+    annotazioni dei tipi lette solo quando servono (PEP 649), che nel 3.13 si hanno con
+    `from __future__ import annotations` in testa al file.
+    """
+    rewritten = 0
+    for path in sorted(root.rglob("*.py")):
+        text = original = path.read_text()
+        if "except" in text:
+            text = _bracket_excepts(text)
+        try:
+            tree = ast.parse(text, str(path))
+        except SyntaxError as err:
+            sys.exit(f"{path}:{err.lineno}: Python {sys.version_info[0]}.{sys.version_info[1]} non lo legge: {err.msg}")
+        if FUTURE_ANNOTATIONS not in text and _annotated(tree):
+            text = _with_future_annotations(text, tree)
+        if text != original:
+            compile(text, str(path), "exec", dont_inherit=True)
+            path.write_text(text)
+            rewritten += 1
+    return rewritten
+
+
+FUTURE_ANNOTATIONS = "from __future__ import annotations"
+
+
+def _annotated(tree: ast.Module) -> bool:
+    for node in ast.walk(tree):
+        if isinstance(node, ast.AnnAssign):
+            return True
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            arguments = node.args
+            every = [*arguments.posonlyargs, *arguments.args, *arguments.kwonlyargs, arguments.vararg, arguments.kwarg]
+            if node.returns is not None or any(arg is not None and arg.annotation is not None for arg in every):
+                return True
+    return False
+
+
+def _with_future_annotations(text: str, tree: ast.Module) -> str:
+    # Dopo la docstring del modulo e prima di qualsiasi altra istruzione, come vuole Python.
+    lines = text.splitlines(keepends=True)
+    after = 0
+    first = tree.body[0] if tree.body else None
+    if isinstance(first, ast.Expr) and isinstance(first.value, ast.Constant) and isinstance(first.value.value, str):
+        after = first.end_lineno or 0
+    lines.insert(after, FUTURE_ANNOTATIONS + "\n")
+    return "".join(lines)
+
+
+def _bracket_excepts(text: str) -> str:
+    tokens = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    spans: list[tuple[tuple[int, int], tuple[int, int]]] = []
+    index = 0
+    while index < len(tokens):
+        token = tokens[index]
+        index += 1
+        if token.type != tokenize.NAME or token.string != "except":
+            continue
+        if tokens[index].string == "*":
+            index += 1
+        first = index
+        depth = 0
+        comma = named = False
+        while index < len(tokens):
+            part = tokens[index]
+            if part.type == tokenize.OP and part.string in "([{":
+                depth += 1
+            elif part.type == tokenize.OP and part.string in ")]}":
+                depth -= 1
+            elif depth == 0 and part.type == tokenize.OP and part.string == ",":
+                comma = True
+            elif depth == 0 and part.type == tokenize.NAME and part.string == "as":
+                named = True
+            elif depth == 0 and part.type == tokenize.OP and part.string == ":":
+                break
+            index += 1
+        if comma and not named:
+            spans.append((tokens[first].start, tokens[index - 1].end))
+    lines = text.splitlines(keepends=True)
+    for (start_row, start_col), (end_row, end_col) in reversed(spans):
+        end = lines[end_row - 1]
+        lines[end_row - 1] = end[:end_col] + ")" + end[end_col:]
+        start = lines[start_row - 1]
+        lines[start_row - 1] = start[:start_col] + "(" + start[start_col:]
+    return "".join(lines)
 
 
 def _replace(path: Path, old: str, new: str) -> None:
@@ -167,6 +265,34 @@ def _patch(root: Path) -> None:
         "            self._schedule_periodic_ha_announce()\n        self._schedule_periodic_upnp_discovery()\n",
         "            self._schedule_periodic_ha_announce()\n",
     )
+    # Lo Zeroconf che i servizi condividono resta, ma sul telefono stesso: nessun socket nella rete.
+    _replace(
+        discovery,
+        '        return AsyncZeroconf(\n            ip_version=zc_args["ip_version"],\n'
+        '            interfaces=zc_args["interfaces"],\n        )\n',
+        "        # Xonos: solo il telefono stesso, nessun socket nella rete.\n"
+        '        return AsyncZeroconf(ip_version=IPVersion.V4Only, interfaces=["127.0.0.1"])\n',
+    )
+    _replace(discovery, "from zeroconf import (\n", "from zeroconf import (\n    IPVersion,\n")
+    # Sendspin: Music Assistant prepara l'audio in float a 32 bit e aiosendspin lo converte per ogni
+    # lettore con PyAV, che per Android non c'è. Sul telefono il lettore è Xonos, che prende PCM a
+    # 16 bit: l'audio si prepara già così (ffmpeg converte) e aiosendspin lo passa com'è.
+    playback = root / "providers" / "sendspin" / "playback.py"
+    for indent, rate in (("", "48000"), ("        ", "sample_rate")):
+        _replace(
+            playback,
+            f"{indent}    content_type=ContentType.PCM_F32LE,\n{indent}    sample_rate={rate},\n"
+            f"{indent}    bit_depth=32,\n",
+            f"{indent}    content_type=ContentType.PCM_S16LE,  # Xonos: PCM a 16 bit\n"
+            f"{indent}    sample_rate={rate},\n{indent}    bit_depth=16,\n",
+        )
+        _replace(
+            playback,
+            f"{indent}    sample_rate={rate},\n{indent}    bit_depth=32,\n{indent}    channels=2,\n"
+            f'{indent}    sample_type="float",\n',
+            f"{indent}    sample_rate={rate},\n{indent}    bit_depth=16,\n{indent}    channels=2,\n"
+            f'{indent}    sample_type="int",  # Xonos: PCM a 16 bit\n',
+        )
 
 
 if __name__ == "__main__":
