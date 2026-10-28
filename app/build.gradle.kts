@@ -15,10 +15,9 @@ val hasXonosKey = xonosKeystore.exists()
 val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "xonos-android"
 val debugSigning = System.getenv("XONOS_DEBUG_SIGNING") == "true"
 
-// La versione con Music Assistant sul telefono (Xonos-server.apk): gradle -PxonosServer. Senza la proprietà,
-// come per Xonos.apk e F-Droid, l'app è quella di sempre e PhoneServer dice che il server non c'è.
-val withServer = providers.gradleProperty("xonosServer").isPresent && findProject(":server") != null
-val serverAbis = providers.gradleProperty("xonosServerAbis").get().split(',').map(String::trim)
+// Il pacchetto di Music Assistant sul telefono che questa versione usa (gradle.properties): Xonos lo scarica su
+// richiesta dalla release di GitHub di questa versione (server/package/make_payload.py lo costruisce).
+val serverPackage: String = providers.gradleProperty("xonosServerPackage").get()
 
 android {
     namespace = "it.xonos.ma"
@@ -32,9 +31,12 @@ android {
         // Obtainium confronta con l'app installata, e F-Droid compila da quel tag.
         versionCode = 41
         versionName = "0.1.41"
-        // Con il server solo le sue ABI, a 64 bit: un telefono a 32 bit non installa Xonos-server.apk,
-        // invece di avere un server che non parte.
-        if (withServer) ndk { abiFilters += serverAbis }
+        buildConfigField("String", "SERVER_PACKAGE", "\"$serverPackage\"")
+        buildConfigField(
+            "String",
+            "SERVER_PACKAGE_URL",
+            "\"https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases/download/v$versionName/\"",
+        )
     }
 
     signingConfigs {
@@ -77,12 +79,6 @@ android {
         compose = true
     }
 
-    sourceSets {
-        getByName("main") {
-            java.srcDir(if (withServer) "src/withServer/java" else "src/withoutServer/java")
-        }
-    }
-
     lint {
         abortOnError = false
         checkReleaseBuilds = false
@@ -101,14 +97,6 @@ kotlin {
     }
 }
 
-// ffmpeg e ffprobe del server (modulo server) sono programmi: Android li deve estrarre dall'APK,
-// altrimenti non si possono eseguire.
-if (withServer) {
-    androidComponents {
-        onVariants { variant -> variant.packaging.jniLibs.useLegacyPackaging.set(true) }
-    }
-}
-
 // Il profilo generato (vedi baselineprofile/) sta in src/main/generated/baselineProfiles.
 baselineProfile {
     mergeIntoMain = true
@@ -116,7 +104,6 @@ baselineProfile {
 
 dependencies {
     baselineProfile(project(":baselineprofile"))
-    if (withServer) implementation(project(":server"))
     // Installa il Baseline Profile anche quando l'APK non arriva dal Play Store (Obtainium).
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.media3:media3-session:1.11.1")

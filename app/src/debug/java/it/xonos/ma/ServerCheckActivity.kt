@@ -25,9 +25,10 @@ import java.io.File
 import kotlin.concurrent.thread
 
 /**
- * Solo nella build di prova: avvia Music Assistant sul telefono e mostra se gira (nella versione senza
- * server lo dice). Il workflow "Server MA" la apre con `am start`, poi parla col server da fuori (adb
- * forward). Nel registro (tag XonosServer) ogni cambio di stato, con i secondi dall'avvio.
+ * Solo nella build di prova: scarica il pacchetto di Music Assistant sul telefono (se non c'è già), lo avvia
+ * e mostra se gira. Il workflow "Server MA" mette l'indirizzo del pacchetto di prova nel file
+ * files/server-package-url, la apre con `am start`, poi parla col server da fuori (adb forward). Nel registro
+ * (tag XonosServer) il download e ogni cambio di stato, con i secondi dall'avvio.
  *
  * Con `--ez xonos true` fa anche quello che farebbe una persona: "Usa Music Assistant su questo
  * telefono" (account e token come dal tasto nelle impostazioni), la cartella files/music come servizio,
@@ -48,16 +49,21 @@ class ServerCheckActivity : Activity() {
         val app = application as XonosApp
         val server = app.phoneServer
         if (server == null) {
-            say("Questa versione di Xonos non ha Music Assistant dentro di sé.")
-            Log.i(TAG, "Server: STOPPED (questa versione non lo ha)")
+            say("Su questo telefono Music Assistant non può girare (non è a 64 bit).")
+            Log.i(TAG, "Server: STOPPED (telefono a 32 bit)")
             return
         }
         app.repo.acquire()
         thread(name = "server-check") {
             val started = SystemClock.elapsedRealtime()
             thread(name = "server-start") {
+                val ok = runCatching {
+                    runBlocking {
+                        if (!server.installed) download(server)
+                        server.start()
+                    }
+                }.onFailure { say("Server: FAILED $it") }.getOrDefault(false)
                 // Se non parte prima ancora di dire "starting" (Python che non si avvia), lo stato resta STOPPED.
-                val ok = runCatching { runBlocking { server.start() } }.onFailure { say("Server: FAILED $it") }.getOrDefault(false)
                 if (!ok && server.state == PhoneServerControl.State.STOPPED) say("Server: FAILED ${server.error}".trim())
             }
             // STOPPED è lo stato di prima dell'avvio: non si dice.
@@ -85,6 +91,9 @@ class ServerCheckActivity : Activity() {
 
     private suspend fun xonosCheck(app: XonosApp) {
         val model = app.phone
+        // Il pacchetto lo scarica il thread che avvia il server: si aspetta che sia al suo posto.
+        val server = app.phoneServer ?: return
+        withTimeout(DOWNLOAD_MS) { while (!server.installed) delay(500) }
         val page = model.settingsPage()
         model.usePhoneServer(page)
         withTimeout(START_MS) {
@@ -124,6 +133,20 @@ class ServerCheckActivity : Activity() {
         }
     }
 
+    /** Il pacchetto, come dal tasto "Fai diventare Xonos il tuo server Music Assistant": un mega ogni dieci nel registro. */
+    private suspend fun download(server: PhoneServerControl) {
+        val begun = SystemClock.elapsedRealtime()
+        say("Pacchetto: ${server.downloadSize()?.let { "${it / MB} MB" } ?: "dimensione sconosciuta"}")
+        var said = 0L
+        server.download { done, total ->
+            if (done - said >= 10 * MB || done == total) {
+                said = done
+                say("Pacchetto: ${done / MB} di ${total / MB} MB")
+            }
+        }
+        say("Pacchetto scaricato e controllato in ${(SystemClock.elapsedRealtime() - begun) / 1000.0} s")
+    }
+
     private fun say(line: String) {
         Log.i(TAG, line)
         runOnUiThread { text.append(line + "\n") }
@@ -142,5 +165,7 @@ class ServerCheckActivity : Activity() {
         const val SYNC_MS = 120_000L
         const val READY_MS = 60_000L
         const val LISTEN_MS = 12_000L
+        const val MB = 1024L * 1024
+        const val DOWNLOAD_MS = 600_000L
     }
 }

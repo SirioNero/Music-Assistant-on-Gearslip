@@ -90,7 +90,7 @@ class PhoneModel(
     /** Vero quando il telefono è un lettore di Music Assistant: solo allora si può suonare. */
     private val ready: StateFlow<Boolean>,
     private val scope: CoroutineScope,
-    /** Music Assistant sul telefono stesso, nella versione di Xonos che lo porta dentro di sé; null nelle altre. */
+    /** Music Assistant sul telefono stesso, scaricato su richiesta; null dove non può girare (32 bit). */
     private val phoneServer: PhoneServerControl? = null,
 ) {
     val connection: StateFlow<Connection> get() = repo.connection
@@ -165,7 +165,9 @@ class PhoneModel(
     /** Le impostazioni con i valori salvati. */
     fun settingsPage(): SettingsPage {
         val config = settings.load()
-        return SettingsPage(config.homeUrl, config.remoteUrl, config.token, settings.playerName, settings.username)
+        return SettingsPage(config.homeUrl, config.remoteUrl, config.token, settings.playerName, settings.username).also {
+            it.phoneServerInstalled = phoneServer?.installed == true
+        }
     }
 
     /** Un server trovato nella rete: i suoi indirizzi vanno nel modulo. */
@@ -990,8 +992,11 @@ class PhoneModel(
 
     // ---------- Music Assistant sul telefono ----------
 
-    /** Questa versione di Xonos ha Music Assistant dentro di sé (Xonos-server.apk). */
+    /** Xonos può far girare Music Assistant su questo telefono (a 64 bit), scaricandolo su richiesta. */
     val phoneServerAvailable: Boolean get() = phoneServer != null
+
+    /** Il pacchetto c'era ma per una versione precedente di Xonos: va riscaricato. */
+    val phoneServerOutdated: Boolean get() = phoneServer?.outdated == true
 
     /** Il modulo indica il Music Assistant sul telefono. */
     fun usesPhoneServer(page: SettingsPage): Boolean = phoneServer != null && page.home == phoneServer.url
@@ -1043,6 +1048,77 @@ class PhoneModel(
         }
     }
 
+    /**
+     * "Fai diventare Xonos il tuo server Music Assistant": prima la domanda, con quanto pesa il pacchetto. Si
+     * scarica solo se la persona dice di sì ([downloadPhoneServer]).
+     */
+    fun askPhoneServerDownload(page: SettingsPage) {
+        val server = phoneServer ?: return
+        page.phoneServerAsk = true
+        page.phoneServerDownloadError = null
+        if (page.phoneServerSize == null) scope.launch { page.phoneServerSize = server.downloadSize() }
+    }
+
+    fun dismissPhoneServerDownload(page: SettingsPage) {
+        page.phoneServerAsk = false
+    }
+
+    /** Scarica il pacchetto e poi fa come "Usa Music Assistant su questo telefono". */
+    fun downloadPhoneServer(page: SettingsPage) {
+        val server = phoneServer ?: return
+        page.phoneServerAsk = false
+        page.phoneServerDownloadError = null
+        page.phoneServerError = null
+        page.phoneServerProgress = 0L to (page.phoneServerSize ?: -1L)
+        downloading?.cancel()
+        downloading = scope.launch {
+            var shown = 0L
+            try {
+                server.download { done, total ->
+                    // Lo schermo si aggiorna ogni mezzo mega, non a ogni pezzo.
+                    if (done - shown >= PROGRESS_STEP || done == total) {
+                        shown = done
+                        page.phoneServerProgress = done to total
+                    }
+                }
+                page.phoneServerInstalled = server.installed
+                page.phoneServerProgress = null
+                usePhoneServer(page)
+            } catch (e: CancellationException) {
+                page.phoneServerProgress = null
+                throw e
+            } catch (e: Exception) {
+                page.phoneServerProgress = null
+                page.phoneServerInstalled = server.installed
+                page.phoneServerDownloadError = e.message ?: e.toString()
+            }
+        }
+    }
+
+    fun cancelPhoneServerDownload(page: SettingsPage) {
+        downloading?.cancel()
+        downloading = null
+        page.phoneServerProgress = null
+    }
+
+    /**
+     * Toglie Music Assistant dal telefono: il pacchetto e i suoi dati (l'account che Xonos si era creato, i
+     * servizi, la libreria). Se Xonos lo stava usando, il modulo torna vuoto.
+     */
+    fun removePhoneServer(page: SettingsPage) {
+        val server = phoneServer ?: return
+        if (usesPhoneServer(page)) {
+            leavePhoneServer(page)
+            settings.save(Settings.Config("", "", ""))
+            repo.reconnect()
+        }
+        server.remove()
+        settings.phoneServerPassword = null
+        page.phoneServerInstalled = false
+        page.phoneServerSize = null
+        page.phoneServerError = null
+    }
+
     /** Per collegarsi a un altro Music Assistant: il modulo torna vuoto. Il server sul telefono resta com'è. */
     fun leavePhoneServer(page: SettingsPage) {
         page.home = ""
@@ -1053,6 +1129,8 @@ class PhoneModel(
         page.results = emptyList()
         page.phoneServerError = null
     }
+
+    private var downloading: Job? = null
 
     private fun newPassword(): String {
         val random = SecureRandom()
@@ -1195,6 +1273,7 @@ class PhoneModel(
 
         /** Il nome dell'account che Xonos si crea nel Music Assistant sul telefono. */
         const val PHONE_SERVER_USER = "xonos"
+        private const val PROGRESS_STEP = 512L * 1024
         private const val PASSWORD_CHARS = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
         /** Problemi che vengono dal server stesso: provare l'altro indirizzo non cambierebbe niente. */
