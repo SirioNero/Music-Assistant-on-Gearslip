@@ -237,6 +237,44 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   Tailscale vero e myCar esclusa, myCar si collega a Music Assistant attraverso Xonos; nell'anteprima
   suona un album con Sendspin dal ponte.
 
+## Il server di Music Assistant sul telefono (`server/`, ramo `claude/server-ma`)
+
+Per chi non ha un Music Assistant: la versione completa di Xonos lo porta dentro di sé (l'utente ha scelto
+"due versioni": quella di F-Droid resta senza, la ricetta e i workflow che la imitano tolgono `server/`).
+Verificato sull'emulatore (workflow "Server MA", risultati in `refs/xonos/server/<ramo>`): parte in 15 s
+al primo avvio (Python in 2,6 s), crea il primo account, legge una cartella con ffprobe, e un lettore
+Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
+
+- **Python 3.13 con Chaquopy 17.2.0** (MIT), modulo Gradle `:server`. Non il 3.14 che Music Assistant
+  dichiara: per Android Chaquopy compila Pillow (11.0.0), cryptography (42.0.8), cffi (1.17.1), numpy
+  (1.26.2) solo fino al 3.13 (il suo indice, `chaquo.com/pypi-13.1`, dalla sandbox dà 403). Del 3.14 MA usa
+  due cose: `except A, B:` senza parentesi e le annotazioni lette tardi; `server/ma/prepare.py` le riscrive
+  (parentesi, `from __future__ import annotations`) e controlla che ogni file si compili col 3.13.
+- `prepare.py` prende MA 2.10.8 dal tag su GitHub, tiene il nucleo e i servizi della lista `PROVIDERS` e
+  applica modifiche controllate (il testo deve esserci una volta sola, sennò si ferma): niente
+  installazioni di pacchetti, DNS di Android al posto di c-ares, API (8095) e flussi (8097) solo su
+  127.0.0.1, niente mDNS né UPnP, Zeroconf legato a 127.0.0.1, Sendspin in PCM 16 bit (sotto).
+- **Sendspin senza PyAV**: MA prepara l'audio in float e aiosendspin lo converte con PyAV, che per Android
+  non c'è. La sessione si prepara già in PCM 16 bit 48 kHz (lo fa ffmpeg) e aiosendspin la passa così com'è;
+  `av` è un modulo vuoto che si lascia importare (Opus e FLAC risultano non disponibili e il server li
+  scarta da solo: Xonos non deve cambiare i formati che annuncia). numpy serve solo agli import del
+  visualizzatore di aiosendspin.
+- Al posto di pacchetti senza versione Android: `orjson`, `aiodns` (moduli in Python, `server/wheels`),
+  `zeroconf` in Python puro dal sorgente, `modern_colorthief` (Pillow), `music_assistant_frontend` (una
+  pagina sola). `server/ma/wheels.py` ne fa wheel identiche byte per byte; pip le trova con `--find-links`.
+  `requirements.txt`: tutte le versioni fissate. Chaquopy installa solo wheel (`--only-binary`).
+- **ffmpeg 7.1.5** (+ mbedTLS 3.6.5 per https) compilato dall'NDK in `server/ffmpeg/build.sh`, librerie
+  condivise e i programmi chiamati `libffmpeg.so`/`libffprobe.so`: Android esegue solo ciò che installa tra
+  le librerie dell'app (e le estrae solo con `useLegacyPackaging`). `LocalServer` crea a ogni avvio i
+  collegamenti `ffmpeg`/`ffprobe` in una cartella messa nel PATH, con `LD_LIBRARY_PATH`. MA senza ffmpeg 7
+  non parte. In CI ffmpeg si compila in pochi minuti e resta in cache finché lo script non cambia.
+- Chaquopy estrae su disco i file di dati dei pacchetti, non il codice: `music_assistant` è in
+  `extractPackages`, perché MA cerca `setup_flow.py` sul disco per sapere quali servizi hanno una procedura.
+- Pesa (non compresso) ~13 MB di Python, ~14 MB di ffmpeg, ~9 MB di pacchetti nativi per ABI, più ~25 MB
+  in comune. Solo 64 bit: Python 3.13 per Android non c'è per armeabi-v7a.
+- Spotify in MA usa il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`,
+  0.8.0): andrà compilato per Android come ffmpeg (Rust, rustls, senza audio).
+
 ## L'app sul telefono
 
 - Lo stato è in `PhoneModel` (valori osservabili di Compose, runtime 1.5 sulla JVM): vive in
