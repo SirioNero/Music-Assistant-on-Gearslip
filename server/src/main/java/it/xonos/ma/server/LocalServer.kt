@@ -19,7 +19,7 @@ import java.io.File
 object LocalServer {
     const val URL = "http://127.0.0.1:8095"
     private const val TAG = "XonosServer"
-    private val TOOLS = listOf("ffmpeg", "ffprobe")
+    private val TOOLS = listOf("ffmpeg", "ffprobe", "librespot")
 
     enum class State { STOPPED, STARTING, RUNNING, FAILED }
 
@@ -28,6 +28,8 @@ object LocalServer {
     fun start(context: Context) {
         val app = context.applicationContext
         if (!Python.isStarted()) Python.start(AndroidPlatform(app))
+        // Una seconda chiamata mentre parte o gira non deve toccare niente: il server sta già usando i programmi.
+        if (state() == State.STARTING || state() == State.RUNNING) return
         val libraries = app.applicationInfo.nativeLibraryDir
         module().callAttr(
             "start",
@@ -60,17 +62,20 @@ object LocalServer {
     private fun module(): PyObject = Python.getInstance().getModule("xonos_server")
 
     /**
-     * Music Assistant chiama ffmpeg e ffprobe per nome. Android li installa con le librerie dell'app,
-     * l'unico posto da cui un'app può eseguire un programma, ma solo con nomi lib*.so: qui una cartella
-     * con i nomi giusti che rimandano là. Si rifà a ogni avvio, perché quel posto cambia a ogni aggiornamento.
+     * Music Assistant chiama ffmpeg, ffprobe e librespot (Spotify) per nome. Android li installa con le
+     * librerie dell'app, l'unico posto da cui un'app può eseguire un programma, ma solo con nomi lib*.so:
+     * qui una cartella con i nomi giusti che rimandano là. Si rifà a ogni avvio, perché quel posto cambia
+     * a ogni aggiornamento.
      */
     private fun linkTools(context: Context, libraries: String): File {
         val tools = File(context.filesDir, "music-assistant-tools").apply { mkdirs() }
         for (name in TOOLS) {
             val link = File(tools, name)
+            val target = File(libraries, "lib$name.so").path
             try {
+                if (runCatching { Os.readlink(link.path) }.getOrNull() == target) continue
                 link.delete()
-                Os.symlink(File(libraries, "lib$name.so").path, link.path)
+                Os.symlink(target, link.path)
             } catch (e: ErrnoException) {
                 Log.w(TAG, "Non riesco a preparare $name: ${e.message}")
             }

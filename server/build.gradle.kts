@@ -37,26 +37,29 @@ val prepareServerWheels by tasks.registering(Exec::class) {
     commandLine(pythonCommand, file("ma/wheels.py").path, "--out", serverWheels.get().asFile.path)
 }
 
-// ffmpeg e ffprobe, che Music Assistant vuole per partire: compilati dal sorgente con l'NDK (vedi
-// ffmpeg/build.sh, che non rifà niente se l'uscita è già della sua versione). L'NDK è quello di
-// ANDROID_NDK, o ANDROID_NDK_HOME / ANDROID_NDK_LATEST_HOME come sulle macchine di GitHub.
-val ffmpegLibraries = layout.buildDirectory.dir("ffmpeg")
+// I programmi che Music Assistant esegue, compilati dal sorgente con l'NDK: ffmpeg e ffprobe (senza, il
+// server non parte; vedi ffmpeg/build.sh) e librespot per Spotify (librespot/build.sh). Gli script non
+// rifanno niente se l'uscita è già della loro versione. L'NDK è quello di ANDROID_NDK, o ANDROID_NDK_HOME /
+// ANDROID_NDK_LATEST_HOME come sulle macchine di GitHub.
+val nativeTools = listOf("ffmpeg", "librespot")
 val androidNdk: Provider<String> = providers.environmentVariable("ANDROID_NDK")
     .orElse(providers.environmentVariable("ANDROID_NDK_HOME"))
     .orElse(providers.environmentVariable("ANDROID_NDK_LATEST_HOME"))
 val serverAbis = listOf("arm64-v8a", "x86_64")
-val buildFfmpeg = serverAbis.map { abi ->
-    val suffix = abi.split('-', '_').joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }
-    tasks.register<Exec>("buildFfmpeg$suffix") {
-        description = "Compila ffmpeg e ffprobe per Android ($abi)."
-        inputs.file("ffmpeg/build.sh")
-        outputs.dir(ffmpegLibraries.map { it.dir(abi) })
-        commandLine("bash", file("ffmpeg/build.sh").path, abi, ffmpegLibraries.get().asFile.path)
-        doFirst {
-            environment(
-                "ANDROID_NDK",
-                androidNdk.orNull ?: throw GradleException("Per compilare ffmpeg serve ANDROID_NDK (la cartella dell'NDK)."),
-            )
+val buildTools = nativeTools.flatMap { tool ->
+    serverAbis.map { abi ->
+        val suffix = (listOf(tool) + abi.split('-', '_')).joinToString("") { part -> part.replaceFirstChar(Char::uppercase) }
+        // Senza uscite dichiarate: Gradle svuoterebbe la cartella alla prima esecuzione del task (anche
+        // con ffmpeg appena ripreso dalla cache di GitHub). Il task parte sempre; lo script decide.
+        tasks.register<Exec>("build$suffix") {
+            description = "Compila $tool per Android ($abi)."
+            commandLine("bash", file("$tool/build.sh").path, abi, layout.buildDirectory.dir(tool).get().asFile.path)
+            doFirst {
+                environment(
+                    "ANDROID_NDK",
+                    androidNdk.orNull ?: throw GradleException("Per compilare $tool serve ANDROID_NDK (la cartella dell'NDK)."),
+                )
+            }
         }
     }
 }
@@ -80,7 +83,7 @@ android {
 
     sourceSets {
         getByName("main") {
-            jniLibs.srcDir(ffmpegLibraries)
+            nativeTools.forEach { tool -> jniLibs.srcDir(layout.buildDirectory.dir(tool)) }
         }
     }
 }
@@ -113,5 +116,5 @@ chaquopy {
 tasks.configureEach {
     if (name.startsWith("merge") && name.endsWith("PythonSources")) dependsOn(prepareMusicAssistant)
     if (name.startsWith("install") && name.endsWith("PythonRequirements")) dependsOn(prepareServerWheels)
-    if (name.startsWith("merge") && name.endsWith("JniLibFolders")) dependsOn(buildFfmpeg)
+    if (name.startsWith("merge") && name.endsWith("JniLibFolders")) dependsOn(buildTools)
 }

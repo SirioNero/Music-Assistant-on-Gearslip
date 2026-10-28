@@ -21,7 +21,7 @@ NDK=${ANDROID_NDK:?serve ANDROID_NDK con la cartella dell’NDK}
 # Fuori dalla cartella delle librerie, che finisce nell'APK così com'è.
 STAMP="$(dirname "$OUT")/.build-$ABI"
 ME=$(sha256sum "$0" | cut -d' ' -f1)
-if [ -f "$STAMP" ] && [ "$(cat "$STAMP")" = "$ME" ]; then
+if [ -f "$STAMP" ] && [ "$(cat "$STAMP")" = "$ME" ] && [ -f "$OUT/libffmpeg.so" ]; then
     echo "ffmpeg per $ABI già pronto in $OUT"
     exit 0
 fi
