@@ -1,0 +1,1 @@
+Novità: il ponte per myCar. Per collegarsi all'auto senza fili myCar va lasciata fuori da Tailscale, e allora non raggiunge un Music Assistant sulla tua tailnet. Ora Xonos, dentro Tailscale, apre quelle connessioni per lei, così Xonos dentro myCar suona anche senza fili. Solo per myCar, controllandone la firma, e solo verso il Music Assistant configurato qui.
