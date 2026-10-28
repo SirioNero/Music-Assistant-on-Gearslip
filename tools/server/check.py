@@ -12,7 +12,8 @@ Con --player (e il --token dell'app) suona invece sul lettore vero di un'app, Xo
 coda in Music Assistant se suona davvero: stato e secondi suonati.
 
 Con --spotify prova anche il primo tratto del flusso di Spotify del server di Xonos: chiede il Client ID
-dell'app Spotify della persona e lo usa per entrare (più avanti serve un account Spotify vero).
+dell'app Spotify della persona e lo usa per entrare (più avanti serve un account Spotify vero). Col lettore
+di prova controlla anche che, quando non c'è niente da suonare, Music Assistant dica perché.
 
 Sull'emulatore il server dentro Xonos si raggiunge con `adb forward tcp:8095 tcp:8095`. Serve aiohttp.
 """
@@ -82,8 +83,9 @@ async def check(args: argparse.Namespace) -> int:
             await player.listen(args.seconds)
             print(f"play_media → primo audio: {player.first_audio_s(started)}")
             await api.call("player_queues/stop", queue_id=player.client_id, ignore_errors=True)
+            reason = 0 if await _reason(api, player.client_id) else 1
             await player.close()
-            return max(player.report(), spotify)
+            return max(player.report(), spotify, reason)
 
 
 class Api:
@@ -303,6 +305,20 @@ async def _wait_tracks(api: Api) -> list[dict[str, Any]]:
             break
         await asyncio.sleep(2)
     return tracks
+
+
+async def _reason(api: Api, queue_id: str) -> bool:
+    """Un brano che non c'è: Music Assistant deve dire perché non c'è niente da suonare, non solo che non c'è."""
+    try:
+        await api.call("player_queues/play_media", queue_id=queue_id, media="library://track/999999", option="add")
+    except RuntimeError as err:
+        print(f"niente da suonare: {err}")
+        if "nothing to play here:" in str(err):
+            return True
+        print("ERRORE: Music Assistant non dice perché")
+        return False
+    print("ERRORE: un brano che non c'è è finito in coda")
+    return False
 
 
 async def _spotify_flow(api: Api) -> bool:

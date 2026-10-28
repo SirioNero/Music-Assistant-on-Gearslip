@@ -383,8 +383,52 @@ def _patch(root: Path) -> None:
     # I consigli di Last.fm Music Assistant li aggiunge da solo, con la sua chiave: sul telefono si aggiungono
     # a mano, con la chiave di Last.fm della persona.
     _replace(root / "constants.py", '    ("lastfm_recommendations", False),\n', "")
+    _reasons(root)
     _spotify(root)
     _texts(root)
+
+
+def _reasons(root: Path) -> None:
+    """
+    Quando non c'è niente da suonare Music Assistant dice solo "There is nothing to play here.", e il
+    perché resta nel suo registro, che sul telefono nessuno vede. Qui lo dice: l'errore del servizio
+    (anche uno di Xonos, già spiegato, come le playlist Spotify non proprie) o che il servizio non ha
+    dato brani da suonare.
+    """
+    loader = root / "controllers" / "player_queues" / "queue_loader.py"
+    _replace(
+        loader,
+        "        shuffle_settled = False\n        # resolve all media items\n",
+        "        shuffle_settled = False\n"
+        "        skipped: MusicAssistantError | None = None  # Xonos: perché un elemento non si suona\n"
+        "        # resolve all media items\n",
+    )
+    _replace(
+        loader,
+        '            except (MusicAssistantError, ZeroDivisionError) as err:\n'
+        '                self.logger.warning("Skipping %s: %s", item, err)\n',
+        '            except (MusicAssistantError, ZeroDivisionError) as err:\n'
+        '                self.logger.warning("Skipping %s: %s", item, err)\n'
+        "                if isinstance(err, MusicAssistantError):\n"
+        "                    skipped = err\n",
+    )
+    _replace(
+        loader,
+        "        if not queue_items:\n"
+        '            raise MediaNotFoundError("No playable items found", translation_key="no_playable_items")\n',
+        "        if not queue_items:\n"
+        "            # Xonos: anche perché, invece del solo \"There is nothing to play here.\"\n"
+        '            if skipped is not None and str(skipped.translation_key).startswith("xonos_"):\n'
+        "                raise skipped\n"
+        "            if skipped is not None:\n"
+        "                reason = str(skipped) or type(skipped).__name__\n"
+        "                raise MediaNotFoundError(\n"
+        '                    f"No playable items found: {reason}",\n'
+        '                    translation_key="xonos_no_playable_items",\n'
+        "                    translation_args=[reason],\n"
+        "                )\n"
+        '            raise MediaNotFoundError("No playable items found", translation_key="xonos_not_available")\n',
+    )
 
 
 def _spotify(root: Path) -> None:
