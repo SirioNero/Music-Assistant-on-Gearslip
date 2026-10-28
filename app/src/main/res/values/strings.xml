@@ -237,6 +237,7 @@
     <string name="hide_advanced">Hide advanced options</string>
     <string name="flow_cancel">Cancel</string>
     <string name="flow_finish">Finish</string>
+    <string name="flow_next">Next</string>
     <string name="flow_open_browser">Open in the browser</string>
     <string name="flow_external_wait">Finish in the browser, then come back here: Xonos moves on by itself.</string>
     <string name="flow_working">Working…</string>

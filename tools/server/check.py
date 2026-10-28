@@ -11,6 +11,9 @@ o silenzio; esce con 1 se l'audio non arriva.
 Con --player (e il --token dell'app) suona invece sul lettore vero di un'app, Xonos, e guarda dalla sua
 coda in Music Assistant se suona davvero: stato e secondi suonati.
 
+Con --spotify prova anche il primo tratto del flusso di Spotify del server di Xonos: chiede il Client ID
+dell'app Spotify della persona e lo usa per entrare (più avanti serve un account Spotify vero).
+
 Sull'emulatore il server dentro Xonos si raggiunge con `adb forward tcp:8095 tcp:8095`. Serve aiohttp.
 """
 
@@ -26,6 +29,7 @@ import sys
 import time
 import uuid
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 import aiohttp
 
@@ -41,6 +45,7 @@ def main() -> None:
     parser.add_argument("--token", help="Un token del server, se l'account c'è già")
     parser.add_argument("--player", help="Suona su questo lettore (quello di Xonos) invece che su uno di prova")
     parser.add_argument("--seconds", type=float, default=10)
+    parser.add_argument("--spotify", action="store_true", help="Prova anche l'inizio del flusso di Spotify")
     args = parser.parse_args()
     sys.exit(asyncio.run(check(args)))
 
@@ -58,6 +63,7 @@ async def check(args: argparse.Namespace) -> int:
             token = args.token or await api.call("auth/token/create", name="Xonos check")
             if not info.get("onboard_done"):
                 await api.call("config/onboard_complete", ignore_errors=True)
+            spotify = 0 if not args.spotify or await _spotify_flow(api) else 1
             if args.music:
                 await _add_folder(api, args.music)
             tracks = await _wait_tracks(api)
@@ -67,7 +73,7 @@ async def check(args: argparse.Namespace) -> int:
             track = tracks[0]
             print(f"brani: {len(tracks)}; suono {track['name']} ({track['uri']})")
             if args.player:
-                return await _play_on(api, args.player, track, args.seconds)
+                return max(await _play_on(api, args.player, track, args.seconds), spotify)
 
             player = Sendspin(http, ws_url, token)
             await player.start()
@@ -77,7 +83,7 @@ async def check(args: argparse.Namespace) -> int:
             print(f"play_media → primo audio: {player.first_audio_s(started)}")
             await api.call("player_queues/stop", queue_id=player.client_id, ignore_errors=True)
             await player.close()
-            return player.report()
+            return max(player.report(), spotify)
 
 
 class Api:
@@ -297,6 +303,27 @@ async def _wait_tracks(api: Api) -> list[dict[str, Any]]:
             break
         await asyncio.sleep(2)
     return tracks
+
+
+async def _spotify_flow(api: Api) -> bool:
+    """Il flusso di Spotify fino al link di Spotify: il primo passo chiede il Client ID, il link lo usa."""
+    client_id = "0123456789abcdef0123456789abcdef"
+    step = await api.call("config/providers/setup", provider_domain="spotify")
+    flow = step["flow_id"]
+    try:
+        print(f"spotify: primo passo {step.get('step_id')} ({step.get('title')})")
+        if step.get("step_id") != "xonos_client_id":
+            print("ERRORE: Spotify non chiede il Client ID")
+            return False
+        step = await api.call("config/flows/submit", flow_id=flow, values={"xonos_client_id": client_id})
+        query = parse_qs(urlparse(step.get("url") or "").query)
+        print(f"spotify: poi {step.get('step_id')}, client_id {query.get('client_id')}, ritorno {query.get('redirect_uri')}")
+        if step.get("step_id") != "authenticate" or query.get("client_id") != [client_id]:
+            print("ERRORE: il link di Spotify non ha il Client ID")
+            return False
+        return True
+    finally:
+        await api.call("config/flows/abort", flow_id=flow, ignore_errors=True)
 
 
 async def _play_on(api: Api, queue_id: str, track: dict[str, Any], seconds: float) -> int:

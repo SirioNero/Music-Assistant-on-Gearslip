@@ -1,0 +1,110 @@
+{
+  "en": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "Your Spotify app's Client ID",
+    "provider.spotify.setup_flow.xonos_client_id.description": "On this phone Music Assistant has no shared Spotify key: it signs in with your own Spotify app, which you can create for free (Spotify Premium needed).\n\n1. Open the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), sign in and press Create app.\n2. Give it any name and description, and add this Redirect URI: `{0}`\n3. Tick Web API, accept the terms and press Save.\n4. Copy the Client ID (not the Client secret) and paste it below.\n\nIf you sign in to Spotify with a different account from the one that owns the app, first add it under User Management in the app's settings.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "This isn't a Client ID: it has 32 characters, digits and the letters a to f. Copy it again from your app's settings.",
+    "provider.spotify.setup_flow.authenticate.title": "Connect your Spotify account",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify opens in the browser: sign in and allow access for the app you created.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Allow Spotify playback",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify asks for a second, one-time approval so that Music Assistant can play the audio: press Next and allow it in the browser.\n\nThe audio goes through librespot, which mostly works only with Spotify accounts created before December 2024.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Approve playback in your browser",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify opens in the browser again: sign in if asked and allow access."
+  },
+  "it": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "Il Client ID della tua app Spotify",
+    "provider.spotify.setup_flow.xonos_client_id.description": "Sul telefono Music Assistant non ha una chiave Spotify condivisa: entra con una tua app Spotify, che si crea gratis (serve Spotify Premium).\n\n1. Apri la [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), accedi e premi Create app.\n2. Dalle un nome e una descrizione qualsiasi e aggiungi questo Redirect URI: `{0}`\n3. Spunta Web API, accetta le condizioni e premi Save.\n4. Copia il Client ID (non il Client secret) e incollalo qui sotto.\n\nSe entri in Spotify con un account diverso da quello che possiede l'app, aggiungilo prima in User Management, nelle impostazioni dell'app.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Questo non è un Client ID: ha 32 caratteri, cifre e lettere dalla a alla f. Copialo di nuovo dalle impostazioni della tua app.",
+    "provider.spotify.setup_flow.authenticate.title": "Collega il tuo account Spotify",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify si apre nel browser: accedi e consenti l'accesso all'app che hai creato.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Consenti la riproduzione di Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify chiede una seconda approvazione, una volta sola, perché Music Assistant possa suonare l'audio: premi Avanti e consentila nel browser.\n\nL'audio passa da librespot, che funziona soprattutto con gli account Spotify creati prima di dicembre 2024.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Approva la riproduzione nel browser",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify si riapre nel browser: accedi se te lo chiede e consenti l'accesso."
+  },
+  "es": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "El Client ID de tu app de Spotify",
+    "provider.spotify.setup_flow.xonos_client_id.description": "En el teléfono, Music Assistant no tiene una clave de Spotify compartida: entra con tu propia app de Spotify, que se crea gratis (hace falta Spotify Premium).\n\n1. Abre el [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), inicia sesión y pulsa Create app.\n2. Ponle cualquier nombre y descripción y añade esta Redirect URI: `{0}`\n3. Marca Web API, acepta las condiciones y pulsa Save.\n4. Copia el Client ID (no el Client secret) y pégalo abajo.\n\nSi entras en Spotify con una cuenta distinta de la que tiene la app, añádela antes en User Management, en los ajustes de la app.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Esto no es un Client ID: tiene 32 caracteres, cifras y letras de la a a la f. Cópialo de nuevo de los ajustes de tu app.",
+    "provider.spotify.setup_flow.authenticate.title": "Conecta tu cuenta de Spotify",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify se abre en el navegador: inicia sesión y permite el acceso a la app que creaste.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Permitir la reproducción de Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify pide una segunda aprobación, una sola vez, para que Music Assistant pueda reproducir el audio: pulsa Siguiente y permítela en el navegador.\n\nEl audio pasa por librespot, que funciona sobre todo con cuentas de Spotify creadas antes de diciembre de 2024.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Aprueba la reproducción en el navegador",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify se abre otra vez en el navegador: inicia sesión si te lo pide y permite el acceso."
+  },
+  "de": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "Die Client ID deiner Spotify-App",
+    "provider.spotify.setup_flow.xonos_client_id.description": "Auf dem Telefon hat Music Assistant keinen gemeinsamen Spotify-Schlüssel: Es meldet sich mit deiner eigenen Spotify-App an, die du kostenlos erstellen kannst (Spotify Premium nötig).\n\n1. Öffne das [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), melde dich an und tippe auf Create app.\n2. Gib einen beliebigen Namen und eine Beschreibung ein und füge diese Redirect URI hinzu: `{0}`\n3. Hake Web API an, akzeptiere die Bedingungen und tippe auf Save.\n4. Kopiere die Client ID (nicht das Client secret) und füge sie unten ein.\n\nWenn du dich bei Spotify mit einem anderen Konto anmeldest als dem, dem die App gehört, füge es vorher unter User Management in den Einstellungen der App hinzu.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Das ist keine Client ID: Sie hat 32 Zeichen, Ziffern und die Buchstaben a bis f. Kopiere sie erneut aus den Einstellungen deiner App.",
+    "provider.spotify.setup_flow.authenticate.title": "Verbinde dein Spotify-Konto",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify öffnet sich im Browser: Melde dich an und erlaube der App, die du erstellt hast, den Zugriff.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Spotify-Wiedergabe erlauben",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify verlangt eine zweite, einmalige Freigabe, damit Music Assistant den Ton abspielen kann: Tippe auf Weiter und erlaube sie im Browser.\n\nDer Ton läuft über librespot, das vor allem mit Spotify-Konten funktioniert, die vor Dezember 2024 erstellt wurden.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Wiedergabe im Browser freigeben",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify öffnet sich wieder im Browser: Melde dich an, falls nötig, und erlaube den Zugriff."
+  },
+  "fr": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "Le Client ID de votre app Spotify",
+    "provider.spotify.setup_flow.xonos_client_id.description": "Sur le téléphone, Music Assistant n'a pas de clé Spotify partagée : il se connecte avec votre propre app Spotify, que vous pouvez créer gratuitement (Spotify Premium requis).\n\n1. Ouvrez le [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), connectez-vous et appuyez sur Create app.\n2. Donnez-lui un nom et une description quelconques et ajoutez cette Redirect URI : `{0}`\n3. Cochez Web API, acceptez les conditions et appuyez sur Save.\n4. Copiez le Client ID (pas le Client secret) et collez-le ci-dessous.\n\nSi vous vous connectez à Spotify avec un autre compte que celui à qui appartient l'app, ajoutez-le d'abord dans User Management, dans les paramètres de l'app.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Ce n'est pas un Client ID : il compte 32 caractères, des chiffres et les lettres de a à f. Copiez-le de nouveau depuis les paramètres de votre app.",
+    "provider.spotify.setup_flow.authenticate.title": "Connectez votre compte Spotify",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify s'ouvre dans le navigateur : connectez-vous et autorisez l'accès à l'app que vous avez créée.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Autoriser la lecture Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify demande une seconde autorisation, une seule fois, pour que Music Assistant puisse lire l'audio : appuyez sur Suivant et accordez-la dans le navigateur.\n\nL'audio passe par librespot, qui fonctionne surtout avec les comptes Spotify créés avant décembre 2024.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Approuvez la lecture dans le navigateur",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify s'ouvre de nouveau dans le navigateur : connectez-vous si on vous le demande et autorisez l'accès."
+  },
+  "pt_PT": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "O Client ID do seu app do Spotify",
+    "provider.spotify.setup_flow.xonos_client_id.description": "No telefone, o Music Assistant não tem uma chave do Spotify compartilhada: ele entra com o seu próprio app do Spotify, que você pode criar de graça (é preciso Spotify Premium).\n\n1. Abra o [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), entre na sua conta e toque em Create app.\n2. Dê a ele qualquer nome e descrição e adicione este Redirect URI: `{0}`\n3. Marque Web API, aceite os termos e toque em Save.\n4. Copie o Client ID (não o Client secret) e cole abaixo.\n\nSe você entra no Spotify com uma conta diferente da dona do app, adicione-a antes em User Management, nas configurações do app.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Isto não é um Client ID: ele tem 32 caracteres, números e as letras de a até f. Copie de novo nas configurações do seu app.",
+    "provider.spotify.setup_flow.authenticate.title": "Conecte sua conta do Spotify",
+    "provider.spotify.setup_flow.authenticate.description": "O Spotify abre no navegador: entre na sua conta e permita o acesso ao app que você criou.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Permitir a reprodução do Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "O Spotify pede uma segunda aprovação, só uma vez, para que o Music Assistant possa tocar o áudio: toque em Avançar e permita no navegador.\n\nO áudio passa pelo librespot, que funciona sobretudo com contas do Spotify criadas antes de dezembro de 2024.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Aprove a reprodução no navegador",
+    "provider.spotify.setup_flow.playback_browser_open.description": "O Spotify abre de novo no navegador: entre na sua conta se ele pedir e permita o acesso."
+  },
+  "el_GR": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "Το Client ID της εφαρμογής σας Spotify",
+    "provider.spotify.setup_flow.xonos_client_id.description": "Στο τηλέφωνο το Music Assistant δεν έχει κοινόχρηστο κλειδί Spotify: συνδέεται με τη δική σας εφαρμογή Spotify, που μπορείτε να δημιουργήσετε δωρεάν (χρειάζεται Spotify Premium).\n\n1. Ανοίξτε το [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), συνδεθείτε και πατήστε Create app.\n2. Δώστε της όποιο όνομα και περιγραφή θέλετε και προσθέστε αυτό το Redirect URI: `{0}`\n3. Επιλέξτε Web API, αποδεχτείτε τους όρους και πατήστε Save.\n4. Αντιγράψτε το Client ID (όχι το Client secret) και επικολλήστε το παρακάτω.\n\nΑν συνδέεστε στο Spotify με λογαριασμό διαφορετικό από αυτόν στον οποίο ανήκει η εφαρμογή, προσθέστε τον πρώτα στο User Management, στις ρυθμίσεις της εφαρμογής.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Αυτό δεν είναι Client ID: έχει 32 χαρακτήρες, ψηφία και τα γράμματα a έως f. Αντιγράψτε το ξανά από τις ρυθμίσεις της εφαρμογής σας.",
+    "provider.spotify.setup_flow.authenticate.title": "Συνδέστε τον λογαριασμό σας Spotify",
+    "provider.spotify.setup_flow.authenticate.description": "Το Spotify ανοίγει στο πρόγραμμα περιήγησης: συνδεθείτε και επιτρέψτε την πρόσβαση στην εφαρμογή που δημιουργήσατε.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Επιτρέψτε την αναπαραγωγή του Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "Το Spotify ζητά μια δεύτερη έγκριση, μία φορά μόνο, ώστε το Music Assistant να μπορεί να παίζει τον ήχο: πατήστε Επόμενο και δώστε την στο πρόγραμμα περιήγησης.\n\nΟ ήχος περνά από το librespot, που λειτουργεί κυρίως με λογαριασμούς Spotify που δημιουργήθηκαν πριν από τον Δεκέμβριο του 2024.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Εγκρίνετε την αναπαραγωγή στο πρόγραμμα περιήγησης",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Το Spotify ανοίγει ξανά στο πρόγραμμα περιήγησης: συνδεθείτε αν σας ζητηθεί και επιτρέψτε την πρόσβαση."
+  },
+  "ru_RU": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "Client ID вашего приложения Spotify",
+    "provider.spotify.setup_flow.xonos_client_id.description": "На телефоне у Music Assistant нет общего ключа Spotify: он входит через ваше собственное приложение Spotify, которое можно создать бесплатно (нужен Spotify Premium).\n\n1. Откройте [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), войдите и нажмите Create app.\n2. Укажите любое название и описание и добавьте этот Redirect URI: `{0}`\n3. Отметьте Web API, примите условия и нажмите Save.\n4. Скопируйте Client ID (не Client secret) и вставьте его ниже.\n\nЕсли вы входите в Spotify с другим аккаунтом, а не с тем, которому принадлежит приложение, сначала добавьте его в User Management в настройках приложения.",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "Это не Client ID: в нём 32 символа, цифры и буквы от a до f. Скопируйте его ещё раз из настроек вашего приложения.",
+    "provider.spotify.setup_flow.authenticate.title": "Подключите аккаунт Spotify",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify откроется в браузере: войдите и разрешите доступ созданному вами приложению.",
+    "provider.spotify.setup_flow.xonos_playback.title": "Разрешите воспроизведение Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify просит второе, однократное разрешение, чтобы Music Assistant мог воспроизводить звук: нажмите «Далее» и дайте его в браузере.\n\nЗвук идёт через librespot, который работает в основном с аккаунтами Spotify, созданными до декабря 2024 года.",
+    "provider.spotify.setup_flow.playback_browser_open.title": "Одобрите воспроизведение в браузере",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify снова откроется в браузере: войдите, если попросят, и разрешите доступ."
+  },
+  "zh_CN": {
+    "provider.spotify.setup_flow.xonos_client_id.title": "你的 Spotify 应用的 Client ID",
+    "provider.spotify.setup_flow.xonos_client_id.description": "在这部手机上，Music Assistant 没有共享的 Spotify 密钥：它通过你自己的 Spotify 应用登录，这个应用可以免费创建（需要 Spotify Premium）。\n\n1. 打开 [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)，登录后点按 Create app。\n2. 随意填写名称和描述，并添加这个 Redirect URI：`{0}`\n3. 勾选 Web API，接受条款，然后点按 Save。\n4. 复制 Client ID（不是 Client secret），粘贴到下面。\n\n如果你登录 Spotify 用的账号不是这个应用的所有者，请先在应用设置的 User Management 中添加该账号。",
+    "provider.spotify.config_entries.xonos_client_id.label": "Client ID",
+    "provider.spotify.errors.xonos_client_id_invalid": "这不是 Client ID：它由 32 个字符组成，包括数字和字母 a 到 f。请从应用设置中重新复制。",
+    "provider.spotify.setup_flow.authenticate.title": "连接你的 Spotify 账号",
+    "provider.spotify.setup_flow.authenticate.description": "Spotify 会在浏览器中打开：登录并允许你创建的应用访问。",
+    "provider.spotify.setup_flow.xonos_playback.title": "允许播放 Spotify",
+    "provider.spotify.setup_flow.xonos_playback.description": "Spotify 需要再授权一次（仅此一次），Music Assistant 才能播放音频：点按“下一步”，然后在浏览器中允许。\n\n音频通过 librespot 播放，它主要适用于 2024 年 12 月之前创建的 Spotify 账号。",
+    "provider.spotify.setup_flow.playback_browser_open.title": "在浏览器中批准播放",
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify 会再次在浏览器中打开：如有需要请登录，然后允许访问。"
+  }
+}

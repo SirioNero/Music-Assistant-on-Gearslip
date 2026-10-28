@@ -224,6 +224,7 @@
     <string name="hide_advanced">隐藏高级选项</string>
     <string name="flow_cancel">取消</string>
     <string name="flow_finish">完成</string>
+    <string name="flow_next">下一步</string>
     <string name="flow_open_browser">在浏览器中打开</string>
     <string name="flow_external_wait">在浏览器中完成后回到这里，Xonos 会自动继续。</string>
     <string name="flow_working">请稍候…</string>

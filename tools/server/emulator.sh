@@ -3,7 +3,8 @@
 # chiave delle app) lo serve un piccolo server HTTP sul runner, che l'emulatore vede a 10.0.2.2:8000; Xonos lo
 # scarica da lì (file files/server-package-url dell'app) come dalla release di GitHub. Tre prove:
 #  1. Il server da solo: mette un album di toni nella cartella dell'app, scarica e avvia Music Assistant
-#     (ServerCheckActivity) e lo prova da fuori con check.py, attraverso adb forward.
+#     (ServerCheckActivity) e lo prova da fuori con check.py, attraverso adb forward, anche l'inizio del
+#     flusso di Spotify (il Client ID della persona); poi FFmpeg con https e librespot sul telefono.
 #  2. Xonos stesso, da capo (dati cancellati, quindi anche il pacchetto): "Usa Music Assistant su questo
 #     telefono", la cartella come servizio e il primo brano suonato dal lettore di Xonos
 #     (ServerCheckActivity --ez xonos true).
@@ -125,7 +126,7 @@ grep "XonosServer" "$OUT/logcat.txt" | head -n 80
 status=1
 if [ "$state" = "Server: RUNNING" ]; then
     adb forward tcp:8095 tcp:8095
-    python3 tools/server/check.py --url http://127.0.0.1:8095 --music "$MUSIC" --seconds 12 2>&1 | tee "$OUT/check.txt"
+    python3 tools/server/check.py --url http://127.0.0.1:8095 --music "$MUSIC" --seconds 12 --spotify 2>&1 | tee "$OUT/check.txt"
     status=${PIPESTATUS[0]}
     adb forward --remove tcp:8095
 fi
@@ -138,6 +139,10 @@ server_dir=/data/user/0/$PACKAGE/${server_dir%/}
 adb shell run-as "$PACKAGE" env LD_LIBRARY_PATH="$server_dir/lib" /system/bin/linker64 "$server_dir/bin/ffmpeg" -hide_banner -nostdin \
     -i https://raw.githubusercontent.com/music-assistant/server/2.10.8/music_assistant/helpers/resources/announce.mp3 \
     -f null - 2>&1 | grep -E "Duration|Stream|size=|rror|nvalid|annot|denied" | tee "$OUT/ffmpeg-https.txt"
+# librespot del telefono, come lo prova Music Assistant prima di usarlo per Spotify (--version). Solo da leggere.
+echo "== librespot"
+adb shell run-as "$PACKAGE" env LD_LIBRARY_PATH="$server_dir/lib" /system/bin/linker64 "$server_dir/bin/librespot" --version 2>&1 \
+    | tee "$OUT/librespot.txt"
 kill "$LOGCAT" 2>/dev/null
 grep -E "XonosServer|AndroidRuntime" "$OUT/logcat.txt" | tail -n 60
 

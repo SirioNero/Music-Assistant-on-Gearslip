@@ -254,6 +254,7 @@
     <string name="hide_advanced">Скрыть дополнительные настройки</string>
     <string name="flow_cancel">Отмена</string>
     <string name="flow_finish">Завершить</string>
+    <string name="flow_next">Далее</string>
     <string name="flow_open_browser">Открыть в браузере</string>
     <string name="flow_external_wait">Завершите в браузере и вернитесь сюда: Xonos продолжит сам.</string>
     <string name="flow_working">Минутку…</string>
