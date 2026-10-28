@@ -95,6 +95,13 @@ if [ "$state" = "Server: RUNNING" ]; then
     adb forward --remove tcp:8095
 fi
 adb exec-out run-as "$PACKAGE" cat files/music-assistant/musicassistant.log > "$OUT/musicassistant.log" 2>/dev/null
+# FFmpeg del telefono con https (mbedTLS), come per radio e podcast: un file di Music Assistant su GitHub.
+# Solo da leggere, non decide l'esito (dipende dalla rete).
+echo "== FFmpeg e https"
+ffmpeg_lib=$(adb shell run-as "$PACKAGE" readlink files/music-assistant-tools/ffmpeg | tr -d '\r')
+adb shell run-as "$PACKAGE" env LD_LIBRARY_PATH="${ffmpeg_lib%/*}" files/music-assistant-tools/ffmpeg -hide_banner -nostdin \
+    -i https://raw.githubusercontent.com/music-assistant/server/2.10.8/music_assistant/helpers/resources/announce.mp3 \
+    -f null - 2>&1 | grep -E "Duration|Stream|size=|rror|nvalid" | tee "$OUT/ffmpeg-https.txt"
 kill "$LOGCAT" 2>/dev/null
 grep -E " (E|W)/python\.std(err|out)|AndroidRuntime" "$OUT/logcat.txt" | tail -n 60
 
@@ -148,7 +155,15 @@ if wait_ui use_phone_server 60 && tap use_phone_server; then
     else
         echo "ERRORE: Xonos non ha chiesto il permesso per la musica"
     fi
-    wait_ui onboarding_done 300 && connected=true
+    # "Vai alla tua musica" compare in fondo alle impostazioni quando Xonos è collegato: si scorre in giù.
+    for _ in $(seq 1 60); do
+        if ui_center onboarding_done >/dev/null; then
+            connected=true
+            break
+        fi
+        adb shell input swipe 540 1600 540 900 300
+        sleep 5
+    done
 fi
 if $connected; then
     sleep 2
