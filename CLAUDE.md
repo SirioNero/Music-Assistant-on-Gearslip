@@ -243,7 +243,7 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 
 Per chi non ha un Music Assistant. L'app è una sola (`Xonos.apk`, la stessa per F-Droid): nelle impostazioni
 (e nel benvenuto) la scheda "Music Assistant su questo telefono" ha il tasto "Fai diventare Xonos il tuo server
-Music Assistant"; dopo una domanda con quanto pesa (circa 72 MB) e un sì, Xonos scarica il pacchetto che porta
+Music Assistant"; dopo una domanda con quanto pesa (circa 70 MB) e un sì, Xonos scarica il pacchetto che porta
 Music Assistant sul telefono, lo controlla e lo avvia. L'utente l'ha scelto al posto di due APK (Xonos e
 Xonos-server, 72 MB solo arm64, che c'erano prima nel ramo). Verificato sull'emulatore (workflow "Server MA",
 0.1.42, risultati in `refs/xonos/server/<ramo>`): Xonos scarica il pacchetto (72 MB per x86_64) dal server HTTP
@@ -311,7 +311,8 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   in pochi minuti e resta in cache finché lo script non cambia.
 - `music_assistant` è in `extractPackages` di Chaquopy: MA cerca `setup_flow.py` sul disco per sapere quali
   servizi hanno una procedura (nel pacchetto tutto è comunque estratto).
-- Pesa 72 MB lo zip per x86_64, 179 MB estratto (Xonos chiede libero 4 volte lo zip: zip ed estratto insieme). Solo 64 bit: Python 3.13 per Android non c'è
+- Pesa 68,5 MB lo zip per arm64 (165 MB estratto), 72 MB per x86_64 (179 MB); Xonos chiede libero 4 volte lo zip,
+  per zip ed estratto insieme. Solo 64 bit: Python 3.13 per Android non c'è
   per armeabi-v7a; su un telefono a 32 bit la scheda non c'è (`PhoneServer.create` dà null).
 - **Servizi** (`PROVIDERS` in `prepare.py`): 63, cioè tutti quelli le cui librerie esistono per Android e
   che si importano col 3.13; fuori, con il motivo scritto lì, Apple Music (DRM), Deezer (per ora), NFS e SMB
@@ -371,7 +372,11 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   Xonos). Se in `lib/` compare una libreria senza voce, lo dice nel log.
 - **Pagine da 16 KB**: i telefoni con Android 15 e successivi possono avere pagine di memoria da 16 KB, e lì si
   caricano solo programmi e librerie con i segmenti allineati a 16 KB. `make_payload.py` elenca quelli che non
-  lo sono (`ELF: N, allineati a meno di 16 KB: M`); `python3` si compila con `-z max-page-size=16384`.
+  lo sono (`ELF: N, allineati a meno di 16 KB: M`); `python3` si compila con `-z max-page-size=16384`. Per arm64
+  (0.1.42): su 153 ne resta uno solo, `site-packages/chaquopy/lib/libfreetype.so` (il pacchetto chaquopy-freetype
+  di Chaquopy, per Pillow). Music Assistant usa FreeType solo per il testo sulle copertine generate delle
+  playlist (Playlist Metadata): `prepare.py` lo fa ripiegare sul carattere a punti di Pillow se FreeType non si
+  carica (provato con Pillow 11.0.0 togliendo FreeType). Per x86_64 (solo l'emulatore) quattro librerie di Chaquopy.
 
 ## L'app sul telefono
 

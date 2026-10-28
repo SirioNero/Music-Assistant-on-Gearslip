@@ -73,7 +73,7 @@ Xonos signs in to Music Assistant and registers the phone as a private player th
 
 No Music Assistant at home? Xonos can run one on the phone itself, just for itself and for myCar.
 
-- In **Settings**, or the first time you open Xonos, tap **Make Xonos your Music Assistant server**. Xonos tells you how big the download is (about 72 MB, 180 MB once installed) and downloads it only after you tap **Download**: Music Assistant with Python, FFmpeg and librespot, from the release of the same Xonos version on this page. App stores such as F-Droid don’t check this download; Xonos uses it only if it’s signed with the same key as Xonos itself.
+- In **Settings**, or the first time you open Xonos, tap **Make Xonos your Music Assistant server**. Xonos tells you how big the download is (about 70 MB, 165 MB once installed) and downloads it only after you tap **Download**: Music Assistant with Python, FFmpeg and librespot, from the release of the same Xonos version on this page. App stores such as F-Droid don’t check this download; Xonos uses it only if it’s signed with the same key as Xonos itself.
 - Android asks to let Xonos read the music on the phone: allow it, and Music Assistant’s local disk service starts from the phone’s Music folder.
 - Then Xonos starts Music Assistant, creates its first account and connects to it by itself; the first start takes about a minute. Add your music from **Music Assistant services**: the phone’s files, radio, podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
 - It answers only on the phone, not to the rest of your network, and runs while Xonos runs. myCar reaches it through Xonos.
@@ -228,7 +228,7 @@ Xonos inicia sesión en Music Assistant y registra el teléfono como reproductor
 
 ¿No tienes Music Assistant en casa? Xonos puede ejecutar uno en el propio teléfono, solo para sí mismo y para myCar.
 
-- En **Ajustes**, o la primera vez que abres Xonos, pulsa **Convierte Xonos en tu servidor de Music Assistant**. Xonos te dice cuánto ocupa la descarga (unos 72 MB, 180 MB una vez instalado) y solo descarga después de que pulses **Descargar**: Music Assistant con Python, FFmpeg y librespot, desde la release de la misma versión de Xonos en esta página. Las tiendas de apps como F-Droid no revisan esta descarga; Xonos la usa solo si está firmada con la misma clave que Xonos.
+- En **Ajustes**, o la primera vez que abres Xonos, pulsa **Convierte Xonos en tu servidor de Music Assistant**. Xonos te dice cuánto ocupa la descarga (unos 70 MB, 165 MB una vez instalado) y solo descarga después de que pulses **Descargar**: Music Assistant con Python, FFmpeg y librespot, desde la release de la misma versión de Xonos en esta página. Las tiendas de apps como F-Droid no revisan esta descarga; Xonos la usa solo si está firmada con la misma clave que Xonos.
 - Android pide permiso para que Xonos lea la música del teléfono: permítelo, y el servicio de disco local de Music Assistant empieza por la carpeta Music del teléfono.
 - Después Xonos inicia Music Assistant, crea su primera cuenta y se conecta solo; el primer inicio tarda un minuto. Añade tu música desde **Servicios de Music Assistant**: los archivos del teléfono, radio, pódcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
 - Solo responde en el teléfono, no al resto de tu red, y funciona mientras Xonos funciona. myCar llega a él a través de Xonos.
@@ -343,7 +343,7 @@ Xonos se connecte à Music Assistant et enregistre le téléphone comme lecteur 
 
 Pas de Music Assistant à la maison ? Xonos peut en faire tourner un sur le téléphone même, rien que pour lui et pour myCar.
 
-- Dans **Réglages**, ou la première fois que vous ouvrez Xonos, touchez **Faire de Xonos votre serveur Music Assistant**. Xonos vous indique la taille du téléchargement (environ 72 Mo, 180 Mo une fois installé) et ne télécharge qu’après que vous avez touché **Télécharger** : Music Assistant avec Python, FFmpeg et librespot, depuis la release de la même version de Xonos sur cette page. Les magasins d’applications comme F-Droid ne vérifient pas ce téléchargement ; Xonos ne l’utilise que s’il est signé avec la même clé que Xonos.
+- Dans **Réglages**, ou la première fois que vous ouvrez Xonos, touchez **Faire de Xonos votre serveur Music Assistant**. Xonos vous indique la taille du téléchargement (environ 70 Mo, 165 Mo une fois installé) et ne télécharge qu’après que vous avez touché **Télécharger** : Music Assistant avec Python, FFmpeg et librespot, depuis la release de la même version de Xonos sur cette page. Les magasins d’applications comme F-Droid ne vérifient pas ce téléchargement ; Xonos ne l’utilise que s’il est signé avec la même clé que Xonos.
 - Android demande de laisser Xonos lire la musique du téléphone : autorisez-le, et le service de disque local de Music Assistant part du dossier Music du téléphone.
 - Ensuite Xonos démarre Music Assistant, crée son premier compte et s’y connecte tout seul ; le premier démarrage prend environ une minute. Ajoutez votre musique depuis **Services de Music Assistant** : les fichiers du téléphone, la radio, les podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
 - Il ne répond que sur le téléphone, pas au reste de votre réseau, et tourne tant que Xonos tourne. myCar l’atteint à travers Xonos.
@@ -458,7 +458,7 @@ Xonos meldet sich bei Music Assistant an und registriert das Handy über Sendspi
 
 Kein Music Assistant zu Hause? Xonos kann einen auf dem Handy selbst ausführen, nur für sich und für myCar.
 
-- Tippe in den **Einstellungen**, oder beim ersten Öffnen von Xonos, auf **Xonos zu deinem Music-Assistant-Server machen**. Xonos sagt dir, wie groß der Download ist (etwa 72 MB, installiert 180 MB), und lädt erst herunter, wenn du auf **Herunterladen** tippst: Music Assistant mit Python, FFmpeg und librespot, aus dem Release derselben Xonos-Version auf dieser Seite. App-Stores wie F-Droid prüfen diesen Download nicht; Xonos verwendet ihn nur, wenn er mit demselben Schlüssel wie Xonos signiert ist.
+- Tippe in den **Einstellungen**, oder beim ersten Öffnen von Xonos, auf **Xonos zu deinem Music-Assistant-Server machen**. Xonos sagt dir, wie groß der Download ist (etwa 70 MB, installiert 165 MB), und lädt erst herunter, wenn du auf **Herunterladen** tippst: Music Assistant mit Python, FFmpeg und librespot, aus dem Release derselben Xonos-Version auf dieser Seite. App-Stores wie F-Droid prüfen diesen Download nicht; Xonos verwendet ihn nur, wenn er mit demselben Schlüssel wie Xonos signiert ist.
 - Android fragt, ob Xonos die Musik auf dem Handy lesen darf: Erlaube es, dann beginnt der Dienst für lokale Dateien von Music Assistant mit dem Ordner Music des Handys.
 - Danach startet Xonos Music Assistant, legt das erste Konto an und verbindet sich von selbst; der erste Start dauert etwa eine Minute. Füge deine Musik unter **Music-Assistant-Dienste** hinzu: Dateien auf dem Handy, Radio, Podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
 - Er antwortet nur auf dem Handy, nicht dem Rest deines Netzwerks, und läuft, solange Xonos läuft. myCar erreicht ihn über Xonos.
@@ -573,7 +573,7 @@ Xonos accede a Music Assistant e registra il telefono come lettore privato con S
 
 Non hai un Music Assistant a casa? Xonos può farne girare uno sul telefono stesso, solo per sé e per myCar.
 
-- Nelle **Impostazioni**, o la prima volta che apri Xonos, premi **Fai diventare Xonos il tuo server Music Assistant**. Xonos ti dice quanto pesa il download (circa 72 MB, 180 MB una volta installato) e scarica solo dopo che hai premuto **Scarica**: Music Assistant con Python, FFmpeg e librespot, dalla release della stessa versione di Xonos in questa pagina. Gli store come F-Droid non controllano questo download; Xonos lo usa solo se è firmato con la stessa chiave di Xonos.
+- Nelle **Impostazioni**, o la prima volta che apri Xonos, premi **Fai diventare Xonos il tuo server Music Assistant**. Xonos ti dice quanto pesa il download (circa 70 MB, 165 MB una volta installato) e scarica solo dopo che hai premuto **Scarica**: Music Assistant con Python, FFmpeg e librespot, dalla release della stessa versione di Xonos in questa pagina. Gli store come F-Droid non controllano questo download; Xonos lo usa solo se è firmato con la stessa chiave di Xonos.
 - Android chiede di lasciar leggere a Xonos la musica del telefono: consentilo, e il servizio del disco locale di Music Assistant parte dalla cartella Music del telefono.
 - Poi Xonos avvia Music Assistant, crea il primo account e ci si collega da solo; il primo avvio dura circa un minuto. Aggiungi la tua musica da **Servizi di Music Assistant**: i file del telefono, radio, podcast, Jellyfin, Plex, Subsonic, Spotify, Tidal…
 - Risponde solo sul telefono, non al resto della tua rete, e gira finché gira Xonos. myCar lo raggiunge attraverso Xonos.
@@ -688,7 +688,7 @@ O Xonos entra no Music Assistant e registra o telefone como reprodutor privado p
 
 Não tem um Music Assistant em casa? O Xonos pode rodar um no próprio telefone, só para ele mesmo e para o myCar.
 
-- Nas **Configurações**, ou na primeira vez que abrir o Xonos, toque em **Transformar o Xonos no seu servidor Music Assistant**. O Xonos diz o tamanho do download (cerca de 72 MB, 180 MB depois de instalado) e só baixa depois que você tocar em **Baixar**: o Music Assistant com Python, FFmpeg e librespot, da release da mesma versão do Xonos nesta página. Lojas de apps como o F-Droid não verificam esse download; o Xonos só o usa se estiver assinado com a mesma chave do Xonos.
+- Nas **Configurações**, ou na primeira vez que abrir o Xonos, toque em **Transformar o Xonos no seu servidor Music Assistant**. O Xonos diz o tamanho do download (cerca de 70 MB, 165 MB depois de instalado) e só baixa depois que você tocar em **Baixar**: o Music Assistant com Python, FFmpeg e librespot, da release da mesma versão do Xonos nesta página. Lojas de apps como o F-Droid não verificam esse download; o Xonos só o usa se estiver assinado com a mesma chave do Xonos.
 - O Android pede para deixar o Xonos ler as músicas do telefone: permita, e o serviço de disco local do Music Assistant começa pela pasta Music do telefone.
 - Depois o Xonos inicia o Music Assistant, cria a primeira conta e se conecta sozinho; a primeira inicialização leva cerca de um minuto. Adicione sua música em **Serviços do Music Assistant**: os arquivos do telefone, rádio, podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
 - Ele só responde no telefone, não para o resto da sua rede, e roda enquanto o Xonos roda. O myCar chega a ele através do Xonos.
