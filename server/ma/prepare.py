@@ -427,6 +427,18 @@ def _reasons(root: Path) -> None:
         '                    translation_key="xonos_no_playable_items",\n'
         "                    translation_args=[reason],\n"
         "                )\n"
+        "            for found in media_items:\n"
+        "                for mapping in getattr(found, \"provider_mappings\", None) or ():\n"
+        "                    if self.mass.get_provider(mapping.provider_instance) is None:\n"
+        "                        try:\n"
+        "                            service = self.mass.get_provider_manifest(mapping.provider_domain).name\n"
+        "                        except KeyError:\n"
+        "                            service = mapping.provider_domain\n"
+        "                        raise MediaNotFoundError(\n"
+        '                            f"No playable items found: {service} is not loaded",\n'
+        '                            translation_key="xonos_service_down",\n'
+        "                            translation_args=[service],\n"
+        "                        )\n"
         '            raise MediaNotFoundError("No playable items found", translation_key="xonos_not_available")\n',
     )
 
