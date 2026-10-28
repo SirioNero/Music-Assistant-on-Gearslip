@@ -17,6 +17,10 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   in 9 lingue (vedi sotto), con l'inglese come predefinita.
 - Si lavora su un ramo `claude/...`. In `main` si pubblica solo quando l'utente lo chiede (anche con
   "fai un aggiornamento"): ogni push in `main` che cambia l'app crea una release.
+- All'utente si danno **sempre i link per rilasciare**, appena una versione è pronta e senza aspettare
+  che li chieda: quello per unire il ramo in `main`
+  (`https://github.com/SirioNero/Music-Assistant-on-Gearslip/compare/main...<ramo>`, poi Create pull
+  request e Merge: la release parte da sola), e dopo il link della release.
 - Niente pull request se non richiesta.
 - Niente copie offline o permanenti dei brani di Spotify, Tidal, YouTube Music e degli altri servizi
   in streaming: vorrebbe dire aggirare le loro protezioni (termini d'uso e diritto d'autore). L'offline
