@@ -37,12 +37,11 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `curl https://api.github.com/repos/SirioNero/Music-Assistant-on-Gearslip/actions/runs?branch=...`
   (senza token: `gh` qui non è autenticato). Gli errori di compilazione finiscono anche in
   un'annotazione del check run. Non si può leggere l'elenco dei secret.
-- Release: solo da `main`, solo se l'app è cambiata, solo con la chiave. File `Xonos.apk` e
-  `Xonos-server.apk` (la versione con Music Assistant dentro, solo arm64: `-PxonosServer
-  -PxonosServerAbis=arm64-v8a`; se non si compila la release non parte, così escono sempre insieme), tag
-  `v<versionName>`. Con due APK Obtainium chiede quale installare, a meno che nel filtro "Filter APKs by
-  regular expression" ci sia `Xonos-server` o `Xonos\.apk$` (lo dicono le note della release). La versione è scritta in `app/build.gradle.kts` e **va alzata a mano a ogni
-  pubblicazione** che cambia l'app: `versionCode` +1 e `versionName` = `0.1.<versionCode>` (fino alla
+- Release: solo da `main`, solo se l'app è cambiata, solo con la chiave. File `Xonos.apk` e il pacchetto di
+  Music Assistant per il telefono, `xonos-server-arm64-v8a.zip` con la sua firma `.sig` (vedi "Il server di
+  Music Assistant sul telefono"; se non si costruisce la release non parte, così escono sempre insieme), tag
+  `v<versionName>`. Obtainium vede un APK solo. La versione è scritta in `app/build.gradle.kts` e **va alzata
+  a mano a ogni pubblicazione** che cambia l'app: `versionCode` +1 e `versionName` = `0.1.<versionCode>` (fino alla
   v0.1.36 il numero era quello del workflow; la prima scritta nel sorgente è la 37). Insieme si scrivono
   le note `fastlane/metadata/android/{en-US,it-IT}/changelogs/<versionCode>.txt` (massimo 500 caratteri),
   che diventano anche il testo della release. Se il tag c'è già il workflow si ferma con un errore.
@@ -242,17 +241,57 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 
 ## Il server di Music Assistant sul telefono (`server/`, ramo `claude/server-ma`)
 
-Per chi non ha un Music Assistant: la versione completa di Xonos lo porta dentro di sé (l'utente ha scelto
-"due versioni": quella di F-Droid resta senza, la ricetta e i workflow che la imitano tolgono `server/`).
-Verificato sull'emulatore (workflow "Server MA", risultati in `refs/xonos/server/<ramo>`): parte in 15 s
-al primo avvio (Python in 2,6 s), crea il primo account, legge una cartella con ffprobe, e un lettore
-Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
+Per chi non ha un Music Assistant. L'app è una sola (`Xonos.apk`, la stessa per F-Droid): nelle impostazioni
+(e nel benvenuto) la scheda "Music Assistant su questo telefono" ha il tasto "Fai diventare Xonos il tuo server
+Music Assistant"; dopo una domanda con quanto pesa (circa 72 MB) e un sì, Xonos scarica il pacchetto che porta
+Music Assistant sul telefono, lo controlla e lo avvia. L'utente l'ha scelto al posto di due APK (Xonos e
+Xonos-server, 72 MB solo arm64, che c'erano prima nel ramo). Verificato sull'emulatore (workflow "Server MA",
+0.1.42, risultati in `refs/xonos/server/<ramo>`): Xonos scarica il pacchetto (72 MB per x86_64) dal server HTTP
+del runner, controlla la firma, lo estrae e avvia Python con `linker64` (download ed estrazione circa 20 s, poi
+Music Assistant risponde in circa 10 s); crea il primo account, legge una cartella con ffprobe, un lettore
+Sendspin riceve PCM 16 bit/48 kHz 0,5 s dopo play; ffmpeg (sempre con `linker64`) apre https; la build di prova
+di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come una persona (il tasto, "Scarica",
+"Consenti" per la musica), si collega da sola e il suo lettore suona 15 s dalla cartella Music del telefono.
 
-- **Python 3.13 con Chaquopy 17.2.0** (MIT), modulo Gradle `:server`. Non il 3.14 che Music Assistant
-  dichiara: per Android Chaquopy compila Pillow (11.0.0), cryptography (42.0.8), cffi (1.17.1), numpy
-  (1.26.2) solo fino al 3.13 (il suo indice, `chaquo.com/pypi-13.1`, dalla sandbox dà 403). Del 3.14 MA usa
-  due cose: `except A, B:` senza parentesi e le annotazioni lette tardi; `server/ma/prepare.py` le riscrive
-  (parentesi, `from __future__ import annotations`) e controlla che ogni file si compili col 3.13.
+- **Il pacchetto** (`server/package/make_payload.py`, a partire dall'AAR del modulo `:server`): uno zip per ABI,
+  sempre uguale a parità di contenuto. Dentro: `bin/` (`python3`, compilato con l'NDK da `python3.c` che chiama
+  `Py_BytesMain`; `ffmpeg`, `ffprobe`, `librespot`), `lib/` (`libpython3.13.so` e le altre librerie, la libreria
+  standard in `python313.zip`, i moduli nativi in `python3.13/lib-dynload`, `cacert.pem`), `app/` (Music
+  Assistant preparato e `xonos_server.py`), `site-packages/` (i pacchetti di Chaquopy), `payload.json` (versione,
+  ABI, Python). La versione è `xonosServerPackage` in `gradle.properties` (es. `2.10.8-1`): si alza quando cambia
+  il server (Music Assistant, pacchetti, `xonos_server.py`, `make_payload.py`). L'app la confronta con quella
+  scaricata: se è cambiata la scheda dice di aggiornarlo, con la stessa domanda.
+- **Da dove e con quale firma**: dalla release di GitHub della stessa versione di Xonos
+  (`releases/download/v<versionName>/xonos-server-<abi>.zip` e `.sig`, `BuildConfig.SERVER_PACKAGE_URL`). Il
+  workflow di release lo costruisce per arm64-v8a e lo firma con la chiave delle app (`keytool -importkeystore`,
+  `openssl dgst -sha256 -sign`); Xonos lo usa solo se la firma corrisponde alla chiave del certificato che ha
+  firmato Xonos stesso (`ServerPackage.signedLikeXonos`, SHA256withRSA o con ECDSA; la chiave vera è RSA 2048):
+  nessun altro può metterne uno al suo posto. Il peso si chiede con un HEAD. Prima di scaricare si guarda lo
+  spazio (4 volte lo zip); lo zip si estrae in `noBackupFilesDir/music-assistant-server/<versione>.new`
+  (niente voci fuori dalla cartella, i file di `bin/` eseguibili), si controlla `payload.json`, poi si rinomina
+  e le versioni vecchie si tolgono: mai niente a metà. Le prove mettono un altro indirizzo nel file
+  `files/server-package-url` dell'app (vale solo per un pacchetto firmato come l'app).
+- **F-Droid**: scaricare codice eseguibile è permesso solo se la persona lo chiede esplicitamente e le si dice
+  che F-Droid non lo controlla: lo dice la domanda prima del download. Con la build riproducibile F-Droid
+  pubblica l'APK con la nostra firma, quindi la firma del pacchetto torna anche lì. La ricetta e i workflow
+  che la imitano tolgono ancora `server/`: il modulo serve solo a costruire il pacchetto.
+- **Processo a sé** (`PhoneServer`): `python3 -m xonos_server --data <files/music-assistant> --cache
+  <cache/music-assistant>`, figlio di Xonos (vive quanto il processo dell'app). Da Android 10 un'app con target
+  29 o più non può avviare i file che ha scaricato (W^X), ma può caricarli come librerie: i programmi si avviano
+  col linker di sistema, `/system/bin/linker64 <programma> argomenti` (come Termux). Anche ffmpeg, ffprobe e
+  librespot, quando li lancia Music Assistant: `xonos_server.py` sostituisce `subprocess.Popen` (lo usa anche
+  asyncio) e per i programmi di `XONOS_BIN` mette davanti `XONOS_LINKER`. Ambiente: `PYTHONHOME`, `PYTHONPATH`
+  (`app` e `site-packages`), `LD_LIBRARY_PATH`, `PATH`, `SSL_CERT_FILE`, `HOME`, `TMPDIR`. Lo stato arriva con
+  righe `XONOS_STATE starting|running|stopped|failed <perché>` sull'uscita; il resto va nel logcat col tag
+  `XonosServer`. Si ferma con SIGTERM (Music Assistant chiude database e servizi), dopo 15 s SIGKILL; l'avvio si
+  aspetta al massimo 180 s. I dati di Music Assistant (account, servizi, libreria) restano in `files/` quando
+  il pacchetto cambia; "Togli dal telefono" toglie pacchetto e dati.
+- **Python 3.13 di Chaquopy 17.2.0** (MIT), modulo Gradle `:server`: serve solo a costruire il pacchetto
+  (Python per Android e i pacchetti compilati per Android); il ponte Java di Chaquopy non si usa più. Non il
+  3.14 che Music Assistant dichiara: per Android Chaquopy compila Pillow (11.0.0), cryptography (42.0.8), cffi
+  (1.17.1), numpy (1.26.2) solo fino al 3.13 (il suo indice, `chaquo.com/pypi-13.1`, dalla sandbox dà 403).
+  Del 3.14 MA usa due cose: `except A, B:` senza parentesi e le annotazioni lette tardi; `server/ma/prepare.py`
+  le riscrive (parentesi, `from __future__ import annotations`) e controlla che ogni file si compili col 3.13.
 - `prepare.py` prende MA 2.10.8 dal tag su GitHub, tiene il nucleo e i servizi della lista `PROVIDERS` e
   applica modifiche controllate (il testo deve esserci una volta sola, sennò si ferma): niente
   installazioni di pacchetti, DNS di Android al posto di c-ares, API (8095) e flussi (8097) solo su
@@ -267,14 +306,13 @@ Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
   pagina sola). `server/ma/wheels.py` ne fa wheel identiche byte per byte; pip le trova con `--find-links`.
   `requirements.txt`: tutte le versioni fissate. Chaquopy installa solo wheel (`--only-binary`).
 - **ffmpeg 7.1.5** (+ mbedTLS 3.6.5 per https) compilato dall'NDK in `server/ffmpeg/build.sh`, librerie
-  condivise e i programmi chiamati `libffmpeg.so`/`libffprobe.so`: Android esegue solo ciò che installa tra
-  le librerie dell'app (e le estrae solo con `useLegacyPackaging`). `LocalServer` crea a ogni avvio i
-  collegamenti `ffmpeg`/`ffprobe` in una cartella messa nel PATH, con `LD_LIBRARY_PATH`. MA senza ffmpeg 7
-  non parte. In CI ffmpeg si compila in pochi minuti e resta in cache finché lo script non cambia.
-- Chaquopy estrae su disco i file di dati dei pacchetti, non il codice: `music_assistant` è in
-  `extractPackages`, perché MA cerca `setup_flow.py` sul disco per sapere quali servizi hanno una procedura.
-- Pesa (non compresso) ~13 MB di Python, ~14 MB di ffmpeg, ~9 MB di pacchetti nativi per ABI, più ~25 MB
-  in comune. Solo 64 bit: Python 3.13 per Android non c'è per armeabi-v7a.
+  condivise e i programmi chiamati `libffmpeg.so`/`libffprobe.so` (i nomi di quando stavano nell'APK: il
+  pacchetto li rimette in `bin/ffmpeg` e `bin/ffprobe`). MA senza ffmpeg 7 non parte. In CI ffmpeg si compila
+  in pochi minuti e resta in cache finché lo script non cambia.
+- `music_assistant` è in `extractPackages` di Chaquopy: MA cerca `setup_flow.py` sul disco per sapere quali
+  servizi hanno una procedura (nel pacchetto tutto è comunque estratto).
+- Pesa 72 MB lo zip per x86_64, 179 MB estratto (Xonos chiede libero 4 volte lo zip: zip ed estratto insieme). Solo 64 bit: Python 3.13 per Android non c'è
+  per armeabi-v7a; su un telefono a 32 bit la scheda non c'è (`PhoneServer.create` dà null).
 - **Servizi** (`PROVIDERS` in `prepare.py`): 63, cioè tutti quelli le cui librerie esistono per Android e
   che si importano col 3.13; fuori, con il motivo scritto lì, Apple Music (DRM), Deezer (per ora), NFS e SMB
   (vogliono mount), YouTube Music (deno), nicovideo (pydantic 2), QQ Music (cryptography 47), BBC Sounds e
@@ -288,33 +326,52 @@ Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
   (WebDAV vuole `defusedxml`).
 - **Spotify**: il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`, 0.8.0)
   compilato per Android in `server/librespot/build.sh` (Rust con cargo-ndk, rustls al posto di OpenSSL, senza
-  uscite audio) e chiamato `liblibrespot.so`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
-  gli account Premium creati prima di dicembre 2024 (Soloist, il motore ufficiale, è solo per Linux).
+  uscite audio), nel pacchetto `bin/librespot`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
+  gli account Premium creati prima di dicembre 2024. Soloist, il motore ufficiale, è un programma per Linux
+  (glibc, PipeWire/PulseAudio): non si può ridistribuire, va scaricato da Spotify sul telefono con il consenso
+  della persona e una sua chiave dell'API; da provare (attività in sospeso).
 - I task Gradle di ffmpeg e librespot **non dichiarano uscite**: alla prima esecuzione Gradle svuota le
   cartelle di uscita dei task, e con la cache di GitHub lo script trovava il suo segno (fuori dalla cartella)
-  e non ricompilava, così ffmpeg mancava dall'APK. Gli script controllano anche che i programmi ci siano.
-- **Nell'app**: `gradle -PxonosServer` include il modulo e `app/src/withServer` (`PhoneServer` che usa
-  `LocalServer`); senza la proprietà `app/src/withoutServer` dice che non c'è (Xonos.apk, F-Droid). Nelle
-  impostazioni la scheda "Music Assistant su questo telefono" (`PhoneModel.usePhoneServer`): avvia il server,
-  la prima volta crea l'account `xonos` (amministratore) con una password che Xonos tiene in `Settings`
-  (per rientrare se perde il token), poi token e prova della connessione come per ogni Music Assistant.
-  `XonosApp` riavvia il server con l'app se l'indirizzo salvato è il suo. `LocalServer.start` chiamato due
-  volte non tocca niente se il server parte o gira (prima rifaceva i collegamenti a ffmpeg sotto i piedi del
-  server). Provato sulla JVM con `PhoneServerCheckKt` e sull'emulatore con `ServerCheckActivity --ez xonos
-  true` (solo debug: tasto, cartella come servizio, primo brano dal lettore di Xonos).
-- **La musica del telefono**: il modulo server dichiara `READ_MEDIA_AUDIO` (`READ_EXTERNAL_STORAGE` fino ad
-  Android 12), Xonos lo chiede al tocco sul tasto (`Host.askMusicFiles`) e il servizio dei file sul disco
-  (Filesystem (local disk)) propone `/storage/emulated/0/Music` invece di `/media` (`prepare.py`).
-- **ABI**: `xonosServerAbis` in `gradle.properties` (arm64-v8a e x86_64, quella dell'emulatore delle prove);
-  la release solo arm64-v8a. Con il server l'app ha solo quelle ABI (`abiFilters`): un telefono a 32 bit non
-  installa Xonos-server.apk, invece di avere un server che non parte.
-- **Le prove** (workflow "Server MA", `tools/server/emulator.sh`, a ogni cambio all'app su un ramo
-  `claude/`): 1. il server da solo, provato da fuori con `tools/server/check.py`; 2. la build di prova con
-  `ServerCheckActivity --ez xonos true`; 3. la release ridotta con R8 (firmata con la chiave di debug), da
-  capo come la usa una persona: uiautomator tocca il tasto (i testTag sono resource-id) e "Consenti" alla
-  domanda di Android (animazioni spente, sennò uiautomator non legge lo schermo), i toni nella cartella Music
-  del telefono, token e id del lettore letti con root dalle preferenze (l'emulatore google_apis lo permette),
-  poi `check.py --player` suona sul lettore di Xonos e guarda dalla sua coda che suoni.
+  e non ricompilava, così ffmpeg mancava. Gli script controllano anche che i programmi ci siano.
+- **Nell'app** (`PhoneModel`, `SettingsScreen.PhoneServerCard`): finché il pacchetto non c'è, il tasto apre la
+  domanda (peso dal HEAD, "qualche decina di MB" se non si sa); "Scarica" chiede anche il permesso per la musica
+  del telefono e mostra l'avanzamento con "Annulla"; a download finito Xonos si collega da solo
+  (`usePhoneServer`): avvia il server, la prima volta crea l'account `xonos` (amministratore) con una password
+  che Xonos tiene in `Settings` (per rientrare se perde il token), poi token e prova della connessione come
+  per ogni Music Assistant. Scaricato: "Usa Music Assistant su questo telefono" e "Togli dal telefono" (con
+  conferma); in uso: "Usa un altro Music Assistant". `XonosApp` riavvia il server all'avvio e quando la
+  connessione cade, se l'indirizzo salvato è il suo e il pacchetto c'è. `PhoneServerControl` è l'interfaccia
+  senza Android: `PhoneServerCheckKt` (banco JVM) la prova con un download finto contro il server avviato sul
+  computer.
+- **La musica del telefono**: l'app dichiara `READ_MEDIA_AUDIO` (`READ_EXTERNAL_STORAGE` fino ad Android 12) e
+  lo chiede al sì del download (`Host.askMusicFiles`); il servizio dei file sul disco (Filesystem (local
+  disk)) propone `/storage/emulated/0/Music` invece di `/media` (`prepare.py`).
+- **ABI**: `xonosServerAbis` in `gradle.properties` (arm64-v8a e x86_64, quella dell'emulatore delle prove).
+  La release pubblica solo il pacchetto arm64-v8a.
+- **Le prove** (workflow "Server MA", `tools/server/emulator.sh`, a ogni cambio all'app su un ramo `claude/`):
+  il workflow crea una chiave usa e getta (RSA 2048) che firma le due app e il pacchetto x86_64 con gli stessi
+  comandi della release (sul runner la chiave di debug di Android non è in `~/.android`), e un piccolo server
+  HTTP sul runner serve il pacchetto (l'emulatore lo vede a `10.0.2.2:8000`). 1. il server da solo:
+  `ServerCheckActivity` (solo debug) lo scarica e lo avvia, poi `tools/server/check.py` lo prova da fuori;
+  2. la build di prova con `ServerCheckActivity --ez xonos true` (cartella come servizio, primo brano dal
+  lettore di Xonos); 3. la release ridotta con R8, da capo come la usa una persona: uiautomator tocca il tasto e
+  "Scarica" (i testTag sono resource-id; il dialogo è una finestra a sé e vuole `automationIds()` anche lui) e
+  "Consenti" alla domanda di Android (animazioni spente, sennò uiautomator non legge lo schermo), i toni nella
+  cartella Music del telefono, indirizzo del pacchetto scritto e token e lettore letti con root
+  (l'emulatore google_apis lo permette), poi `check.py --player` suona sul lettore di Xonos e guarda dalla sua
+  coda che suoni. Sull'emulatore sotto carico è comparso «Pixel Launcher isn't responding», che copriva tutto:
+  ora i dialoghi d'errore sono nascosti (`hide_error_dialogs`) e, se uno compare, lo script tocca «Attendi».
+  Lanciato a mano con `arm64`, il workflow costruisce dopo le prove anche il pacchetto per i telefoni, per
+  vederne peso, allineamento e NOTICE (`payload-arm64.txt`, `NOTICE-arm64.txt` tra i risultati).
+- **Licenze del pacchetto**: dentro ci sono parti con licenze diverse (Music Assistant Apache 2.0, Python PSF,
+  FFmpeg LGPL 3, Mbed TLS, OpenSSL, librespot MIT, pacchetti come mutagen GPL 2 e chardet LGPL). Per questo
+  `make_payload.py` scrive `NOTICE.txt` (ogni parte, la sua licenza, dove sta il sorgente; i pacchetti Python
+  dai loro METADATA) e mette in `licenses/` i testi (`server/package/licenses/`, presi da
+  `/usr/share/common-licenses`, da Python e dai repository di Chaquopy, librespot e Mbed TLS, più la licenza di
+  Xonos). Se in `lib/` compare una libreria senza voce, lo dice nel log.
+- **Pagine da 16 KB**: i telefoni con Android 15 e successivi possono avere pagine di memoria da 16 KB, e lì si
+  caricano solo programmi e librerie con i segmenti allineati a 16 KB. `make_payload.py` elenca quelli che non
+  lo sono (`ELF: N, allineati a meno di 16 KB: M`); `python3` si compila con `-z max-page-size=16384`.
 
 ## L'app sul telefono
 
@@ -402,8 +459,8 @@ Fatte: app sul telefono con grafica moderna (riproduzione, mini-lettore, libreri
 sincronizzati sul telefono, fluidità (R8, Baseline Profile, elenchi fuori dal thread principale, meno
 ricomposizioni, schermate salvate), server trovati in rete e accesso con nome utente e password,
 gestione dei servizi di MA per gli admin, "Suona su" con passaggio della coda, playlist modificabili
-(aggiungi, togli, nuova, elimina) e coda modificabile (suona dopo, togli). Studiato, in attesa
-della scelta dell'utente: un server MA sul telefono stesso (Termux, proot dentro l'app, Chaquopy).
+(aggiungi, togli, nuova, elimina) e coda modificabile (suona dopo, togli), Music Assistant sul telefono
+stesso scaricato su richiesta ("Fai diventare Xonos il tuo server Music Assistant", da provare sul telefono).
 Proposto, non fatto: cercare dal telefono con mDNS/SSDP le casse che MA non vede e suggerire il
 servizio da aggiungere. Ancora da fare:
 
