@@ -360,7 +360,7 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   (allora il controllo del Premium di Music Assistant si salta). Music Assistant 2.10.8 manda quelle chiamate
   alla "sessione globale", che qui è la chiave della persona: rispondono "non trovato" (400/403/404 diventano
   `MediaNotFoundError`), senza fermare il servizio.
-- **Perché non suona** (pacchetto 2.10.8-3, Xonos 0.1.44): collegato Spotify, l'utente riceveva a ogni brano
+- **Perché non suona** (pacchetto 2.10.8-3, Xonos 0.1.45): collegato Spotify, l'utente riceveva a ogni brano
   "There is nothing to play here." (`no_playable_items` di `queue_loader.play_media`): Music Assistant scarta il
   perché (un `MusicAssistantError` del servizio) e lo scrive solo nel suo registro. `_reasons` in `prepare.py` lo
   fa dire: `xonos_no_playable_items` col motivo come argomento ("There is nothing to play here: track not found in
