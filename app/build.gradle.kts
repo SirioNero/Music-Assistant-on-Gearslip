@@ -87,6 +87,14 @@ kotlin {
     }
 }
 
+// ffmpeg e ffprobe del server (modulo server) sono programmi: Android li deve estrarre dall'APK,
+// altrimenti non si possono eseguire.
+androidComponents {
+    onVariants(selector().withBuildType("debug")) { variant ->
+        variant.packaging.jniLibs.useLegacyPackaging.set(true)
+    }
+}
+
 // Il profilo generato (vedi baselineprofile/) sta in src/main/generated/baselineProfiles.
 baselineProfile {
     mergeIntoMain = true
@@ -94,6 +102,8 @@ baselineProfile {
 
 dependencies {
     baselineProfile(project(":baselineprofile"))
+    // Il server di Music Assistant sul telefono: per ora solo nella build di prova (ServerCheckActivity).
+    if (findProject(":server") != null) debugImplementation(project(":server"))
     // Installa il Baseline Profile anche quando l'APK non arriva dal Play Store (Obtainium).
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.media3:media3-session:1.11.1")
