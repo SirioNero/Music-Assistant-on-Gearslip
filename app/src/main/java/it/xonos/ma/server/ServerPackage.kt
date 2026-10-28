@@ -46,7 +46,7 @@ class ServerPackage(private val context: Context, http: OkHttpClient) {
 
     /** C'è quello di una versione precedente (Xonos è stato aggiornato e il server con lui). */
     val outdated: Boolean
-        get() = !installed && base.listFiles()?.any { it.isDirectory && File(it, PAYLOAD).isFile } == true
+        get() = !installed && base.listFiles()?.any { it.isDirectory && !it.name.endsWith(STAGING) && File(it, PAYLOAD).isFile } == true
 
     private val zipName: String get() = "xonos-server-$abi.zip"
 
@@ -65,7 +65,8 @@ class ServerPackage(private val context: Context, http: OkHttpClient) {
         if (abi == null) throw IOException("this phone isn't 64-bit")
         base.mkdirs()
         val part = File(base, "$zipName.part")
-        val staging = File(base, "${dir.name}.new")
+        // Un'estrazione interrotta (Xonos chiuso a metà) resta qui fino al download dopo: non è un pacchetto.
+        val staging = File(base, dir.name + STAGING)
         try {
             val signature = fetch(url("$zipName.sig")).use { it.body?.bytes() } ?: throw IOException("no signature")
             fetch(url(zipName)).use { response ->
@@ -185,6 +186,7 @@ class ServerPackage(private val context: Context, http: OkHttpClient) {
         val ABIS = listOf("arm64-v8a", "x86_64")
         const val OVERRIDE = "server-package-url"
         private const val PAYLOAD = "payload.json"
+        private const val STAGING = ".new"
         private const val BUFFER = 64 * 1024
         private const val MB = 1024L * 1024
         private const val SPACE_FACTOR = 4L
