@@ -28,14 +28,17 @@ _state = "stopped"
 _error = ""
 
 
-def start(data_dir: str, cache_dir: str, tools_dir: str = "", log_level: str = "INFO") -> None:
+def start(
+    data_dir: str, cache_dir: str, tools_dir: str = "", library_dir: str = "", log_level: str = "INFO"
+) -> None:
     """
-    Start the server in a thread of its own, and return at once; a call while it runs does nothing.
+    Avvia il server in un thread suo e torna subito; se gira già non fa niente.
 
-    :param data_dir: Where the server keeps its settings and library.
-    :param cache_dir: Where it keeps what it can download again.
-    :param tools_dir: A folder with the programs it runs (ffmpeg), put first on the PATH.
-    :param log_level: The level of the server's own log.
+    :param data_dir: Dove il server tiene impostazioni e libreria.
+    :param cache_dir: Dove tiene quello che può riscaricare.
+    :param tools_dir: Una cartella con i programmi che chiama (ffmpeg, ffprobe), messa prima nel PATH.
+    :param library_dir: Dove stanno le librerie di quei programmi (LD_LIBRARY_PATH).
+    :param log_level: Il livello del registro del server.
     """
     global _thread, _state, _error
     with _lock:
@@ -43,8 +46,10 @@ def start(data_dir: str, cache_dir: str, tools_dir: str = "", log_level: str = "
             return
         _state = "starting"
         _error = ""
-        if tools_dir:
+        if tools_dir and tools_dir not in os.environ.get("PATH", "").split(os.pathsep):
             os.environ["PATH"] = tools_dir + os.pathsep + os.environ.get("PATH", "")
+        if library_dir:
+            os.environ["LD_LIBRARY_PATH"] = library_dir
         _thread = threading.Thread(
             target=_run, args=(data_dir, cache_dir, log_level), name="music-assistant", daemon=True
         )
@@ -52,17 +57,17 @@ def start(data_dir: str, cache_dir: str, tools_dir: str = "", log_level: str = "
 
 
 def state() -> str:
-    """Return starting, running, failed or stopped."""
+    """Dice se il server sta partendo (starting), gira (running), si è fermato per un errore (failed) o no (stopped)."""
     return _state
 
 
 def error() -> str:
-    """Return why the server stopped or couldn't start, if it did."""
+    """Dice perché il server si è fermato o non è partito, se è successo."""
     return _error
 
 
 def stop(timeout: float = 15.0) -> None:
-    """Stop the server and wait for it, at most [timeout] seconds."""
+    """Ferma il server e lo aspetta, al massimo [timeout] secondi."""
     loop, event, thread = _loop, _stop_event, _thread
     if loop is not None and event is not None:
         loop.call_soon_threadsafe(event.set)
@@ -76,7 +81,7 @@ def _run(data_dir: str, cache_dir: str, log_level: str) -> None:
         Path(data_dir).mkdir(parents=True, exist_ok=True)
         Path(cache_dir).mkdir(parents=True, exist_ok=True)
         _setup_logging(data_dir, log_level)
-        # Imported only now: loading Music Assistant takes a few seconds.
+        # Importato solo ora: caricare Music Assistant richiede qualche secondo.
         from music_assistant.helpers.logging import activate_log_queue_handler  # noqa: PLC0415
         from music_assistant.mass import MusicAssistant  # noqa: PLC0415
 
@@ -98,7 +103,7 @@ def _run(data_dir: str, cache_dir: str, log_level: str) -> None:
 
         asyncio.run(run_mass())
         _state = "stopped"
-    except BaseException as err:  # noqa: BLE001 - whatever stops it, Xonos has to know why
+    except BaseException as err:  # noqa: BLE001 - qualunque cosa lo fermi, Xonos deve sapere perché
         _state = "failed"
         _error = f"{type(err).__name__}: {err}"
         logging.getLogger("xonos").exception("Music Assistant si è fermato")

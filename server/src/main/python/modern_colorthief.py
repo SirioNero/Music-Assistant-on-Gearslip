@@ -18,11 +18,11 @@ _SAMPLE_SIDE = 96
 
 def get_palette(image: bytes | str, color_count: int = 10, quality: int = 10) -> list[tuple[int, int, int]]:
     """
-    Return the main colours of an image, the most common first.
+    Dà i colori principali di un'immagine, dal più frequente.
 
-    :param image: The image's bytes, or the path to its file.
-    :param color_count: How many colours to find.
-    :param quality: Unused: the image is always sampled at the same small size.
+    :param image: I byte dell'immagine, o il percorso del file.
+    :param color_count: Quanti colori trovare.
+    :param quality: Non usato: l'immagine si guarda sempre alla stessa misura ridotta.
     """
     source = Image.open(io.BytesIO(image) if isinstance(image, (bytes, bytearray)) else image)
     with source:
@@ -39,6 +39,6 @@ def get_palette(image: bytes | str, color_count: int = 10, quality: int = 10) ->
 
 
 def get_color(image: bytes | str, quality: int = 10) -> tuple[int, int, int]:
-    """Return the most common colour of an image."""
+    """Dà il colore più frequente di un'immagine."""
     palette = get_palette(image, 5, quality)
     return palette[0] if palette else (0, 0, 0)
