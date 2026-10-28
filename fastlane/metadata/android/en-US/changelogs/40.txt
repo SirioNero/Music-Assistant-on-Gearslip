@@ -1,0 +1,1 @@
+New: the bridge for myCar. To connect to the car wirelessly, myCar has to be left out of Tailscale, and then it can't reach a Music Assistant on your tailnet. Xonos, inside Tailscale, now opens those connections for it, so Xonos built into myCar plays wirelessly too. Only for myCar, checked by its signature, and only to the Music Assistant set up here.

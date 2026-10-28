@@ -72,6 +72,8 @@ Xonos signs in to Music Assistant and registers the phone as a private player th
 
 [myCar](https://github.com/SirioNero/MyCar), an independent fork of Gearslip, has Xonos built in, with the same engine. Set up Xonos on the phone (0.1.39 or later) and myCar picks up your Music Assistant account by itself: nothing to type twice. Xonos hands the account only to myCar, recognized by its signing certificate, and no other app can read it. When the car’s audio goes through myCar, the music goes straight into the car’s audio channel, and while Xonos is playing Android doesn’t ask for permission to capture the screen.
 
+If you reach Music Assistant through Tailscale: to connect to the car wirelessly, myCar has to be left out of Tailscale (inside a VPN, Android keeps it off the car’s Wi-Fi), and then it can’t reach your server by itself. Xonos 0.1.40 or later, which stays inside Tailscale, opens those connections for myCar: Xonos built into myCar plays wirelessly too. Only for myCar, recognized by its signing certificate, and only to the Music Assistant set up in Xonos: use the same address in both.
+
 ### Get started
 
 1. From the [Releases](https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases) page, download `Xonos.apk` to your phone and install it. Android asks you to allow installing unknown apps; Play Protect may warn that it doesn’t know the app.
@@ -139,6 +141,7 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `data/Services.kt` | Music Assistant’s services: the list, their forms and their setup steps |
 | `data/Devices.kt` | The speakers for Play on, and moving the queue to them |
 | `data/AccountProvider.kt` | The Music Assistant account handed to myCar, and to no other app |
+| `data/MyCarBridge.kt` | myCar’s connections to Music Assistant, opened by Xonos when Tailscale leaves myCar out |
 | `sendspin/SendspinClient.kt` | The phone as a Music Assistant player: the Sendspin protocol and clock sync |
 | `sendspin/AudioEngine.kt` | Plays the audio at the time the server asks for |
 | `sendspin/AndroidAudio.kt` | The phone’s audio output and Opus decoder |
@@ -205,6 +208,8 @@ Xonos inicia sesión en Music Assistant y registra el teléfono como reproductor
 ### Con myCar
 
 [myCar](https://github.com/SirioNero/MyCar), un fork independiente de Gearslip, lleva Xonos integrado, con el mismo motor. Configura Xonos en el teléfono (0.1.39 o posterior) y myCar toma tu cuenta de Music Assistant por sí solo: no hay nada que escribir dos veces. Xonos entrega la cuenta solo a myCar, reconocida por su certificado de firma, y ninguna otra app puede leerla. Cuando el audio del coche pasa por myCar, la música va directa al canal de audio del coche, y mientras suena Xonos Android no pide permiso para capturar la pantalla.
+
+Si llegas a Music Assistant por Tailscale: para conectarse al coche sin cables, myCar tiene que quedar fuera de Tailscale (dentro de una VPN, Android no le deja usar el Wi-Fi del coche), y entonces no llega por sí sola a tu servidor. Xonos 0.1.40 o posterior, que sigue dentro de Tailscale, abre esas conexiones para myCar: el Xonos integrado en myCar suena también sin cables. Solo para myCar, reconocida por su certificado de firma, y solo hacia el Music Assistant configurado en Xonos: usa la misma dirección en los dos.
 
 ### Primeros pasos
 
@@ -304,6 +309,8 @@ Xonos se connecte à Music Assistant et enregistre le téléphone comme lecteur 
 
 [myCar](https://github.com/SirioNero/MyCar), un fork indépendant de Gearslip, intègre Xonos, avec le même moteur. Configurez Xonos sur le téléphone (0.1.39 ou plus récent) et myCar récupère tout seul votre compte Music Assistant : rien à saisir deux fois. Xonos ne confie le compte qu’à myCar, reconnue par son certificat de signature, et aucune autre app ne peut le lire. Quand l’audio de la voiture passe par myCar, la musique va droit dans le canal audio de la voiture, et tant que Xonos joue, Android ne demande pas l’autorisation de capturer l’écran.
 
+Si vous accédez à Music Assistant par Tailscale : pour se connecter à la voiture sans fil, myCar doit rester en dehors de Tailscale (dans un VPN, Android lui interdit le Wi-Fi de la voiture), et elle ne peut alors plus joindre votre serveur toute seule. Xonos 0.1.40 ou plus récent, qui reste dans Tailscale, ouvre ces connexions pour myCar : le Xonos intégré à myCar joue aussi sans fil. Seulement pour myCar, reconnue par son certificat de signature, et seulement vers le Music Assistant configuré dans Xonos : utilisez la même adresse dans les deux.
+
 ### Pour commencer
 
 1. Depuis la page [Releases](https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases), téléchargez `Xonos.apk` sur le téléphone et installez-le. Android demande d’autoriser l’installation d’apps inconnues ; Play Protect peut signaler qu’il ne connaît pas l’app.
@@ -401,6 +408,8 @@ Xonos meldet sich bei Music Assistant an und registriert das Handy über Sendspi
 ### Mit myCar
 
 [myCar](https://github.com/SirioNero/MyCar), ein unabhängiger Fork von Gearslip, hat Xonos eingebaut, mit derselben Engine. Richte Xonos auf dem Handy ein (0.1.39 oder neuer), und myCar übernimmt dein Music-Assistant-Konto von selbst: Nichts muss zweimal eingetippt werden. Xonos gibt das Konto nur an myCar weiter, erkannt am Signaturzertifikat, und keine andere App kann es lesen. Läuft der Ton im Auto über myCar, geht die Musik direkt in den Audiokanal des Autos, und solange Xonos spielt, fragt Android nicht nach der Erlaubnis für eine Bildschirmaufnahme.
+
+Wenn du Music Assistant über Tailscale erreichst: Um sich drahtlos mit dem Auto zu verbinden, muss myCar außerhalb von Tailscale bleiben (in einem VPN lässt Android myCar nicht ins WLAN des Autos), und dann erreicht myCar deinen Server nicht mehr von selbst. Xonos ab 0.1.40, das in Tailscale bleibt, öffnet diese Verbindungen für myCar: Das in myCar eingebaute Xonos spielt auch drahtlos. Nur für myCar, erkannt am Signaturzertifikat, und nur zu dem in Xonos eingerichteten Music Assistant: Verwende in beiden dieselbe Adresse.
 
 ### Los geht’s
 
@@ -500,6 +509,8 @@ Xonos accede a Music Assistant e registra il telefono come lettore privato con S
 
 [myCar](https://github.com/SirioNero/MyCar), un fork indipendente di Gearslip, ha Xonos dentro di sé, con lo stesso motore. Configura Xonos sul telefono (0.1.39 o successivo) e myCar prende da sola il tuo account di Music Assistant: niente da scrivere due volte. Xonos passa l’account solo a myCar, riconosciuta dal suo certificato di firma, e nessun’altra app può leggerlo. Quando l’audio dell’auto passa da myCar, la musica va dritta nel canale audio dell’auto, e finché suona Xonos Android non chiede il permesso di registrare lo schermo.
 
+Se raggiungi Music Assistant con Tailscale: per collegarsi all’auto senza fili, myCar va lasciata fuori da Tailscale (dentro una VPN, Android non le dà il Wi-Fi dell’auto), e allora da sola non raggiunge il tuo server. Xonos 0.1.40 o successivo, che resta dentro Tailscale, apre quelle connessioni per myCar: Xonos dentro myCar suona anche senza fili. Solo per myCar, riconosciuta dal suo certificato di firma, e solo verso il Music Assistant configurato in Xonos: usa lo stesso indirizzo in tutte e due.
+
 ### Per cominciare
 
 1. Dalla pagina [Releases](https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases) scarica `Xonos.apk` sul telefono e installalo. Android chiede di consentire l’installazione di app sconosciute; Play Protect può avvisare che l’app non è nota.
@@ -597,6 +608,8 @@ O Xonos entra no Music Assistant e registra o telefone como reprodutor privado p
 ### Com o myCar
 
 O [myCar](https://github.com/SirioNero/MyCar), um fork independente do Gearslip, tem o Xonos embutido, com o mesmo motor. Configure o Xonos no telefone (0.1.39 ou mais recente) e o myCar pega sua conta do Music Assistant sozinho: nada para digitar duas vezes. O Xonos entrega a conta só ao myCar, reconhecido pelo certificado de assinatura, e nenhum outro app consegue lê-la. Quando o áudio do carro passa pelo myCar, a música vai direto para o canal de áudio do carro, e enquanto o Xonos toca o Android não pede permissão para capturar a tela.
+
+Se você chega ao Music Assistant pelo Tailscale: para se conectar ao carro sem fio, o myCar precisa ficar fora do Tailscale (dentro de uma VPN, o Android não o deixa usar o Wi-Fi do carro), e aí ele não alcança mais o seu servidor sozinho. O Xonos 0.1.40 ou mais recente, que continua dentro do Tailscale, abre essas conexões para o myCar: o Xonos embutido no myCar também toca sem fio. Só para o myCar, reconhecido pelo certificado de assinatura, e só para o Music Assistant configurado no Xonos: use o mesmo endereço nos dois.
 
 ### Para começar
 

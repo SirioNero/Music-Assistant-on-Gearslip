@@ -17,6 +17,10 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   in 9 lingue (vedi sotto), con l'inglese come predefinita.
 - Si lavora su un ramo `claude/...`. In `main` si pubblica solo quando l'utente lo chiede (anche con
   "fai un aggiornamento"): ogni push in `main` che cambia l'app crea una release.
+- All'utente si danno **sempre i link per rilasciare**, appena una versione è pronta e senza aspettare
+  che li chieda: quello per unire il ramo in `main`
+  (`https://github.com/SirioNero/Music-Assistant-on-Gearslip/compare/main...<ramo>`, poi Create pull
+  request e Merge: la release parte da sola), e dopo il link della release.
 - Niente pull request se non richiesta.
 - Niente copie offline o permanenti dei brani di Spotify, Tidal, YouTube Music e degli altri servizi
   in streaming: vorrebbe dire aggirare le loro protezioni (termini d'uso e diritto d'autore). L'offline
@@ -95,6 +99,7 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 | `data/Services.kt` | I servizi (provider) di MA: elenco, tipi, icone, opzioni, pulsanti, flussi a passi; i campi come `ConfigField` |
 | `data/Devices.kt` | I lettori di MA su cui suonare ("Suona su"), il passaggio della coda, i comandi a una coda |
 | `data/AccountProvider.kt` | L'account (indirizzi, token, nome utente) per myCar, che ha Xonos dentro di sé: `content://it.xonos.ma.account`, metodo `account`; risponde solo a `io.github.sirionero.mycar` (e `.dev`) firmati col certificato di myCar (SHA-256 `e477a479…cccc31`), a nessun altro |
+| `data/MyCarBridge.kt` | Il ponte per myCar lasciata fuori da Tailscale (dalla 0.1.40): myCar si lega al servizio (azione `io.github.sirionero.mycar.BRIDGE`) e gli chiede una connessione verso Music Assistant; Xonos la apre e le passa l'altro capo di un socket locale. Solo a myCar firmata col suo certificato (la build di prova anche a myCar `.dev`), solo verso gli indirizzi scritti qui. Risposte: OK 1, NOT_MYCAR 2, NOT_OURS 3, NO_ANSWER 4, OTHER 0 |
 | `phone/MainActivity.kt` | L'app sul telefono: Compose, lingua, MediaController verso il servizio finché è in vista |
 | `phone/ControllerLink.kt` | `PlayerLink` dal MediaController: lo stesso `MaPlayer` che vede Gearslip |
 | `phone/model/` | `PhoneModel` (schede con pile di pagine, caricamenti, ricerca, suona/dopo/in coda, preferiti, testi, impostazioni, "Suona su"), `Pages.kt`, `Player.kt` (`NowPlaying`, `PlayerLink`), `ConnectionCheck.kt`, `Discovery.kt` (server trovati con mDNS), `ServicesModel.kt` e `ServicePages.kt` (i servizi), `RemoteLink.kt` (un lettore di MA comandato dallo schermo). Senza Android: si prova sulla JVM |
@@ -225,6 +230,12 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   con il PCM che va dritto nel canale musicale di Android Auto quando l'audio passa da myCar. L'app Xonos
   resta per Gearslip e per chi la preferisce. Le correzioni al motore qui vanno portate anche là.
 - Dalla 0.1.39 Xonos passa a myCar il suo account (`AccountProvider`), così in myCar non si riscrive niente.
+- Dalla 0.1.40 Xonos fa da ponte a myCar (`MyCarBridge`): per collegarsi all'auto senza fili myCar va lasciata
+  fuori da Tailscale, e allora le sue connessioni verso un Music Assistant sulla tailnet (API, Sendspin, copertine)
+  le apre Xonos, che resta dentro Tailscale. Il legame di myCar tiene Xonos sveglio e con la rete per il viaggio.
+  Verificato in CI dal lato di myCar (Car preview con `xonos_ref`, Release check `tailscale-out`): con
+  Tailscale vero e myCar esclusa, myCar si collega a Music Assistant attraverso Xonos; nell'anteprima
+  suona un album con Sendspin dal ponte.
 
 ## L'app sul telefono
 
