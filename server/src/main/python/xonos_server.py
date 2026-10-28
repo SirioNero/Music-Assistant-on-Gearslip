@@ -1,17 +1,25 @@
 """
 Il server di Music Assistant dentro Xonos.
 
-LocalServer.kt lo avvia con start(): gira in un thread suo, con un ciclo asyncio suo, e risponde solo
-sul telefono stesso (127.0.0.1, porta 8095 per l'API e 8097 per i flussi) come un Music Assistant
-qualsiasi: Xonos, e myCar attraverso Xonos, ci si collegano come a quello di casa. I dati (account,
-servizi, libreria) stanno nella cartella dell'app; non si annuncia in rete.
+Xonos lo avvia come processo a sé, dal pacchetto scaricato con "Fai diventare Xonos il tuo server
+Music Assistant": `python3 -m xonos_server --data <cartella> --cache <cartella>`. Gira con un ciclo asyncio
+suo e risponde solo sul telefono stesso (127.0.0.1, porta 8095 per l'API e 8097 per i flussi) come un
+Music Assistant qualsiasi: Xonos, e myCar attraverso Xonos, ci si collegano come a quello di casa. I dati
+(account, servizi, libreria) stanno nella cartella dell'app; non si annuncia in rete.
+
+Su stdout dice a Xonos a che punto è, una riga per volta: "XONOS_STATE starting", "running", "stopped" o
+"failed <perché>". SIGTERM lo ferma come si deve.
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import logging
 import os
+import signal
+import subprocess
+import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from logging.handlers import RotatingFileHandler
@@ -19,6 +27,7 @@ from pathlib import Path
 
 LOG_FORMAT = "%(asctime)s.%(msecs)03d %(levelname)s (%(threadName)s) [%(name)s] %(message)s"
 LOG_FILE_BYTES = 2_000_000
+STATE_PREFIX = "XONOS_STATE"
 
 _lock = threading.Lock()
 _thread: threading.Thread | None = None
@@ -26,6 +35,36 @@ _loop: asyncio.AbstractEventLoop | None = None
 _stop_event: asyncio.Event | None = None
 _state = "stopped"
 _error = ""
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Avvia il server, dice a Xonos come va e si ferma con SIGTERM (o SIGINT)."""
+    parser = argparse.ArgumentParser(prog="xonos_server")
+    parser.add_argument("--data", required=True, help="Dove il server tiene impostazioni e libreria")
+    parser.add_argument("--cache", required=True, help="Dove tiene quello che può riscaricare")
+    parser.add_argument("--log-level", default="INFO")
+    args = parser.parse_args(argv)
+    _tools_through_linker()
+    stopping = threading.Event()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        signal.signal(sig, lambda *_: stopping.set())
+    _say("starting")
+    start(args.data, args.cache, log_level=args.log_level)
+    said = "starting"
+    while True:
+        if stopping.wait(0.2):
+            stop()
+            break
+        now = state()
+        if now != said:
+            _say(now if now != "failed" else f"failed {error()}")
+            said = now
+        if now in ("failed", "stopped"):
+            break
+    final = state()
+    if final != said:
+        _say(final if final != "failed" else f"failed {error()}")
+    return 1 if final == "failed" else 0
 
 
 def start(
@@ -75,6 +114,53 @@ def stop(timeout: float = 15.0) -> None:
         thread.join(timeout)
 
 
+def _say(what: str) -> None:
+    print(f"{STATE_PREFIX} {what}", flush=True)
+
+
+def _tools_through_linker() -> None:
+    """
+    Da Android 10 un'app non può avviare i programmi che ha scaricato (W^X): li fa partire il linker di
+    sistema, `/system/bin/linker64 <programma> <argomenti>`. Xonos dice quale (XONOS_LINKER) e dove stanno i
+    programmi del pacchetto (XONOS_BIN); qui ogni processo avviato con uno di quei programmi passa da lui.
+    Music Assistant avvia ffmpeg, ffprobe e librespot con subprocess (anche asyncio passa da lì).
+    """
+    linker = os.environ.get("XONOS_LINKER", "")
+    bin_dir = os.environ.get("XONOS_BIN", "")
+    if not bin_dir:
+        return
+    bin_dir = os.path.realpath(bin_dir)
+    # Python stesso è uno di quei programmi: chi lo riavvia (sys.executable) passa dal linker come gli altri.
+    python = os.path.join(bin_dir, "python3")
+    if os.path.exists(python):
+        sys.executable = python
+    if not linker:
+        return
+
+    def through(args: object) -> object:
+        if isinstance(args, (str, bytes, os.PathLike)):
+            return args
+        try:
+            args = list(args)  # type: ignore[call-overload]
+        except TypeError:
+            return args
+        if not args:
+            return args
+        program = os.fsdecode(args[0])
+        path = os.path.abspath(program if os.sep in program else os.path.join(bin_dir, program))
+        if os.path.realpath(os.path.dirname(path)) != bin_dir or not os.path.isfile(path):
+            return args
+        return [linker, path, *args[1:]]
+
+    class Popen(subprocess.Popen):  # type: ignore[type-arg]
+        def __init__(self, args, *rest, **kwargs):  # type: ignore[no-untyped-def]
+            if not kwargs.get("shell"):
+                args = through(args)
+            super().__init__(args, *rest, **kwargs)
+
+    subprocess.Popen = Popen  # type: ignore[misc]
+
+
 def _run(data_dir: str, cache_dir: str, log_level: str) -> None:
     global _loop, _stop_event, _state, _error
     try:
@@ -116,7 +202,7 @@ def _setup_logging(data_dir: str, log_level: str) -> None:
     root = logging.getLogger()
     if getattr(root, "_xonos", False):
         return
-    # stderr finisce nel logcat (python.stderr); il file resta nella cartella dei dati.
+    # stderr arriva a Xonos, che lo mette nel logcat; il file resta nella cartella dei dati.
     logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
     logging.captureWarnings(True)
     file_handler = RotatingFileHandler(
@@ -126,3 +212,7 @@ def _setup_logging(data_dir: str, log_level: str) -> None:
     root.addHandler(file_handler)
     logging.getLogger("music_assistant").setLevel(log_level.upper())
     root._xonos = True  # type: ignore[attr-defined]
+
+
+if __name__ == "__main__":
+    sys.exit(main())
