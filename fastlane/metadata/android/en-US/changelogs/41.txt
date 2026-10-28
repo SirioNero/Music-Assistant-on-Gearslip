@@ -1,3 +1,2 @@
-New: Xonos-server.apk (on GitHub, next to Xonos.apk) runs a complete Music Assistant on the phone itself, for those without a server: the music on the phone, radio, podcasts and streaming services, in the car too.
-Fixed: “Create the account” on a Music Assistant just installed failed.
-Fixed: playing right after opening the app could fail with “The player is not available”.
+Fixed: “Create the account” on a Music Assistant just installed failed on Android.
+Fixed: playing right after opening the app could fail with “The player is not available”: Xonos now waits until Music Assistant has the phone’s queue.
