@@ -372,7 +372,17 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   (`PhoneServer.log`: le ultime 96 KB di `musicassistant.log`, versioni in testa, condivisione di Android come
   testo). Verificato: col server sul computer il motivo nel messaggio (`check.py`, anche in CI), con la rete finta
   il messaggio solo per le playlist non proprie (non per le proprie né per i brani piaciuti); il banco JVM compila.
-  Da confermare col registro dell'utente quale brano o playlist non suonava.
+  Poi l'utente: "qualsiasi brano non funziona". Un brano della libreria al play non passa da Spotify
+  (`get_library_item_by_prov_id`, poi `[track]`): se non suona è la sua mappatura `available` falsa, cioè
+  `is_playable` false da Spotify (`parsers.parse_track`), o il servizio non caricato (`available_providers`; per
+  esempio dopo un INVALID_CREDENTIALS di librespot, che lo scarica). Con l'app della persona Spotify non dà più
+  `country`/`product` dell'account: probabile che `is_playable` (con `market=from_token`) venga falso. Quindi
+  (`_xonos_playable` in `parsers.py`) un brano "non suonabile" si prova comunque, con un avviso nel registro (i primi
+  5), tranne `restrictions.reason == "explicit"` (il filtro della persona); all'avvio del servizio
+  `_xonos_playable_again` rimette `available = 1` alle tracce Spotify di quell'istanza in `provider_mappings` e
+  svuota una volta la sua cache (segno `.xonos-playable-<istanza>` nei dati). E `xonos_service_down` dice quale
+  servizio non è caricato. Provato col server sul computer (servizio dei file spento: "Filesystem (local disk)
+  isn't working right now", anche in italiano) e con la rete finta. Da confermare col registro dell'utente.
 - **Spotify**: il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`, 0.8.0)
   compilato per Android in `server/librespot/build.sh` (Rust con cargo-ndk, rustls al posto di OpenSSL, senza
   uscite audio), nel pacchetto `bin/librespot`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
