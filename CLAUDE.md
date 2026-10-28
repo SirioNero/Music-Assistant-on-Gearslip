@@ -272,8 +272,33 @@ Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
   `extractPackages`, perché MA cerca `setup_flow.py` sul disco per sapere quali servizi hanno una procedura.
 - Pesa (non compresso) ~13 MB di Python, ~14 MB di ffmpeg, ~9 MB di pacchetti nativi per ABI, più ~25 MB
   in comune. Solo 64 bit: Python 3.13 per Android non c'è per armeabi-v7a.
-- Spotify in MA usa il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`,
-  0.8.0): andrà compilato per Android come ffmpeg (Rust, rustls, senza audio).
+- **Servizi** (`PROVIDERS` in `prepare.py`): 63, cioè tutti quelli le cui librerie esistono per Android e
+  che si importano col 3.13; fuori, con il motivo scritto lì, Apple Music (DRM), Deezer (per ora), NFS e SMB
+  (vogliono mount), YouTube Music (deno), nicovideo (pydantic 2), QQ Music (cryptography 47), BBC Sounds e
+  iBroadcast (solo 3.14). `LIBRARIES`: cartelle importate da altri ma non proponibili (Spotify Connect, senza
+  manifest). Per aggiungere un servizio: le sue `requirements` del manifest in `requirements.txt` con tutta
+  la chiusura fissata. La chiusura per Android si calcola nella sandbox con `uv pip compile --python-version
+  3.13 --python-platform aarch64-linux-android --only-binary :all: --find-links <wheel di wheels.py>
+  --find-links <segnaposto>`, dove i segnaposto sono wheel vuote con nome, versione e dipendenze dei pacchetti
+  che solo Chaquopy ha (numpy, pillow, cryptography, cffi, pycryptodome...). Poi si prova l'import di ogni
+  servizio in un ambiente 3.13 con quegli stessi pacchetti. Dipendenze non dichiarate dai manifest esistono
+  (WebDAV vuole `defusedxml`).
+- **Spotify**: il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`, 0.8.0)
+  compilato per Android in `server/librespot/build.sh` (Rust con cargo-ndk, rustls al posto di OpenSSL, senza
+  uscite audio) e chiamato `liblibrespot.so`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
+  gli account Premium creati prima di dicembre 2024 (Soloist, il motore ufficiale, è solo per Linux).
+- I task Gradle di ffmpeg e librespot **non dichiarano uscite**: alla prima esecuzione Gradle svuota le
+  cartelle di uscita dei task, e con la cache di GitHub lo script trovava il suo segno (fuori dalla cartella)
+  e non ricompilava, così ffmpeg mancava dall'APK. Gli script controllano anche che i programmi ci siano.
+- **Nell'app**: `gradle -PxonosServer` include il modulo e `app/src/withServer` (`PhoneServer` che usa
+  `LocalServer`); senza la proprietà `app/src/withoutServer` dice che non c'è (Xonos.apk, F-Droid). Nelle
+  impostazioni la scheda "Music Assistant su questo telefono" (`PhoneModel.usePhoneServer`): avvia il server,
+  la prima volta crea l'account `xonos` (amministratore) con una password che Xonos tiene in `Settings`
+  (per rientrare se perde il token), poi token e prova della connessione come per ogni Music Assistant.
+  `XonosApp` riavvia il server con l'app se l'indirizzo salvato è il suo. `LocalServer.start` chiamato due
+  volte non tocca niente se il server parte o gira (prima rifaceva i collegamenti a ffmpeg sotto i piedi del
+  server). Provato sulla JVM con `PhoneServerCheckKt` e sull'emulatore con `ServerCheckActivity --ez xonos
+  true` (solo debug: tasto, cartella come servizio, primo brano dal lettore di Xonos).
 
 ## L'app sul telefono
 
