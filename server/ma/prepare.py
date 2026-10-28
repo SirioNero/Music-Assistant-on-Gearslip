@@ -359,11 +359,20 @@ def _patch(root: Path) -> None:
     )
     _replace(spotify, "import re\nimport tempfile\n", "import re\nimport shutil\nimport tempfile\n")
     # La cartella che propone il servizio dei file sul disco: sul telefono è quella della musica, che
-    # Xonos-server.apk chiede il permesso di leggere.
+    # Xonos chiede il permesso di leggere.
     _replace(
         root / "providers" / "filesystem_local" / "constants.py",
         '    default_value="/media",\n',
         '    default_value="/storage/emulated/0/Music",  # Xonos: la musica del telefono\n',
+    )
+    # Il testo sulle copertine generate delle playlist: sul telefono nessuno dei caratteri cercati c'è, e si usa
+    # quello di Pillow, che passa da FreeType. La libreria di FreeType di Chaquopy non è allineata a 16 KB: sui
+    # telefoni con pagine da 16 KB non si carica, e allora si ripiega sul carattere a punti di Pillow invece di
+    # perdere la copertina.
+    _replace(
+        root / "providers" / "playlist_metadata" / "__init__.py",
+        "        return ImageFont.load_default(size=size)\n    except TypeError:\n",
+        "        return ImageFont.load_default(size=size)\n    except (TypeError, ImportError, OSError):  # Xonos: senza FreeType\n",
     )
 
 
