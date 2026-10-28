@@ -56,10 +56,29 @@ wait_for() {
     echo "$line"
 }
 
-# Il centro dell'elemento con quel testTag (per uiautomator è il resource-id): "x y". Esce con 1 se non c'è.
-ui_center() {
+# Quello che c'è sullo schermo, in $OUT/ui.xml. Sull'emulatore sotto carico Android a volte dice che un'app
+# (il launcher) non risponde, e il suo dialogo copre tutto: si tocca "Attendi", che non chiude niente.
+ui_dump() {
+    local xy
     adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || return 1
     adb exec-out cat /sdcard/ui.xml > "$OUT/ui.xml"
+    if xy=$(ui_find android:id/aerr_wait); then
+        echo "Android dice che un'app non risponde: Attendi" >&2
+        # shellcheck disable=SC2086
+        adb shell input tap $xy
+        sleep 2
+        adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || return 1
+        adb exec-out cat /sdcard/ui.xml > "$OUT/ui.xml"
+    fi
+}
+
+# Il centro dell'elemento con quel testTag (per uiautomator è il resource-id): "x y". Esce con 1 se non c'è.
+ui_center() {
+    ui_dump && ui_find "$1"
+}
+
+# Come ui_center, sull'ultimo $OUT/ui.xml.
+ui_find() {
     python3 - "$1" "$OUT/ui.xml" <<'PY'
 import re, sys
 import xml.etree.ElementTree as ET
@@ -148,10 +167,12 @@ fi
 #    lascia guardare dentro con run-as: per l'indirizzo del pacchetto e per leggere token e lettore,
 #    sull'emulatore (google_apis) c'è root.
 echo "== La release (R8) con Music Assistant sul telefono"
-# uiautomator legge lo schermo solo quando è fermo: niente animazioni.
+# uiautomator legge lo schermo solo quando è fermo: niente animazioni. Niente dialoghi di app che non
+# rispondono o si fermano (le prove guardano il logcat).
 for scale in window_animation_scale transition_animation_scale animator_duration_scale; do
     adb shell settings put global "$scale" 0
 done
+adb shell settings put global hide_error_dialogs 1
 adb uninstall "$PACKAGE" >/dev/null
 adb install app/build/outputs/apk/release/app-release.apk || exit 1
 PHONE_MUSIC=/storage/emulated/0/Music
