@@ -27,6 +27,13 @@
     <string name="password_short">Ο κωδικός χρειάζεται τουλάχιστον 8 χαρακτήρες.</string>
     <string name="setup_needed">Αυτό το Music Assistant μόλις εγκαταστάθηκε και δεν έχει ακόμη λογαριασμό. Δημιουργήστε τον πρώτο με το όνομα χρήστη και τον κωδικό παραπάνω: θα είναι ο διαχειριστής.</string>
     <string name="create_account">Δημιουργία λογαριασμού</string>
+    <string name="phone_server_title">Music Assistant σε αυτό το τηλέφωνο</string>
+    <string name="phone_server_help">Δεν έχετε Music Assistant στο σπίτι; Το Xonos μπορεί να εκτελέσει ένα σε αυτό το τηλέφωνο, μόνο για τον εαυτό του και για το myCar. Μετά προσθέστε τη μουσική σας από τις Υπηρεσίες του Music Assistant: αρχεία του τηλεφώνου, ραδιόφωνο, podcast και υπηρεσίες streaming.</string>
+    <string name="phone_server_use">Χρήση του Music Assistant σε αυτό το τηλέφωνο</string>
+    <string name="phone_server_starting">Εκκίνηση… (την πρώτη φορά χρειάζεται ένα λεπτό)</string>
+    <string name="phone_server_in_use">Το Xonos χρησιμοποιεί το Music Assistant αυτού του τηλεφώνου. Προσθέστε τη μουσική σας από τις Υπηρεσίες του Music Assistant.</string>
+    <string name="phone_server_leave">Χρήση άλλου Music Assistant</string>
+    <string name="phone_server_failed">Το Music Assistant δεν ξεκίνησε: %1$s</string>
     <string name="show_password">Εμφάνιση κωδικού</string>
     <string name="hide_password">Απόκρυψη κωδικού</string>
     <string name="save">Αποθήκευση και δοκιμή σύνδεσης</string>

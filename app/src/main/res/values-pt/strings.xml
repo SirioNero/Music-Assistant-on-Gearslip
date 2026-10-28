@@ -27,6 +27,13 @@
     <string name="password_short">A senha precisa ter pelo menos 8 caracteres.</string>
     <string name="setup_needed">Este Music Assistant acabou de ser instalado e ainda não tem contas. Crie a primeira com o usuário e a senha acima: ela será a de administrador.</string>
     <string name="create_account">Criar a conta</string>
+    <string name="phone_server_title">Music Assistant neste telefone</string>
+    <string name="phone_server_help">Não tem um Music Assistant em casa? O Xonos pode rodar um neste telefone, só para ele mesmo e para o myCar. Depois adicione sua música em Serviços do Music Assistant: os arquivos do telefone, rádio, podcasts e serviços de streaming.</string>
+    <string name="phone_server_use">Usar o Music Assistant neste telefone</string>
+    <string name="phone_server_starting">Iniciando… (na primeira vez leva um minuto)</string>
+    <string name="phone_server_in_use">O Xonos está usando o Music Assistant deste telefone. Adicione sua música em Serviços do Music Assistant.</string>
+    <string name="phone_server_leave">Usar outro Music Assistant</string>
+    <string name="phone_server_failed">O Music Assistant não iniciou: %1$s</string>
     <string name="show_password">Mostrar a senha</string>
     <string name="hide_password">Ocultar a senha</string>
     <string name="save">Salvar e testar a conexão</string>

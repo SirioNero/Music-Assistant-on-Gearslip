@@ -27,6 +27,13 @@
     <string name="password_short">Пароль должен содержать не менее 8 символов.</string>
     <string name="setup_needed">Этот Music Assistant только что установлен, и учётных записей ещё нет. Создайте первую с именем пользователя и паролем выше: она станет администратором.</string>
     <string name="create_account">Создать учётную запись</string>
+    <string name="phone_server_title">Music Assistant на этом телефоне</string>
+    <string name="phone_server_help">Нет Music Assistant дома? Xonos может запустить его на этом телефоне — только для себя и для myCar. Затем добавьте музыку в разделе «Сервисы Music Assistant»: файлы телефона, радио, подкасты и стриминговые сервисы.</string>
+    <string name="phone_server_use">Использовать Music Assistant на этом телефоне</string>
+    <string name="phone_server_starting">Запуск… (в первый раз это занимает минуту)</string>
+    <string name="phone_server_in_use">Xonos использует Music Assistant на этом телефоне. Добавьте музыку в разделе «Сервисы Music Assistant».</string>
+    <string name="phone_server_leave">Использовать другой Music Assistant</string>
+    <string name="phone_server_failed">Music Assistant не запустился: %1$s</string>
     <string name="show_password">Показать пароль</string>
     <string name="hide_password">Скрыть пароль</string>
     <string name="save">Сохранить и проверить подключение</string>

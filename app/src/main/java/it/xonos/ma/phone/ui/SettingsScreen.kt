@@ -96,24 +96,28 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
         }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             LanguagePicker(host)
-            FoundServers(page, model)
-            Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri, "field_home")
-            Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri, "field_remote")
-            SignInChoice(page)
-            if (page.useToken) {
-                TokenField(page)
-            } else {
-                Field(
-                    page.username,
-                    { page.username = it },
-                    R.string.label_username,
-                    null,
-                    "",
-                    KeyboardType.Text,
-                    "field_username",
-                    help = page.signedIn?.let { stringResource(R.string.signed_in_as, it) } ?: stringResource(R.string.help_username),
-                )
-                PasswordField(page)
+            if (model.phoneServerAvailable) PhoneServerCard(page, model)
+            // Con Music Assistant sul telefono indirizzo e accesso li sa già Xonos.
+            if (!model.usesPhoneServer(page)) {
+                FoundServers(page, model)
+                Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri, "field_home")
+                Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri, "field_remote")
+                SignInChoice(page)
+                if (page.useToken) {
+                    TokenField(page)
+                } else {
+                    Field(
+                        page.username,
+                        { page.username = it },
+                        R.string.label_username,
+                        null,
+                        "",
+                        KeyboardType.Text,
+                        "field_username",
+                        help = page.signedIn?.let { stringResource(R.string.signed_in_as, it) } ?: stringResource(R.string.help_username),
+                    )
+                    PasswordField(page)
+                }
             }
             Field(page.name, { page.name = it }, R.string.label_name, R.string.help_name, stringResource(R.string.hint_name), KeyboardType.Text, "field_name")
             val signIn = !page.useToken && page.password.isNotEmpty()
@@ -200,6 +204,54 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
             )
+        }
+    }
+}
+
+/**
+ * Music Assistant su questo telefono, nella versione di Xonos che lo porta dentro di sé: un tocco lo
+ * avvia, crea l'account e ci collega Xonos; da lì si aggiungono i servizi. Si torna a un altro Music
+ * Assistant svuotando il modulo.
+ */
+@Composable
+private fun PhoneServerCard(page: SettingsPage, model: PhoneModel) {
+    val focus = LocalFocusManager.current
+    val inUse = model.usesPhoneServer(page)
+    Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(XIcons.Phone, null, tint = MaterialTheme.colorScheme.primary)
+                Spacer(Modifier.width(16.dp))
+                Text(stringResource(R.string.phone_server_title), style = MaterialTheme.typography.titleMedium)
+            }
+            Text(
+                stringResource(if (inUse) R.string.phone_server_in_use else R.string.phone_server_help),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            page.phoneServerError?.let { error ->
+                Text(stringResource(R.string.phone_server_failed, error), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            }
+            if (inUse) {
+                FilledTonalButton(onClick = { model.leavePhoneServer(page) }, enabled = !page.checking, modifier = Modifier.testTag("leave_phone_server")) {
+                    Text(stringResource(R.string.phone_server_leave))
+                }
+            } else {
+                Button(
+                    onClick = {
+                        focus.clearFocus()
+                        model.usePhoneServer(page)
+                    },
+                    enabled = !page.checking,
+                    modifier = Modifier.testTag("use_phone_server"),
+                ) {
+                    if (page.checking) {
+                        CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                        Spacer(Modifier.width(12.dp))
+                    }
+                    Text(stringResource(if (page.checking) R.string.phone_server_starting else R.string.phone_server_use))
+                }
+            }
         }
     }
 }
