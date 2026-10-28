@@ -15,6 +15,10 @@ val hasXonosKey = xonosKeystore.exists()
 val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "xonos-android"
 val debugSigning = System.getenv("XONOS_DEBUG_SIGNING") == "true"
 
+// Il pacchetto di Music Assistant sul telefono che questa versione usa (gradle.properties): Xonos lo scarica su
+// richiesta dalla release di GitHub di questa versione (server/package/make_payload.py lo costruisce).
+val serverPackage: String = providers.gradleProperty("xonosServerPackage").get()
+
 android {
     namespace = "it.xonos.ma"
     compileSdk = 36
@@ -25,8 +29,14 @@ android {
         targetSdk = 34
         // Si alzano entrambi a ogni pubblicazione in main: la release prende il tag v<versionName>, che
         // Obtainium confronta con l'app installata, e F-Droid compila da quel tag.
-        versionCode = 40
-        versionName = "0.1.40"
+        versionCode = 42
+        versionName = "0.1.42"
+        buildConfigField("String", "SERVER_PACKAGE", "\"$serverPackage\"")
+        buildConfigField(
+            "String",
+            "SERVER_PACKAGE_URL",
+            "\"https://github.com/SirioNero/Music-Assistant-on-Gearslip/releases/download/v$versionName/\"",
+        )
     }
 
     signingConfigs {

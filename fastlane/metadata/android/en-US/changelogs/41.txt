@@ -1,0 +1,2 @@
+Fixed: “Create the account” on a Music Assistant just installed failed on Android.
+Fixed: playing right after opening the app could fail with “The player is not available”: Xonos now waits until Music Assistant has the phone’s queue.

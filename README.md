@@ -36,6 +36,7 @@
 - 📱 **A real player on the phone.** Recommendations on Home, search as you type, the whole library, synced lyrics, a queue and playlists you can edit.
 - 🔊 **Play on any speaker.** Send the music to the speakers Music Assistant knows (Chromecast, AirPlay, Sonos, DLNA, groups) and bring it back to the phone, from the same point.
 - 🛠️ **Music Assistant in your hand.** Administrators add services, sign in to them and set them up right from the phone.
+- 🏠 **No Music Assistant? Xonos can be one.** It runs Music Assistant on the phone itself, just for you and for myCar, downloaded only if you ask.
 - 🌍 **Nine languages.** English, Español, Français, Deutsch, Italiano, Português, Ελληνικά, Русский, 简体中文.
 - 🔒 **Yours alone.** No ads, no tracking, no account with anyone but your own Music Assistant. Free software (AGPL-3.0), with reproducible builds.
 
@@ -68,6 +69,17 @@ Xonos signs in to Music Assistant and registers the phone as a private player th
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5_search.jpg" width="190" alt="Search"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6_library.jpg" width="190" alt="Library"> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7_play_on.jpg" width="190" alt="Play on">
 </p>
 
+### Music Assistant on this phone
+
+No Music Assistant at home? Xonos can run one on the phone itself, just for itself and for myCar.
+
+- In **Settings**, or the first time you open Xonos, tap **Make Xonos your Music Assistant server**. Xonos tells you how big the download is (about 70 MB, 165 MB once installed) and downloads it only after you tap **Download**: Music Assistant with Python, FFmpeg and librespot, from the release of the same Xonos version on this page. App stores such as F-Droid don’t check this download; Xonos uses it only if it’s signed with the same key as Xonos itself.
+- Android asks to let Xonos read the music on the phone: allow it, and Music Assistant’s local disk service starts from the phone’s Music folder.
+- Then Xonos starts Music Assistant, creates its first account and connects to it by itself; the first start takes about a minute. Add your music from **Music Assistant services**: the phone’s files, radio, podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
+- It answers only on the phone, not to the rest of your network, and runs while Xonos runs. myCar reaches it through Xonos.
+- **Use another Music Assistant** goes back to a server at home; **Remove from this phone** deletes it, with its services and library.
+- It needs a 64-bit phone. Not available on the phone: Apple Music, Deezer, YouTube Music, BBC Sounds and network shares (SMB, NFS). With Music Assistant on the phone, Spotify works only with Premium accounts created before December 2024 (Music Assistant’s other Spotify engine runs only on Linux computers).
+
 ### With myCar
 
 [myCar](https://github.com/SirioNero/MyCar), an independent fork of Gearslip, has Xonos built in, with the same engine. Set up Xonos on the phone (0.1.39 or later) and myCar picks up your Music Assistant account by itself: nothing to type twice. Xonos hands the account only to myCar, recognized by its signing certificate, and no other app can read it. When the car’s audio goes through myCar, the music goes straight into the car’s audio channel, and while Xonos is playing Android doesn’t ask for permission to capture the screen.
@@ -83,7 +95,7 @@ If you reach Music Assistant through Tailscale: to connect to the car wirelessly
    - your Music Assistant username and password (Xonos asks Music Assistant for a token of its own and doesn’t keep the password), or a long-lived access token (in Music Assistant: Settings, Profile, Long-lived access tokens);
    - if you like, the name the phone gets among Music Assistant’s players.
 
-   Tap **Sign in and test the connection** (with a token, **Save and test the connection**): it checks both the API and the audio. Then **Go to your music**. On a Music Assistant just installed, with no users yet, Xonos offers to create the first account, the administrator.
+   Tap **Sign in and test the connection** (with a token, **Save and test the connection**): it checks both the API and the audio. Then **Go to your music**. On a Music Assistant just installed, with no users yet, Xonos offers to create the first account, the administrator. No Music Assistant? Tap **Make Xonos your Music Assistant server** instead (see above).
 3. Tap **Allow in background**, so Android doesn’t stop the music with the screen off. The settings are behind the gear icon, on Home and in Library.
 4. In the car, open Gearslip: Xonos is among the music apps. In myCar it’s built in (see above).
 
@@ -102,6 +114,7 @@ Home Assistant Cloud (Nabu Casa) reaches only Home Assistant, not Music Assistan
 
 - Android 8.0 or later.
 - Music Assistant 2.7.5 or later (checked against 2.10.8 and 2.11.0 beta 7); adding and setting up services from the app needs 2.10.
+- Or Music Assistant on the phone itself: a 64-bit phone with about 300 MB free.
 - In the car, Gearslip or myCar.
 - For Spotify, Music Assistant’s Spotify provider, which needs Spotify Premium.
 
@@ -110,7 +123,7 @@ Home Assistant Cloud (Nabu Casa) reaches only Home Assistant, not Music Assistan
 - **The test says “audio: …”.** The API answers but the audio doesn’t: with a reverse proxy, allow WebSockets on `/sendspin` too; Music Assistant before 2.7.5 has no audio for phones.
 - **The menu works but there’s no sound.** Check that the phone is connected to the car over Bluetooth, or that the car’s audio goes through Gearslip (its USB audio) or myCar.
 - **The music stops with the screen off.** Tap “Allow in background” on the phone and, on some brands (Xiaomi, Huawei, Samsung), also let Xonos run in the background in the battery settings.
-- **Useful logs**: `adb logcat -s Xonos`.
+- **Useful logs**: `adb logcat -s Xonos`, and `adb logcat -s XonosServer` for Music Assistant on the phone.
 
 ### Good to know
 
@@ -127,6 +140,8 @@ The version lives in `app/build.gradle.kts` (`versionCode` and `versionName`) an
 
 Locally: open the folder in Android Studio and press Run (the debug build is signed with your computer’s debug key). A release build without `app/xonos.keystore` is left unsigned, as F-Droid wants it.
 
+Music Assistant for the phone lives in `server/`: Python 3.13 and the Python packages built for Android by Chaquopy, Music Assistant prepared by `server/ma/prepare.py`, FFmpeg and librespot compiled from source. `server/package/make_payload.py` turns them into `xonos-server-<abi>.zip`, with `NOTICE.txt` and the licenses. For each release the workflow builds it for arm64-v8a, signs it with the app’s key (`.sig`) and attaches it to the release, where Xonos downloads it from when asked and checks the signature against its own certificate. The “Server MA” workflow builds it for an x86_64 emulator and tests the whole path there: the download, the start, the first account, a folder of music and Xonos playing from it, in the debug and in the release build.
+
 The F-Droid recipe is in `tools/fdroid/it.xonos.ma.yml`, and the store texts and pictures in `fastlane/`. The “Come F-Droid” workflow builds the app the way F-Droid does and checks it with F-Droid’s own tools; the “Riproducibile” workflow rebuilds a release that way and compares it with the published APK, byte for byte.
 
 ### Contributing
@@ -142,6 +157,7 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `data/Devices.kt` | The speakers for Play on, and moving the queue to them |
 | `data/AccountProvider.kt` | The Music Assistant account handed to myCar, and to no other app |
 | `data/MyCarBridge.kt` | myCar’s connections to Music Assistant, opened by Xonos when Tailscale leaves myCar out |
+| `server/ServerPackage.kt`, `server/PhoneServer.kt` | Music Assistant on the phone: the package (download, signature check, unpacking) and its process |
 | `sendspin/SendspinClient.kt` | The phone as a Music Assistant player: the Sendspin protocol and clock sync |
 | `sendspin/AudioEngine.kt` | Plays the audio at the time the server asks for |
 | `sendspin/AndroidAudio.kt` | The phone’s audio output and Opus decoder |
@@ -158,11 +174,13 @@ Bug reports and pull requests are welcome, especially from people trying Xonos i
 | `Language.kt`, `Texts.kt` | The app’s languages, and problems told in the chosen one |
 | `res/values*/strings.xml` | Every text, in English (`values`) and in each language (`values-it`, `values-es`…) |
 
-`tools/` has what’s needed to check Xonos without a phone: a test Music Assistant in Docker, a JVM harness that does what the car and the phone app do, and `tools/screens`, which draws the phone’s screens to PNG with Compose Desktop (see `tools/README.md`).
+`tools/` has what’s needed to check Xonos without a phone: a test Music Assistant in Docker, a JVM harness that does what the car and the phone app do, `tools/screens`, which draws the phone’s screens to PNG with Compose Desktop, and `tools/server`, which checks Music Assistant for the phone on a computer or on the emulator (see `tools/README.md`).
 
 ### License
 
 Xonos is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License, version 3 or (at your option) any later version. See [LICENSE](LICENSE).
+
+The Music Assistant package for the phone holds other free software, each part under its own license (Apache 2.0, LGPL, MIT, PSF and more): `NOTICE.txt` inside it lists them, with where to find their source.
 
 Xonos is an independent project, not affiliated with Music Assistant, Gearslip or any music service.
 
@@ -177,6 +195,7 @@ Xonos is an independent project, not affiliated with Music Assistant, Gearslip o
 - 📱 **Un reproductor de verdad en el teléfono.** Recomendaciones en Inicio, búsqueda mientras escribes, toda la biblioteca, letras sincronizadas, una cola y playlists que puedes editar.
 - 🔊 **Suena en cualquier altavoz.** Envía la música a los altavoces que conoce Music Assistant (Chromecast, AirPlay, Sonos, DLNA, grupos) y tráela de vuelta al teléfono, desde el mismo punto.
 - 🛠️ **Music Assistant en tu mano.** Quien lo administra añade servicios, inicia sesión en ellos y los configura desde el propio teléfono.
+- 🏠 **¿Sin Music Assistant? Xonos puede serlo.** Ejecuta Music Assistant en el propio teléfono, solo para ti y para myCar, y lo descarga solo si se lo pides.
 - 🌍 **Nueve idiomas.** English, Español, Français, Deutsch, Italiano, Português, Ελληνικά, Русский, 简体中文.
 - 🔒 **Solo tuyo.** Sin anuncios, sin rastreo, sin más cuentas que la de tu propio Music Assistant. Software libre (AGPL-3.0), con compilaciones reproducibles.
 
@@ -205,6 +224,17 @@ Xonos inicia sesión en Music Assistant y registra el teléfono como reproductor
 - **Reproducir en**: desde el reproductor, o desde el icono de enviar en Inicio, manda la música a un altavoz que conozca Music Assistant. La cola pasa allí y sigue desde el mismo punto, y el teléfono se detiene; desde entonces la pantalla controla ese altavoz, volumen incluido, y lo que reproduces va allí. Elige «Este teléfono» para recuperar la música. En el coche no cambia nada: el coche siempre suena en el teléfono.
 - **Servicios de Music Assistant** (para quien lo administra, desde Ajustes, o desde Inicio cuando la biblioteca está vacía): mira los servicios, añade uno (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, pódcasts, radio, carpetas…), inicia sesión en el navegador cuando lo pida, cambia sus opciones, configúralo de nuevo o quítalo. Los formularios son los de Music Assistant, en tu idioma cuando Music Assistant tiene la traducción. Para añadir y configurar servicios hace falta Music Assistant 2.10 o posterior.
 
+### Music Assistant en este teléfono
+
+¿No tienes Music Assistant en casa? Xonos puede ejecutar uno en el propio teléfono, solo para sí mismo y para myCar.
+
+- En **Ajustes**, o la primera vez que abres Xonos, pulsa **Convierte Xonos en tu servidor de Music Assistant**. Xonos te dice cuánto ocupa la descarga (unos 70 MB, 165 MB una vez instalado) y solo descarga después de que pulses **Descargar**: Music Assistant con Python, FFmpeg y librespot, desde la release de la misma versión de Xonos en esta página. Las tiendas de apps como F-Droid no revisan esta descarga; Xonos la usa solo si está firmada con la misma clave que Xonos.
+- Android pide permiso para que Xonos lea la música del teléfono: permítelo, y el servicio de disco local de Music Assistant empieza por la carpeta Music del teléfono.
+- Después Xonos inicia Music Assistant, crea su primera cuenta y se conecta solo; el primer inicio tarda un minuto. Añade tu música desde **Servicios de Music Assistant**: los archivos del teléfono, radio, pódcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
+- Solo responde en el teléfono, no al resto de tu red, y funciona mientras Xonos funciona. myCar llega a él a través de Xonos.
+- **Usar otro Music Assistant** vuelve a un servidor de casa; **Quitar de este teléfono** lo borra, con sus servicios y su biblioteca.
+- Hace falta un teléfono de 64 bits. No están disponibles en el teléfono: Apple Music, Deezer, YouTube Music, BBC Sounds y las carpetas de red (SMB, NFS). Con Music Assistant en el teléfono, Spotify solo funciona con cuentas Premium creadas antes de diciembre de 2024 (el otro motor de Spotify de Music Assistant solo funciona en ordenadores con Linux).
+
 ### Con myCar
 
 [myCar](https://github.com/SirioNero/MyCar), un fork independiente de Gearslip, lleva Xonos integrado, con el mismo motor. Configura Xonos en el teléfono (0.1.39 o posterior) y myCar toma tu cuenta de Music Assistant por sí solo: no hay nada que escribir dos veces. Xonos entrega la cuenta solo a myCar, reconocida por su certificado de firma, y ninguna otra app puede leerla. Cuando el audio del coche pasa por myCar, la música va directa al canal de audio del coche, y mientras suena Xonos Android no pide permiso para capturar la pantalla.
@@ -220,7 +250,7 @@ Si llegas a Music Assistant por Tailscale: para conectarse al coche sin cables, 
    - tu usuario y contraseña de Music Assistant (Xonos le pide a Music Assistant un token propio y no guarda la contraseña), o un token de acceso de larga duración (en Music Assistant: Ajustes, Perfil, Tokens de acceso de larga duración);
    - si quieres, el nombre del teléfono entre los reproductores de Music Assistant.
 
-   Pulsa **Iniciar sesión y probar la conexión** (con un token, **Guardar y probar la conexión**): comprueba tanto la API como el audio. Después, **Ir a tu música**. En un Music Assistant recién instalado, todavía sin usuarios, Xonos ofrece crear la primera cuenta, la de administrador.
+   Pulsa **Iniciar sesión y probar la conexión** (con un token, **Guardar y probar la conexión**): comprueba tanto la API como el audio. Después, **Ir a tu música**. En un Music Assistant recién instalado, todavía sin usuarios, Xonos ofrece crear la primera cuenta, la de administrador. ¿No tienes Music Assistant? Pulsa **Convierte Xonos en tu servidor de Music Assistant** (mira arriba).
 3. Pulsa **Permitir en segundo plano**, para que Android no detenga la música con la pantalla apagada. Los ajustes están tras el icono del engranaje, en Inicio y en Biblioteca.
 4. En el coche, abre Gearslip: Xonos aparece entre las apps de música. En myCar viene integrado (mira arriba).
 
@@ -239,6 +269,7 @@ Home Assistant Cloud (Nabu Casa) solo llega a Home Assistant, no al puerto de Mu
 
 - Android 8.0 o posterior.
 - Music Assistant 2.7.5 o posterior (probado con 2.10.8 y 2.11.0 beta 7); para añadir y configurar servicios desde la app hace falta la 2.10.
+- O Music Assistant en el propio teléfono: un teléfono de 64 bits con unos 300 MB libres.
 - En el coche, Gearslip o myCar.
 - Para Spotify, el proveedor de Spotify de Music Assistant, que requiere Spotify Premium.
 
@@ -247,7 +278,7 @@ Home Assistant Cloud (Nabu Casa) solo llega a Home Assistant, no al puerto de Mu
 - **La prueba dice «audio: …».** La API responde pero el audio no: con un proxy inverso, permite los WebSockets también en `/sendspin`; Music Assistant anterior a la 2.7.5 no tiene audio para teléfonos.
 - **El menú funciona pero no se oye nada.** Comprueba que el teléfono está conectado al coche por Bluetooth, o que el audio del coche pasa por Gearslip (su audio USB) o por myCar.
 - **La música se para con la pantalla apagada.** Pulsa «Permitir en segundo plano» en el teléfono y, en algunas marcas (Xiaomi, Huawei, Samsung), permite también que Xonos funcione en segundo plano en los ajustes de batería.
-- **Registros útiles**: `adb logcat -s Xonos`.
+- **Registros útiles**: `adb logcat -s Xonos`, y `adb logcat -s XonosServer` para Music Assistant en el teléfono.
 
 ### Bueno saberlo
 
@@ -264,6 +295,8 @@ Los informes de errores y las pull requests son bienvenidos, sobre todo de quien
 
 Xonos es software libre: puedes redistribuirlo y modificarlo según los términos de la GNU Affero General Public License, versión 3 o (a tu elección) cualquier versión posterior. Consulta [LICENSE](LICENSE).
 
+El paquete de Music Assistant para el teléfono contiene otro software libre, cada parte con su licencia (Apache 2.0, LGPL, MIT, PSF y otras): `NOTICE.txt`, dentro del paquete, las enumera junto con dónde encontrar su código fuente.
+
 Xonos es un proyecto independiente, sin relación con Music Assistant, Gearslip ni ningún servicio de música.
 
 ## Français
@@ -277,6 +310,7 @@ Xonos es un proyecto independiente, sin relación con Music Assistant, Gearslip 
 - 📱 **Un vrai lecteur sur le téléphone.** Des recommandations sur l’Accueil, la recherche pendant la saisie, toute la bibliothèque, les paroles synchronisées, une file d’attente et des playlists modifiables.
 - 🔊 **Sur n’importe quelle enceinte.** Envoyez la musique vers les enceintes que Music Assistant connaît (Chromecast, AirPlay, Sonos, DLNA, groupes) et ramenez-la sur le téléphone, au même endroit.
 - 🛠️ **Music Assistant en main.** Les administrateurs ajoutent des services, s’y connectent et les configurent depuis le téléphone.
+- 🏠 **Pas de Music Assistant ? Xonos peut en être un.** Il fait tourner Music Assistant sur le téléphone même, rien que pour vous et pour myCar, et ne le télécharge que si vous le demandez.
 - 🌍 **Neuf langues.** English, Español, Français, Deutsch, Italiano, Português, Ελληνικά, Русский, 简体中文.
 - 🔒 **Rien qu’à vous.** Pas de publicité, pas de pistage, aucun compte à part votre propre Music Assistant. Logiciel libre (AGPL-3.0), avec des builds reproductibles.
 
@@ -305,6 +339,17 @@ Xonos se connecte à Music Assistant et enregistre le téléphone comme lecteur 
 - **Lire sur** : depuis le lecteur, ou l’icône de diffusion sur l’Accueil, envoyez la musique vers une enceinte que Music Assistant connaît. La file d’attente y passe et continue au même endroit, et le téléphone s’arrête ; l’écran commande alors cette enceinte, volume compris, et ce que vous lancez y joue. Choisissez « Ce téléphone » pour ramener la musique. En voiture rien ne change : la voiture joue toujours sur le téléphone.
 - **Services de Music Assistant** (pour les administrateurs, depuis Réglages, ou depuis l’Accueil quand la bibliothèque est vide) : voyez les services, ajoutez-en un (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, podcasts, radio, dossiers…), connectez-vous dans le navigateur quand il le demande, changez ses options, reconfigurez-le ou retirez-le. Les formulaires sont ceux de Music Assistant, dans votre langue quand Music Assistant a la traduction. Ajouter et configurer des services demande Music Assistant 2.10 ou plus récent.
 
+### Music Assistant sur ce téléphone
+
+Pas de Music Assistant à la maison ? Xonos peut en faire tourner un sur le téléphone même, rien que pour lui et pour myCar.
+
+- Dans **Réglages**, ou la première fois que vous ouvrez Xonos, touchez **Faire de Xonos votre serveur Music Assistant**. Xonos vous indique la taille du téléchargement (environ 70 Mo, 165 Mo une fois installé) et ne télécharge qu’après que vous avez touché **Télécharger** : Music Assistant avec Python, FFmpeg et librespot, depuis la release de la même version de Xonos sur cette page. Les magasins d’applications comme F-Droid ne vérifient pas ce téléchargement ; Xonos ne l’utilise que s’il est signé avec la même clé que Xonos.
+- Android demande de laisser Xonos lire la musique du téléphone : autorisez-le, et le service de disque local de Music Assistant part du dossier Music du téléphone.
+- Ensuite Xonos démarre Music Assistant, crée son premier compte et s’y connecte tout seul ; le premier démarrage prend environ une minute. Ajoutez votre musique depuis **Services de Music Assistant** : les fichiers du téléphone, la radio, les podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
+- Il ne répond que sur le téléphone, pas au reste de votre réseau, et tourne tant que Xonos tourne. myCar l’atteint à travers Xonos.
+- **Utiliser un autre Music Assistant** revient à un serveur à la maison ; **Retirer de ce téléphone** le supprime, avec ses services et sa bibliothèque.
+- Il faut un téléphone 64 bits. Pas disponibles sur le téléphone : Apple Music, Deezer, YouTube Music, BBC Sounds et les partages réseau (SMB, NFS). Avec Music Assistant sur le téléphone, Spotify ne marche qu’avec les comptes Premium créés avant décembre 2024 (l’autre moteur Spotify de Music Assistant ne tourne que sur les ordinateurs Linux).
+
 ### Avec myCar
 
 [myCar](https://github.com/SirioNero/MyCar), un fork indépendant de Gearslip, intègre Xonos, avec le même moteur. Configurez Xonos sur le téléphone (0.1.39 ou plus récent) et myCar récupère tout seul votre compte Music Assistant : rien à saisir deux fois. Xonos ne confie le compte qu’à myCar, reconnue par son certificat de signature, et aucune autre app ne peut le lire. Quand l’audio de la voiture passe par myCar, la musique va droit dans le canal audio de la voiture, et tant que Xonos joue, Android ne demande pas l’autorisation de capturer l’écran.
@@ -320,7 +365,7 @@ Si vous accédez à Music Assistant par Tailscale : pour se connecter à la voit
    - votre nom d’utilisateur et votre mot de passe Music Assistant (Xonos demande à Music Assistant un jeton à lui et ne garde pas le mot de passe), ou un jeton d’accès longue durée (dans Music Assistant : Paramètres, Profil, Jetons d’accès longue durée) ;
    - si vous voulez, le nom du téléphone parmi les lecteurs de Music Assistant.
 
-   Touchez **Se connecter et tester la connexion** (avec un jeton, **Enregistrer et tester la connexion**) : cela vérifie l’API et l’audio. Puis **Aller à votre musique**. Sur un Music Assistant tout juste installé, encore sans utilisateurs, Xonos propose de créer le premier compte, celui de l’administrateur.
+   Touchez **Se connecter et tester la connexion** (avec un jeton, **Enregistrer et tester la connexion**) : cela vérifie l’API et l’audio. Puis **Aller à votre musique**. Sur un Music Assistant tout juste installé, encore sans utilisateurs, Xonos propose de créer le premier compte, celui de l’administrateur. Pas de Music Assistant ? Touchez plutôt **Faire de Xonos votre serveur Music Assistant** (voir plus haut).
 3. Touchez **Autoriser en arrière-plan**, pour qu’Android n’arrête pas la musique écran éteint. Les réglages sont derrière l’icône d’engrenage, sur l’Accueil et dans la Bibliothèque.
 4. En voiture, ouvrez Gearslip : Xonos figure parmi les apps de musique. Dans myCar, il est intégré (voir plus haut).
 
@@ -339,6 +384,7 @@ Home Assistant Cloud (Nabu Casa) n’atteint que Home Assistant, pas le port de 
 
 - Android 8.0 ou plus récent.
 - Music Assistant 2.7.5 ou plus récent (vérifié avec 2.10.8 et 2.11.0 bêta 7) ; ajouter et configurer des services depuis l’app demande la 2.10.
+- Ou Music Assistant sur le téléphone même : un téléphone 64 bits avec environ 300 Mo libres.
 - En voiture, Gearslip ou myCar.
 - Pour Spotify, le fournisseur Spotify de Music Assistant, qui demande Spotify Premium.
 
@@ -347,7 +393,7 @@ Home Assistant Cloud (Nabu Casa) n’atteint que Home Assistant, pas le port de 
 - **Le test indique « audio : … ».** L’API répond mais pas l’audio : avec un proxy inverse, autorisez aussi les WebSockets sur `/sendspin` ; avant la 2.7.5, Music Assistant n’a pas d’audio pour les téléphones.
 - **Le menu marche mais on n’entend rien.** Vérifiez que le téléphone est relié à la voiture en Bluetooth, ou que l’audio de la voiture passe par Gearslip (son audio USB) ou par myCar.
 - **La musique s’arrête écran éteint.** Touchez « Autoriser en arrière-plan » sur le téléphone et, sur certaines marques (Xiaomi, Huawei, Samsung), autorisez aussi Xonos à fonctionner en arrière-plan dans les réglages de la batterie.
-- **Journaux utiles** : `adb logcat -s Xonos`.
+- **Journaux utiles** : `adb logcat -s Xonos`, et `adb logcat -s XonosServer` pour Music Assistant sur le téléphone.
 
 ### Bon à savoir
 
@@ -364,6 +410,8 @@ Les rapports de bugs et les pull requests sont les bienvenus, surtout de la part
 
 Xonos est un logiciel libre : vous pouvez le redistribuer et le modifier selon les termes de la GNU Affero General Public License, version 3 ou (à votre choix) toute version ultérieure. Voir [LICENSE](LICENSE).
 
+Le paquet Music Assistant pour le téléphone contient d’autres logiciels libres, chacun sous sa licence (Apache 2.0, LGPL, MIT, PSF et d’autres) : `NOTICE.txt`, dans le paquet, les énumère avec l’endroit où trouver leur code source.
+
 Xonos est un projet indépendant, sans lien avec Music Assistant, Gearslip ni aucun service de musique.
 
 ## Deutsch
@@ -377,6 +425,7 @@ Xonos est un projet indépendant, sans lien avec Music Assistant, Gearslip ni au
 - 📱 **Ein echter Player auf dem Handy.** Empfehlungen auf Start, Suche beim Tippen, die ganze Bibliothek, synchronisierte Songtexte, eine Warteschlange und Playlists, die du bearbeiten kannst.
 - 🔊 **Auf jedem Lautsprecher.** Schick die Musik an die Lautsprecher, die Music Assistant kennt (Chromecast, AirPlay, Sonos, DLNA, Gruppen), und hol sie an derselben Stelle zurück aufs Handy.
 - 🛠️ **Music Assistant in der Hand.** Admins fügen Dienste hinzu, melden sich bei ihnen an und richten sie direkt auf dem Handy ein.
+- 🏠 **Kein Music Assistant? Xonos kann einer sein.** Es führt Music Assistant auf dem Handy selbst aus, nur für dich und für myCar, und lädt ihn nur herunter, wenn du es willst.
 - 🌍 **Neun Sprachen.** English, Español, Français, Deutsch, Italiano, Português, Ελληνικά, Русский, 简体中文.
 - 🔒 **Nur deins.** Keine Werbung, kein Tracking, kein Konto außer deinem eigenen Music Assistant. Freie Software (AGPL-3.0) mit reproduzierbaren Builds.
 
@@ -405,6 +454,17 @@ Xonos meldet sich bei Music Assistant an und registriert das Handy über Sendspi
 - **Abspielen auf**: Schick die Musik vom Player aus, oder über das Cast-Symbol auf Start, an einen Lautsprecher, den Music Assistant kennt. Die Warteschlange zieht dorthin um und läuft an derselben Stelle weiter, das Handy hört auf; ab dann steuert der Bildschirm diesen Lautsprecher, Lautstärke inklusive, und was du abspielst, läuft dort. Wähle „Dieses Telefon“, um die Musik zurückzuholen. Im Auto ändert sich nichts: Das Auto spielt immer auf dem Handy.
 - **Music-Assistant-Dienste** (für Admins, in den Einstellungen oder auf Start, wenn die Bibliothek leer ist): Sieh dir die Dienste an, füge einen hinzu (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, Podcasts, Radio, Ordner…), melde dich im Browser an, wenn er danach fragt, ändere seine Optionen, richte ihn neu ein oder entferne ihn. Die Formulare sind die von Music Assistant, in deiner Sprache, wenn Music Assistant die Übersetzung hat. Zum Hinzufügen und Einrichten von Diensten braucht es Music Assistant 2.10 oder neuer.
 
+### Music Assistant auf diesem Telefon
+
+Kein Music Assistant zu Hause? Xonos kann einen auf dem Handy selbst ausführen, nur für sich und für myCar.
+
+- Tippe in den **Einstellungen**, oder beim ersten Öffnen von Xonos, auf **Xonos zu deinem Music-Assistant-Server machen**. Xonos sagt dir, wie groß der Download ist (etwa 70 MB, installiert 165 MB), und lädt erst herunter, wenn du auf **Herunterladen** tippst: Music Assistant mit Python, FFmpeg und librespot, aus dem Release derselben Xonos-Version auf dieser Seite. App-Stores wie F-Droid prüfen diesen Download nicht; Xonos verwendet ihn nur, wenn er mit demselben Schlüssel wie Xonos signiert ist.
+- Android fragt, ob Xonos die Musik auf dem Handy lesen darf: Erlaube es, dann beginnt der Dienst für lokale Dateien von Music Assistant mit dem Ordner Music des Handys.
+- Danach startet Xonos Music Assistant, legt das erste Konto an und verbindet sich von selbst; der erste Start dauert etwa eine Minute. Füge deine Musik unter **Music-Assistant-Dienste** hinzu: Dateien auf dem Handy, Radio, Podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
+- Er antwortet nur auf dem Handy, nicht dem Rest deines Netzwerks, und läuft, solange Xonos läuft. myCar erreicht ihn über Xonos.
+- **Einen anderen Music Assistant verwenden** führt zurück zu einem Server zu Hause; **Von diesem Telefon entfernen** löscht ihn samt Diensten und Bibliothek.
+- Du brauchst ein 64-Bit-Handy. Auf dem Handy nicht verfügbar: Apple Music, Deezer, YouTube Music, BBC Sounds und Netzwerkfreigaben (SMB, NFS). Mit Music Assistant auf dem Handy funktioniert Spotify nur mit Premium-Konten, die vor Dezember 2024 angelegt wurden (die andere Spotify-Engine von Music Assistant läuft nur auf Linux-Computern).
+
 ### Mit myCar
 
 [myCar](https://github.com/SirioNero/MyCar), ein unabhängiger Fork von Gearslip, hat Xonos eingebaut, mit derselben Engine. Richte Xonos auf dem Handy ein (0.1.39 oder neuer), und myCar übernimmt dein Music-Assistant-Konto von selbst: Nichts muss zweimal eingetippt werden. Xonos gibt das Konto nur an myCar weiter, erkannt am Signaturzertifikat, und keine andere App kann es lesen. Läuft der Ton im Auto über myCar, geht die Musik direkt in den Audiokanal des Autos, und solange Xonos spielt, fragt Android nicht nach der Erlaubnis für eine Bildschirmaufnahme.
@@ -420,7 +480,7 @@ Wenn du Music Assistant über Tailscale erreichst: Um sich drahtlos mit dem Auto
    - Benutzername und Passwort von Music Assistant (Xonos holt sich von Music Assistant ein eigenes Token und behält das Passwort nicht) oder ein langlebiges Zugriffstoken (in Music Assistant: Einstellungen, Profil, Langlebige Zugriffstoken);
    - wenn du willst, den Namen des Handys unter den Playern von Music Assistant.
 
-   Tippe auf **Anmelden und Verbindung testen** (mit Token: **Speichern und Verbindung testen**): Es prüft API und Ton. Dann **Zu deiner Musik**. Bei einem frisch installierten Music Assistant ohne Benutzer bietet Xonos an, das erste Konto anzulegen, das des Admins.
+   Tippe auf **Anmelden und Verbindung testen** (mit Token: **Speichern und Verbindung testen**): Es prüft API und Ton. Dann **Zu deiner Musik**. Bei einem frisch installierten Music Assistant ohne Benutzer bietet Xonos an, das erste Konto anzulegen, das des Admins. Kein Music Assistant? Tippe stattdessen auf **Xonos zu deinem Music-Assistant-Server machen** (siehe oben).
 3. Tippe auf **Im Hintergrund erlauben**, damit Android die Musik bei ausgeschaltetem Bildschirm nicht stoppt. Die Einstellungen liegen hinter dem Zahnrad, auf Start und in der Bibliothek.
 4. Öffne im Auto Gearslip: Xonos ist bei den Musik-Apps. In myCar ist es eingebaut (siehe oben).
 
@@ -439,6 +499,7 @@ Home Assistant Cloud (Nabu Casa) erreicht nur Home Assistant, nicht den Port von
 
 - Android 8.0 oder neuer.
 - Music Assistant 2.7.5 oder neuer (geprüft mit 2.10.8 und 2.11.0 Beta 7); Dienste in der App hinzufügen und einrichten braucht 2.10.
+- Oder Music Assistant auf dem Handy selbst: ein 64-Bit-Handy mit etwa 300 MB freiem Speicher.
 - Im Auto Gearslip oder myCar.
 - Für Spotify der Spotify-Anbieter von Music Assistant, der Spotify Premium braucht.
 
@@ -447,7 +508,7 @@ Home Assistant Cloud (Nabu Casa) erreicht nur Home Assistant, nicht den Port von
 - **Der Test meldet „Audio: …“.** Die API antwortet, der Ton nicht: Erlaube mit einem Reverse-Proxy WebSockets auch auf `/sendspin`; Music Assistant vor 2.7.5 hat keinen Ton für Handys.
 - **Das Menü geht, aber man hört nichts.** Prüfe, ob das Handy per Bluetooth mit dem Auto verbunden ist oder ob der Ton im Auto über Gearslip (sein USB-Audio) oder über myCar läuft.
 - **Die Musik stoppt bei ausgeschaltetem Bildschirm.** Tippe auf dem Handy auf „Im Hintergrund erlauben“ und erlaube Xonos bei manchen Marken (Xiaomi, Huawei, Samsung) auch in den Akku-Einstellungen, im Hintergrund zu laufen.
-- **Nützliche Logs**: `adb logcat -s Xonos`.
+- **Nützliche Logs**: `adb logcat -s Xonos`, und `adb logcat -s XonosServer` für Music Assistant auf dem Handy.
 
 ### Gut zu wissen
 
@@ -464,6 +525,8 @@ Fehlerberichte und Pull Requests sind willkommen, besonders von allen, die Xonos
 
 Xonos ist freie Software: Du kannst sie unter den Bedingungen der GNU Affero General Public License, Version 3 oder (nach deiner Wahl) jeder späteren Version, weitergeben und verändern. Siehe [LICENSE](LICENSE).
 
+Das Music-Assistant-Paket für das Handy enthält weitere freie Software, jeder Teil unter seiner eigenen Lizenz (Apache 2.0, LGPL, MIT, PSF und andere): `NOTICE.txt` im Paket listet sie auf, mit dem Ort ihres Quellcodes.
+
 Xonos ist ein unabhängiges Projekt und steht in keiner Verbindung zu Music Assistant, Gearslip oder einem Musikdienst.
 
 ## Italiano
@@ -477,6 +540,7 @@ Xonos ist ein unabhängiges Projekt und steht in keiner Verbindung zu Music Assi
 - 📱 **Un lettore vero anche sul telefono.** Consigli nella Home, ricerca mentre scrivi, tutta la libreria, testi sincronizzati, una coda e playlist che puoi modificare.
 - 🔊 **Suona su qualsiasi cassa.** Manda la musica alle casse che Music Assistant conosce (Chromecast, AirPlay, Sonos, DLNA, gruppi) e riportala sul telefono, dallo stesso punto.
 - 🛠️ **Music Assistant in mano.** Chi lo amministra aggiunge i servizi, ci fa l’accesso e li configura direttamente dal telefono.
+- 🏠 **Niente Music Assistant? Xonos può esserlo.** Fa girare Music Assistant sul telefono stesso, solo per te e per myCar, e lo scarica solo se glielo chiedi.
 - 🌍 **Nove lingue.** English, Español, Français, Deutsch, Italiano, Português, Ελληνικά, Русский, 简体中文.
 - 🔒 **Solo tuo.** Niente pubblicità, niente tracciamento, nessun account se non quello del tuo Music Assistant. Software libero (AGPL-3.0), con build riproducibili.
 
@@ -505,6 +569,17 @@ Xonos accede a Music Assistant e registra il telefono come lettore privato con S
 - **Suona su**: dal lettore, o dall’icona in alto nella Home, mandi la musica a una cassa che Music Assistant conosce. La coda passa lì e continua dallo stesso punto, e il telefono si ferma; da quel momento lo schermo comanda quella cassa, volume compreso, e quello che fai partire suona lì. Scegli “Questo telefono” per riportare indietro la musica. In auto non cambia niente: l’auto suona sempre sul telefono.
 - **I servizi di Music Assistant** (per chi lo amministra, dalle Impostazioni, o dalla Home quando la libreria è vuota): vedi i servizi, ne aggiungi uno (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, podcast, radio, cartelle…), fai l’accesso nel browser quando lo chiede, cambi le opzioni, lo configuri di nuovo o lo togli. I moduli sono quelli di Music Assistant, nella tua lingua quando Music Assistant ha la traduzione. Per aggiungere e configurare i servizi serve Music Assistant 2.10 o successivo.
 
+### Music Assistant su questo telefono
+
+Non hai un Music Assistant a casa? Xonos può farne girare uno sul telefono stesso, solo per sé e per myCar.
+
+- Nelle **Impostazioni**, o la prima volta che apri Xonos, premi **Fai diventare Xonos il tuo server Music Assistant**. Xonos ti dice quanto pesa il download (circa 70 MB, 165 MB una volta installato) e scarica solo dopo che hai premuto **Scarica**: Music Assistant con Python, FFmpeg e librespot, dalla release della stessa versione di Xonos in questa pagina. Gli store come F-Droid non controllano questo download; Xonos lo usa solo se è firmato con la stessa chiave di Xonos.
+- Android chiede di lasciar leggere a Xonos la musica del telefono: consentilo, e il servizio del disco locale di Music Assistant parte dalla cartella Music del telefono.
+- Poi Xonos avvia Music Assistant, crea il primo account e ci si collega da solo; il primo avvio dura circa un minuto. Aggiungi la tua musica da **Servizi di Music Assistant**: i file del telefono, radio, podcast, Jellyfin, Plex, Subsonic, Spotify, Tidal…
+- Risponde solo sul telefono, non al resto della tua rete, e gira finché gira Xonos. myCar lo raggiunge attraverso Xonos.
+- **Usa un altro Music Assistant** torna a un server di casa; **Togli da questo telefono** lo cancella, con i suoi servizi e la sua libreria.
+- Serve un telefono a 64 bit. Non ci sono sul telefono: Apple Music, Deezer, YouTube Music, BBC Sounds e le cartelle di rete (SMB, NFS). Con Music Assistant sul telefono, Spotify funziona solo con gli account Premium creati prima di dicembre 2024 (l’altro motore di Spotify di Music Assistant gira solo sui computer Linux).
+
 ### Con myCar
 
 [myCar](https://github.com/SirioNero/MyCar), un fork indipendente di Gearslip, ha Xonos dentro di sé, con lo stesso motore. Configura Xonos sul telefono (0.1.39 o successivo) e myCar prende da sola il tuo account di Music Assistant: niente da scrivere due volte. Xonos passa l’account solo a myCar, riconosciuta dal suo certificato di firma, e nessun’altra app può leggerlo. Quando l’audio dell’auto passa da myCar, la musica va dritta nel canale audio dell’auto, e finché suona Xonos Android non chiede il permesso di registrare lo schermo.
@@ -520,7 +595,7 @@ Se raggiungi Music Assistant con Tailscale: per collegarsi all’auto senza fili
    - nome utente e password di Music Assistant (Xonos si fa dare da Music Assistant un token suo e la password non la tiene), oppure un token di accesso a lungo termine (in Music Assistant: Impostazioni, Profilo, Token di accesso a lungo termine);
    - se vuoi, il nome del telefono tra i lettori di Music Assistant.
 
-   Premi **Accedi e prova la connessione** (con un token, **Salva e prova la connessione**): controlla sia l’API sia l’audio. Poi **Vai alla tua musica**. Su un Music Assistant appena installato, ancora senza utenti, Xonos propone di creare il primo account, quello dell’amministratore.
+   Premi **Accedi e prova la connessione** (con un token, **Salva e prova la connessione**): controlla sia l’API sia l’audio. Poi **Vai alla tua musica**. Su un Music Assistant appena installato, ancora senza utenti, Xonos propone di creare il primo account, quello dell’amministratore. Niente Music Assistant? Premi invece **Fai diventare Xonos il tuo server Music Assistant** (vedi sopra).
 3. Premi **Consenti in background**, così Android non ferma la musica a schermo spento. Le impostazioni stanno dietro l’ingranaggio, nella Home e nella Libreria.
 4. In auto apri Gearslip: Xonos compare tra le app musicali. In myCar c’è già dentro (vedi sopra).
 
@@ -539,6 +614,7 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 
 - Android 8.0 o successivo.
 - Music Assistant 2.7.5 o successivo (verificato con la 2.10.8 e la 2.11.0 beta 7); per aggiungere e configurare i servizi dall’app serve la 2.10.
+- Oppure Music Assistant sul telefono stesso: un telefono a 64 bit con circa 300 MB liberi.
 - In auto, Gearslip o myCar.
 - Per Spotify, il provider Spotify di Music Assistant, che vuole Spotify Premium.
 
@@ -547,7 +623,7 @@ Home Assistant Cloud (Nabu Casa) arriva solo a Home Assistant, non alla porta di
 - **La prova dice “audio: …”.** L’API risponde ma l’audio no: con un reverse proxy consenti i WebSocket anche su `/sendspin`; Music Assistant prima della 2.7.5 non ha l’audio per i telefoni.
 - **Il menu funziona ma non si sente niente.** Controlla che il telefono sia collegato all’auto via Bluetooth, o che l’audio dell’auto passi da Gearslip (il suo audio USB) o da myCar.
 - **La musica si ferma a schermo spento.** Premi “Consenti in background” sul telefono e, su alcune marche (Xiaomi, Huawei, Samsung), consenti a Xonos di funzionare in background anche nelle impostazioni della batteria.
-- **Log utili**: `adb logcat -s Xonos`.
+- **Log utili**: `adb logcat -s Xonos`, e `adb logcat -s XonosServer` per Music Assistant sul telefono.
 
 ### Buono a sapersi
 
@@ -564,6 +640,8 @@ Segnalazioni e pull request sono benvenute, soprattutto da chi prova Xonos in au
 
 Xonos è software libero: puoi ridistribuirlo e modificarlo secondo i termini della GNU Affero General Public License, versione 3 o (a tua scelta) successiva. Vedi [LICENSE](LICENSE).
 
+Il pacchetto di Music Assistant per il telefono contiene altro software libero, ogni parte con la sua licenza (Apache 2.0, LGPL, MIT, PSF e altre): `NOTICE.txt`, dentro il pacchetto, le elenca con dove trovarne il sorgente.
+
 Xonos è un progetto indipendente, non legato a Music Assistant, a Gearslip né ad alcun servizio musicale.
 
 ## Português
@@ -577,6 +655,7 @@ Xonos è un progetto indipendente, non legato a Music Assistant, a Gearslip né 
 - 📱 **Um reprodutor de verdade no telefone.** Recomendações no Início, busca enquanto você digita, a biblioteca inteira, letras sincronizadas, uma fila e playlists que você pode editar.
 - 🔊 **Toque em qualquer caixa de som.** Envie a música para as caixas de som que o Music Assistant conhece (Chromecast, AirPlay, Sonos, DLNA, grupos) e traga de volta para o telefone, do mesmo ponto.
 - 🛠️ **O Music Assistant na mão.** Quem administra adiciona serviços, entra neles e os configura direto do telefone.
+- 🏠 **Sem Music Assistant? O Xonos pode ser um.** Ele roda o Music Assistant no próprio telefone, só para você e para o myCar, e só baixa se você pedir.
 - 🌍 **Nove idiomas.** English, Español, Français, Deutsch, Italiano, Português, Ελληνικά, Русский, 简体中文.
 - 🔒 **Só seu.** Sem anúncios, sem rastreamento, sem nenhuma conta além do seu próprio Music Assistant. Software livre (AGPL-3.0), com builds reproduzíveis.
 
@@ -605,6 +684,17 @@ O Xonos entra no Music Assistant e registra o telefone como reprodutor privado p
 - **Tocar em**: no reprodutor, ou no ícone de transmitir no Início, envie a música para uma caixa de som que o Music Assistant conhece. A fila vai para lá e continua do mesmo ponto, e o telefone para; a partir daí a tela controla essa caixa, volume incluído, e o que você tocar vai para lá. Escolha “Este telefone” para trazer a música de volta. No carro nada muda: o carro sempre toca no telefone.
 - **Serviços do Music Assistant** (para quem administra, nas Configurações, ou no Início quando a biblioteca está vazia): veja os serviços, adicione um (Spotify, Tidal, YouTube Music, Deezer, Qobuz, Jellyfin, Plex, Subsonic, podcasts, rádio, pastas…), entre pelo navegador quando ele pedir, mude as opções, configure de novo ou remova. Os formulários são os do Music Assistant, no seu idioma quando o Music Assistant tem a tradução. Para adicionar e configurar serviços é preciso o Music Assistant 2.10 ou mais recente.
 
+### Music Assistant neste telefone
+
+Não tem um Music Assistant em casa? O Xonos pode rodar um no próprio telefone, só para ele mesmo e para o myCar.
+
+- Nas **Configurações**, ou na primeira vez que abrir o Xonos, toque em **Transformar o Xonos no seu servidor Music Assistant**. O Xonos diz o tamanho do download (cerca de 70 MB, 165 MB depois de instalado) e só baixa depois que você tocar em **Baixar**: o Music Assistant com Python, FFmpeg e librespot, da release da mesma versão do Xonos nesta página. Lojas de apps como o F-Droid não verificam esse download; o Xonos só o usa se estiver assinado com a mesma chave do Xonos.
+- O Android pede para deixar o Xonos ler as músicas do telefone: permita, e o serviço de disco local do Music Assistant começa pela pasta Music do telefone.
+- Depois o Xonos inicia o Music Assistant, cria a primeira conta e se conecta sozinho; a primeira inicialização leva cerca de um minuto. Adicione sua música em **Serviços do Music Assistant**: os arquivos do telefone, rádio, podcasts, Jellyfin, Plex, Subsonic, Spotify, Tidal…
+- Ele só responde no telefone, não para o resto da sua rede, e roda enquanto o Xonos roda. O myCar chega a ele através do Xonos.
+- **Usar outro Music Assistant** volta para um servidor de casa; **Remover deste telefone** o apaga, com os serviços e a biblioteca.
+- É preciso um telefone de 64 bits. Não estão disponíveis no telefone: Apple Music, Deezer, YouTube Music, BBC Sounds e pastas de rede (SMB, NFS). Com o Music Assistant no telefone, o Spotify só funciona com contas Premium criadas antes de dezembro de 2024 (o outro motor do Spotify do Music Assistant só roda em computadores Linux).
+
 ### Com o myCar
 
 O [myCar](https://github.com/SirioNero/MyCar), um fork independente do Gearslip, tem o Xonos embutido, com o mesmo motor. Configure o Xonos no telefone (0.1.39 ou mais recente) e o myCar pega sua conta do Music Assistant sozinho: nada para digitar duas vezes. O Xonos entrega a conta só ao myCar, reconhecido pelo certificado de assinatura, e nenhum outro app consegue lê-la. Quando o áudio do carro passa pelo myCar, a música vai direto para o canal de áudio do carro, e enquanto o Xonos toca o Android não pede permissão para capturar a tela.
@@ -620,7 +710,7 @@ Se você chega ao Music Assistant pelo Tailscale: para se conectar ao carro sem 
    - seu usuário e senha do Music Assistant (o Xonos pede ao Music Assistant um token próprio e não guarda a senha), ou um token de acesso de longa duração (no Music Assistant: Configurações, Perfil, Tokens de acesso de longa duração);
    - se quiser, o nome do telefone entre os reprodutores do Music Assistant.
 
-   Toque em **Entrar e testar a conexão** (com um token, **Salvar e testar a conexão**): ele confere a API e o áudio. Depois, **Ir para a sua música**. Em um Music Assistant recém-instalado, ainda sem usuários, o Xonos oferece criar a primeira conta, a de administrador.
+   Toque em **Entrar e testar a conexão** (com um token, **Salvar e testar a conexão**): ele confere a API e o áudio. Depois, **Ir para a sua música**. Em um Music Assistant recém-instalado, ainda sem usuários, o Xonos oferece criar a primeira conta, a de administrador. Sem Music Assistant? Toque em **Transformar o Xonos no seu servidor Music Assistant** (veja acima).
 3. Toque em **Permitir em segundo plano**, para o Android não parar a música com a tela apagada. As configurações ficam atrás do ícone de engrenagem, no Início e na Biblioteca.
 4. No carro, abra o Gearslip: o Xonos aparece entre os apps de música. No myCar ele já vem embutido (veja acima).
 
@@ -639,6 +729,7 @@ O Home Assistant Cloud (Nabu Casa) só chega ao Home Assistant, não à porta do
 
 - Android 8.0 ou mais recente.
 - Music Assistant 2.7.5 ou mais recente (testado com 2.10.8 e 2.11.0 beta 7); para adicionar e configurar serviços pelo app é preciso a 2.10.
+- Ou o Music Assistant no próprio telefone: um telefone de 64 bits com cerca de 300 MB livres.
 - No carro, Gearslip ou myCar.
 - Para o Spotify, o provedor Spotify do Music Assistant, que exige Spotify Premium.
 
@@ -647,7 +738,7 @@ O Home Assistant Cloud (Nabu Casa) só chega ao Home Assistant, não à porta do
 - **O teste diz “áudio: …”.** A API responde, mas o áudio não: com um proxy reverso, libere os WebSockets também em `/sendspin`; o Music Assistant antes da 2.7.5 não tem áudio para telefones.
 - **O menu funciona, mas não sai som.** Confira se o telefone está conectado ao carro por Bluetooth, ou se o áudio do carro passa pelo Gearslip (o áudio USB dele) ou pelo myCar.
 - **A música para com a tela apagada.** Toque em “Permitir em segundo plano” no telefone e, em algumas marcas (Xiaomi, Huawei, Samsung), permita também que o Xonos funcione em segundo plano nas configurações de bateria.
-- **Logs úteis**: `adb logcat -s Xonos`.
+- **Logs úteis**: `adb logcat -s Xonos`, e `adb logcat -s XonosServer` para o Music Assistant no telefone.
 
 ### Bom saber
 
@@ -663,5 +754,7 @@ Relatos de bugs e pull requests são bem-vindos, principalmente de quem testa o 
 ### Licença
 
 O Xonos é software livre: você pode redistribuí-lo e modificá-lo nos termos da GNU Affero General Public License, versão 3 ou (a seu critério) qualquer versão posterior. Veja [LICENSE](LICENSE).
+
+O pacote do Music Assistant para o telefone contém outros softwares livres, cada parte com a sua licença (Apache 2.0, LGPL, MIT, PSF e outras): o `NOTICE.txt`, dentro do pacote, lista todos, com onde encontrar o código-fonte.
 
 O Xonos é um projeto independente, sem vínculo com o Music Assistant, o Gearslip ou qualquer serviço de música.

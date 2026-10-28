@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Per il pulsante che chiede di non ottimizzare la batteria: senza, Android può fermare la musica in auto. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Music Assistant sul telefono legge la cartella Music: Xonos lo chiede solo quando lo si scarica o
+         lo si avvia. Da Android 13 il permesso è solo per l'audio. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:name=".XonosApp"

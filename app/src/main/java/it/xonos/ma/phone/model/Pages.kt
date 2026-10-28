@@ -189,6 +189,22 @@ class SettingsPage(home: String, remote: String, token: String, name: String, si
     /** Vero dopo il primo "Salva": da lì si dice se manca qualcosa. */
     var tried by mutableStateOf(false)
     var results by mutableStateOf<List<ConnectionCheck.Result>>(emptyList())
+
+    /** Perché Music Assistant sul telefono non è partito, se è successo. */
+    var phoneServerError by mutableStateOf<String?>(null)
+
+    /** Il pacchetto di Music Assistant sul telefono è scaricato (nella versione che serve). */
+    var phoneServerInstalled by mutableStateOf(false)
+
+    /** La domanda prima di scaricarlo, con quanto pesa (null finché non lo si sa). */
+    var phoneServerAsk by mutableStateOf(false)
+    var phoneServerSize by mutableStateOf<Long?>(null)
+
+    /** Mentre si scarica: byte arrivati e totale (-1 se non si sa). */
+    var phoneServerProgress by mutableStateOf<Pair<Long, Long>?>(null)
+
+    /** Perché il download non è riuscito, se è successo. */
+    var phoneServerDownloadError by mutableStateOf<String?>(null)
 }
 
 /** "Aggiungi a una playlist": dove mettere [uri] (un brano, un album o una playlist), o una playlist nuova. */

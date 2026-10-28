@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -27,10 +28,12 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -96,24 +99,28 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
         }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             LanguagePicker(host)
-            FoundServers(page, model)
-            Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri, "field_home")
-            Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri, "field_remote")
-            SignInChoice(page)
-            if (page.useToken) {
-                TokenField(page)
-            } else {
-                Field(
-                    page.username,
-                    { page.username = it },
-                    R.string.label_username,
-                    null,
-                    "",
-                    KeyboardType.Text,
-                    "field_username",
-                    help = page.signedIn?.let { stringResource(R.string.signed_in_as, it) } ?: stringResource(R.string.help_username),
-                )
-                PasswordField(page)
+            if (model.phoneServerAvailable) PhoneServerCard(page, model, host)
+            // Con Music Assistant sul telefono indirizzo e accesso li sa già Xonos.
+            if (!model.usesPhoneServer(page)) {
+                FoundServers(page, model)
+                Field(page.home, { page.home = it }, R.string.label_home, R.string.help_home, stringResource(R.string.hint_home), KeyboardType.Uri, "field_home")
+                Field(page.remote, { page.remote = it }, R.string.label_remote, R.string.help_remote, stringResource(R.string.hint_remote), KeyboardType.Uri, "field_remote")
+                SignInChoice(page)
+                if (page.useToken) {
+                    TokenField(page)
+                } else {
+                    Field(
+                        page.username,
+                        { page.username = it },
+                        R.string.label_username,
+                        null,
+                        "",
+                        KeyboardType.Text,
+                        "field_username",
+                        help = page.signedIn?.let { stringResource(R.string.signed_in_as, it) } ?: stringResource(R.string.help_username),
+                    )
+                    PasswordField(page)
+                }
             }
             Field(page.name, { page.name = it }, R.string.label_name, R.string.help_name, stringResource(R.string.hint_name), KeyboardType.Text, "field_name")
             val signIn = !page.useToken && page.password.isNotEmpty()
@@ -203,6 +210,150 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
         }
     }
 }
+
+/**
+ * Music Assistant su questo telefono. Finché il pacchetto non c'è, un tasto lo scarica: prima una domanda
+ * con quanto pesa (F-Droid vuole un sì esplicito, e che si dica che non lo controlla), poi l'avanzamento, e
+ * alla fine Xonos ci si collega da solo. Scaricato, un tocco lo avvia, crea l'account e ci collega Xonos; da
+ * lì si aggiungono i servizi. Si torna a un altro Music Assistant svuotando il modulo, o lo si toglie.
+ */
+@Composable
+private fun PhoneServerCard(page: SettingsPage, model: PhoneModel, host: Host) {
+    val focus = LocalFocusManager.current
+    val inUse = model.usesPhoneServer(page)
+    val progress = page.phoneServerProgress
+    var confirmRemove by remember { mutableStateOf(false) }
+    Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(XIcons.Phone, null, tint = MaterialTheme.colorScheme.primary)
+                Spacer(Modifier.width(16.dp))
+                Text(stringResource(R.string.phone_server_title), style = MaterialTheme.typography.titleMedium)
+            }
+            Text(
+                stringResource(
+                    when {
+                        inUse -> R.string.phone_server_in_use
+                        !page.phoneServerInstalled && model.phoneServerOutdated -> R.string.phone_server_outdated
+                        else -> R.string.phone_server_help
+                    },
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            page.phoneServerError?.let { error ->
+                Text(stringResource(R.string.phone_server_failed, error), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            }
+            page.phoneServerDownloadError?.let { error ->
+                Text(stringResource(R.string.phone_server_download_failed, error), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+            }
+            when {
+                progress != null -> {
+                    val (done, total) = progress
+                    if (total > 0) {
+                        LinearProgressIndicator(progress = { done.toFloat() / total }, modifier = Modifier.fillMaxWidth())
+                        Text(stringResource(R.string.phone_server_downloading, done / MEGABYTE, total / MEGABYTE), style = MaterialTheme.typography.bodySmall)
+                    } else {
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                        Text(stringResource(R.string.phone_server_downloading_unknown, done / MEGABYTE), style = MaterialTheme.typography.bodySmall)
+                    }
+                    TextButton(onClick = { model.cancelPhoneServerDownload(page) }, modifier = Modifier.testTag("cancel_phone_server")) {
+                        Text(stringResource(R.string.flow_cancel))
+                    }
+                }
+                inUse -> {
+                    FilledTonalButton(onClick = { model.leavePhoneServer(page) }, enabled = !page.checking, modifier = Modifier.testTag("leave_phone_server")) {
+                        Text(stringResource(R.string.phone_server_leave))
+                    }
+                }
+                page.phoneServerInstalled -> {
+                    Button(
+                        onClick = {
+                            focus.clearFocus()
+                            // La musica del telefono: il servizio dei file sul disco la legge dalla cartella Music.
+                            host.askMusicFiles()
+                            model.usePhoneServer(page)
+                        },
+                        enabled = !page.checking,
+                        modifier = Modifier.testTag("use_phone_server"),
+                    ) {
+                        if (page.checking) {
+                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                            Spacer(Modifier.width(12.dp))
+                        }
+                        Text(stringResource(if (page.checking) R.string.phone_server_starting else R.string.phone_server_use))
+                    }
+                    TextButton(onClick = { confirmRemove = true }, enabled = !page.checking, modifier = Modifier.testTag("remove_phone_server")) {
+                        Text(stringResource(R.string.phone_server_remove))
+                    }
+                }
+                else -> {
+                    Button(
+                        onClick = {
+                            focus.clearFocus()
+                            model.askPhoneServerDownload(page)
+                        },
+                        enabled = !page.checking,
+                        modifier = Modifier.testTag("make_phone_server"),
+                    ) {
+                        if (page.checking) {
+                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
+                            Spacer(Modifier.width(12.dp))
+                            Text(stringResource(R.string.phone_server_starting))
+                        } else {
+                            Text(stringResource(if (model.phoneServerOutdated) R.string.phone_server_update else R.string.phone_server_make))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (confirmRemove) {
+        AlertDialog(
+            onDismissRequest = { confirmRemove = false },
+            title = { Text(stringResource(R.string.phone_server_remove_title)) },
+            text = { Text(stringResource(R.string.phone_server_remove_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmRemove = false
+                    model.removePhoneServer(page)
+                }) { Text(stringResource(R.string.remove)) }
+            },
+            dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text(stringResource(R.string.flow_cancel)) } },
+        )
+    }
+    if (page.phoneServerAsk) {
+        val size = page.phoneServerSize
+        AlertDialog(
+            onDismissRequest = { model.dismissPhoneServerDownload(page) },
+            title = { Text(stringResource(R.string.phone_server_ask_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.phone_server_ask_text,
+                        if (size != null) stringResource(R.string.phone_server_size, (size + MEGABYTE / 2) / MEGABYTE) else stringResource(R.string.phone_server_size_unknown),
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // La musica del telefono: Android lo chiede ora, così a download finito si parte.
+                        host.askMusicFiles()
+                        model.downloadPhoneServer(page)
+                    },
+                    // Il dialogo è una finestra a sé: i testTag diventano resource-id solo se lo si dice anche qui.
+                    modifier = Modifier.testTag("download_phone_server").automationIds(),
+                ) { Text(stringResource(R.string.phone_server_download)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { model.dismissPhoneServerDownload(page) }) { Text(stringResource(R.string.flow_cancel)) }
+            },
+        )
+    }
+}
+
+private const val MEGABYTE = 1024L * 1024
 
 @Composable
 private fun Field(
