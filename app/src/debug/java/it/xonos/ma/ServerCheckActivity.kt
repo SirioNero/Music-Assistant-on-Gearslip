@@ -1,34 +1,57 @@
 package it.xonos.ma
 
 import android.app.Activity
+import android.content.ComponentName
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.widget.TextView
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import it.xonos.ma.data.MaItem
+import it.xonos.ma.data.Services
+import it.xonos.ma.phone.model.ConnectionCheck
+import it.xonos.ma.playback.PlaybackService
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.guava.await
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import java.io.File
 import kotlin.concurrent.thread
 
 /**
  * Solo nella build di prova: avvia Music Assistant sul telefono e mostra se gira (nella versione senza
  * server lo dice). Il workflow "Server MA" la apre con `am start`, poi parla col server da fuori (adb
  * forward). Nel registro (tag XonosServer) ogni cambio di stato, con i secondi dall'avvio.
+ *
+ * Con `--ez xonos true` fa anche quello che farebbe una persona: "Usa Music Assistant su questo
+ * telefono" (account e token come dal tasto nelle impostazioni), la cartella files/music come servizio,
+ * e il primo brano suonato dal lettore di Xonos stesso (il servizio di riproduzione e il suo motore audio).
  */
 class ServerCheckActivity : Activity() {
     @Volatile private var open = true
+    private val scope = MainScope()
+    private lateinit var text: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val text = TextView(this).apply {
+        text = TextView(this).apply {
             setPadding(48, 96, 48, 48)
             textSize = 18f
         }
         setContentView(text)
-        val server = (application as XonosApp).phoneServer
+        val app = application as XonosApp
+        val server = app.phoneServer
         if (server == null) {
-            text.text = "Questa versione di Xonos non ha Music Assistant dentro di sé."
+            say("Questa versione di Xonos non ha Music Assistant dentro di sé.")
             Log.i(TAG, "Server: STOPPED (questa versione non lo ha)")
             return
         }
+        app.repo.acquire()
         thread(name = "server-check") {
             val started = SystemClock.elapsedRealtime()
             thread(name = "server-start") { runBlocking { server.start() } }
@@ -37,22 +60,81 @@ class ServerCheckActivity : Activity() {
                 val state = server.state.name
                 if (state != last) {
                     val seconds = (SystemClock.elapsedRealtime() - started) / 1000.0
-                    val line = "Server: $state dopo $seconds s ${server.error}".trim()
-                    Log.i(TAG, line)
-                    runOnUiThread { text.text = "$line\n${server.url}" }
+                    say("Server: $state dopo $seconds s ${server.error}".trim())
                     last = state
                 }
                 Thread.sleep(500)
             }
         }
+        if (intent.getBooleanExtra("xonos", false)) {
+            scope.launch {
+                try {
+                    xonosCheck(app)
+                } catch (e: Exception) {
+                    say("Xonos: prova interrotta: $e")
+                }
+            }
+        }
+    }
+
+    private suspend fun xonosCheck(app: XonosApp) {
+        val model = app.phone
+        val page = model.settingsPage()
+        model.usePhoneServer(page)
+        withTimeout(START_MS) {
+            while (page.checking || (page.results.isEmpty() && page.phoneServerError == null)) delay(200)
+        }
+        val connected = page.results.any { it is ConnectionCheck.Result.Ok }
+        say("Xonos: collegato al server sul telefono = $connected ${page.results} ${page.phoneServerError.orEmpty()}".trim())
+        if (!connected) return
+
+        val services = Services(app.repo)
+        var step = services.setup("filesystem_local")
+        if (step.type == "form") {
+            step = services.submit(step.flowId, mapOf("content_type" to "music", "path" to File(filesDir, "music").path))
+        }
+        say("Xonos: cartella del telefono come servizio (${step.type})")
+        app.repo.command("music/sync")
+        var tracks: List<MaItem> = emptyList()
+        withTimeout(SYNC_MS) {
+            while (tracks.isEmpty()) {
+                delay(1_000)
+                tracks = app.library.libraryItems("tracks")
+            }
+        }
+        say("Xonos: ${tracks.size} brani")
+
+        // Il lettore di Xonos parte quando un MediaController si collega al servizio, come fa lo schermo.
+        val token = SessionToken(this, ComponentName(this, PlaybackService::class.java))
+        val controller = MediaController.Builder(this, token).buildAsync().await()
+        try {
+            withTimeout(READY_MS) { app.playerReady.first { it } }
+            say("Xonos: lettore pronto")
+            app.library.playMedia(app.settings.playerId, listOf(tracks.first().uri))
+            delay(LISTEN_MS)
+            say("Xonos: suona=${controller.isPlaying} posizione=${controller.currentPosition / 1000.0} s brano=${controller.mediaMetadata.title}")
+        } finally {
+            controller.release()
+        }
+    }
+
+    private fun say(line: String) {
+        Log.i(TAG, line)
+        runOnUiThread { text.append(line + "\n") }
     }
 
     override fun onDestroy() {
         open = false
+        scope.cancel()
+        (application as XonosApp).let { if (it.phoneServer != null) it.repo.release() }
         super.onDestroy()
     }
 
     private companion object {
         const val TAG = "XonosServer"
+        const val START_MS = 240_000L
+        const val SYNC_MS = 120_000L
+        const val READY_MS = 60_000L
+        const val LISTEN_MS = 12_000L
     }
 }
