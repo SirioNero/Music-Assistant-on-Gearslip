@@ -1,0 +1,1 @@
+Dopo un riavvio del sistema audio del telefono (capita ogni tanto, spesso cambiando dispositivo Bluetooth), la musica non resta più ferma in «buffering» fino al brano dopo: Xonos apre una nuova uscita audio e continua a suonare.
