@@ -11,14 +11,17 @@ mkdir -p "$OUT"
 adb install -r -g app/build/outputs/apk/debug/app-debug.apk || exit 1
 
 python3 tools/server/tones.py "$OUT/music"
-adb shell run-as "$PACKAGE" mkdir -p "files/music/Check\ Artist/Check\ Album"
-for file in "$OUT/music/Check Artist/Check Album"/*.wav; do
-    name=$(basename "$file")
-    # adb unisce gli argomenti con spazi: il comando va scritto tutto per la shell del telefono.
-    adb exec-in "run-as $PACKAGE sh -c 'cat > \"files/music/Check Artist/Check Album/$name\"'" < "$file"
-done
-rm -rf "$OUT/music"
+adb shell rm -rf /data/local/tmp/music
+adb push "$OUT/music" /data/local/tmp/ >/dev/null
+# La cartella dell'app la vede solo l'app: si copia con run-as (la build di prova è debuggable).
+adb shell run-as "$PACKAGE" cp -r /data/local/tmp/music files/
 adb shell run-as "$PACKAGE" ls -lR files/music
+# Una copia a metà farebbe passare la prova con un brano più corto.
+expected=$(find "$OUT/music" -type f -name '*.wav' -printf '%s\n' | sort | tr '\n' ' ')
+copied=$(adb shell run-as "$PACKAGE" find files/music -type f -name "'*.wav'" -exec stat -c %s {} + | tr -d '\r' | sort | tr '\n' ' ')
+echo "attesi: $expected copiati: $copied"
+[ "$expected" = "$copied" ] || { echo "La musica di prova non è arrivata intera"; exit 1; }
+rm -rf "$OUT/music"
 
 adb logcat -c
 adb logcat -v time > "$OUT/logcat.txt" 2>&1 &
