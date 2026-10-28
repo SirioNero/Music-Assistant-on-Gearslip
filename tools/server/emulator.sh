@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Sull'emulatore (workflow "Server MA"): il pacchetto di Music Assistant (cartella $PAYLOAD, firmato come le
-# app di prova) lo serve un piccolo server HTTP sul runner, che l'emulatore vede a 10.0.2.2:8000; Xonos lo
+# Sull'emulatore (workflow "Server MA"): il pacchetto di Music Assistant (cartella $PAYLOAD, firmato con la
+# chiave delle app) lo serve un piccolo server HTTP sul runner, che l'emulatore vede a 10.0.2.2:8000; Xonos lo
 # scarica da lì (file files/server-package-url dell'app) come dalla release di GitHub. Tre prove:
 #  1. Il server da solo: mette un album di toni nella cartella dell'app, scarica e avvia Music Assistant
 #     (ServerCheckActivity) e lo prova da fuori con check.py, attraverso adb forward.
@@ -120,7 +120,7 @@ adb shell run-as "$PACKAGE" env LD_LIBRARY_PATH="$server_dir/lib" /system/bin/li
     -i https://raw.githubusercontent.com/music-assistant/server/2.10.8/music_assistant/helpers/resources/announce.mp3 \
     -f null - 2>&1 | grep -E "Duration|Stream|size=|rror|nvalid|annot|denied" | tee "$OUT/ffmpeg-https.txt"
 kill "$LOGCAT" 2>/dev/null
-grep -E " (E|W)/python\.std(err|out)|AndroidRuntime" "$OUT/logcat.txt" | tail -n 60
+grep -E "XonosServer|AndroidRuntime" "$OUT/logcat.txt" | tail -n 60
 
 # 2. Xonos stesso, da capo.
 echo "== Xonos con Music Assistant sul telefono"
@@ -211,6 +211,6 @@ fi
 adb exec-out screencap -p > "$OUT/release.png"
 adb exec-out cat "$DATA/files/music-assistant/musicassistant.log" > "$OUT/musicassistant-release.log" 2>/dev/null
 kill "$LOGCAT" 2>/dev/null
-grep -E "Xonos|AndroidRuntime|python\.std(err|out)" "$OUT/logcat-release.txt" | tail -n 80
+grep -E "Xonos|AndroidRuntime" "$OUT/logcat-release.txt" | tail -n 80
 [ "$release" = 0 ] || status=1
 exit "$status"
