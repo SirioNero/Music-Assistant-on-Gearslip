@@ -234,6 +234,7 @@
     <string name="hide_advanced">Nascondi le opzioni avanzate</string>
     <string name="flow_cancel">Annulla</string>
     <string name="flow_finish">Fine</string>
+    <string name="flow_next">Avanti</string>
     <string name="flow_open_browser">Apri nel browser</string>
     <string name="flow_external_wait">Finisci nel browser, poi torna qui: Xonos va avanti da solo.</string>
     <string name="flow_working">Un momento…</string>
