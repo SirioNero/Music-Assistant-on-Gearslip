@@ -1,0 +1,3 @@
+Novità: Xonos-server.apk (su GitHub, accanto a Xonos.apk) fa girare un Music Assistant completo sul telefono stesso, per chi non ha un server: la musica del telefono, radio, podcast e servizi in streaming, anche in auto.
+Corretto: «Crea l’account» su un Music Assistant appena installato non riusciva.
+Corretto: un play subito dopo aver aperto l’app poteva fallire con «The player is not available».

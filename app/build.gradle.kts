@@ -30,8 +30,8 @@ android {
         targetSdk = 34
         // Si alzano entrambi a ogni pubblicazione in main: la release prende il tag v<versionName>, che
         // Obtainium confronta con l'app installata, e F-Droid compila da quel tag.
-        versionCode = 40
-        versionName = "0.1.40"
+        versionCode = 41
+        versionName = "0.1.41"
         // Con il server solo le sue ABI, a 64 bit: un telefono a 32 bit non installa Xonos-server.apk,
         // invece di avere un server che non parte.
         if (withServer) ndk { abiFilters += serverAbis }
