@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import ast
 import io
+import json
 import shutil
 import sys
 import tarfile
@@ -46,7 +47,8 @@ PROVIDERS = [
     # musica: i file del telefono e i servizi le cui librerie ci sono per Android (vedi requirements.txt).
     # Fuori: Apple Music (DRM), Deezer (per ora), NFS e SMB (vogliono mount), YouTube Music (deno),
     # nicovideo (pydantic 2, in Rust), QQ Music (cryptography 47), BBC Sounds e iBroadcast (solo 3.14),
-    # Qobuz e Tidal (entrano con una chiave dell'app di Music Assistant, vedi sopra).
+    # Qobuz e Tidal (entrano con una chiave dell'app di Music Assistant, vedi sopra). Spotify usa la
+    # chiave dell'app Spotify della persona (vedi _spotify).
     "abc_radio_network",
     "ambient_sounds",
     "ard_audiothek",
@@ -134,8 +136,13 @@ def main() -> None:
     )
 
 
+# I testi dei passi che Xonos aggiunge ai servizi, nelle lingue di Xonos (vedi _texts).
+STRINGS = Path(__file__).with_name("strings.json")
+
+
 def _fingerprint(version: str) -> str:
-    return f"{version} {' '.join(PROVIDERS + LIBRARIES)} {Path(__file__).stat().st_mtime_ns}"
+    changed = f"{Path(__file__).stat().st_mtime_ns} {STRINGS.stat().st_mtime_ns}"
+    return f"{version} {' '.join(PROVIDERS + LIBRARIES)} {changed}"
 
 
 def _download(version: str, folder: Path) -> Path:
@@ -376,6 +383,143 @@ def _patch(root: Path) -> None:
     # I consigli di Last.fm Music Assistant li aggiunge da solo, con la sua chiave: sul telefono si aggiungono
     # a mano, con la chiave di Last.fm della persona.
     _replace(root / "constants.py", '    ("lastfm_recommendations", False),\n', "")
+    _spotify(root)
+    _texts(root)
+
+
+def _spotify(root: Path) -> None:
+    """
+    Spotify sul telefono.
+
+    Music Assistant entra in Spotify con un Client ID suo, che c'è solo nelle sue build ufficiali e che
+    chiede di non usare altrove: qui si usa quello dell'app Spotify della persona (si crea gratis nel
+    Developer Dashboard di Spotify), per entrare e per i rinnovi. Senza, Spotify rispondeva "client_id:
+    not present". L'audio passa da librespot (Soloist è un programma per Linux) e si autorizza nel
+    browser del telefono, che torna da solo a librespot su 127.0.0.1: l'abbinamento dall'app Spotify
+    non trova Music Assistant, che sul telefono non si fa vedere nella rete.
+    """
+    folder = root / "providers" / "spotify"
+    constants = folder / "constants.py"
+    _replace(
+        constants,
+        'CONF_CLIENT_ID = "client_id"\n',
+        'CONF_CLIENT_ID = "client_id"\n'
+        'CONF_XONOS_CLIENT_ID = "xonos_client_id"  # Xonos: il Client ID dell\'app Spotify della persona\n',
+    )
+    _replace(
+        constants,
+        "LOOPBACK_WAIT_TIMEOUT = 30  # seconds before offering the manual paste instead\n",
+        "LOOPBACK_WAIT_TIMEOUT = 5 * 60  # Xonos: il browser è sul telefono stesso e torna sempre qui\n",
+    )
+    flow = folder / "setup_flow.py"
+    _replace(flow, "    CONF_CLIENT_ID,\n", "    CONF_CLIENT_ID,\n    CONF_XONOS_CLIENT_ID,\n")
+    _replace(
+        flow,
+        "        token_result = await _pkce_authenticate(\n"
+        '            session, app_var("spotify_client_id"), step_id="authenticate"\n'
+        "        )\n",
+        "        # Xonos: senza la chiave di Music Assistant, il Client ID dell'app Spotify della persona\n"
+        '        client_id = app_var("spotify_client_id") or await _xonos_client_id(session, setup_data)\n'
+        '        token_result = await _pkce_authenticate(session, client_id, step_id="authenticate")\n',
+    )
+    _replace(
+        flow,
+        '        client_id_default = str(session.context.setup_data.get(CONF_CLIENT_ID) or "")\n',
+        '        if not app_var("spotify_client_id"):\n'
+        "            # Xonos: la chiave è già quella della persona, il passo per aggiungerne una sua non serve\n"
+        "            setup_data[CONF_CLIENT_ID] = None\n"
+        "            setup_data[CONF_REFRESH_TOKEN_DEV] = None\n"
+        "            await session.finish(setup_data)\n"
+        "            return\n"
+        '        client_id_default = str(session.context.setup_data.get(CONF_CLIENT_ID) or "")\n',
+    )
+    _replace(
+        flow,
+        "        selected = await _choose_playback_backend(session, preselect, errors)\n",
+        "        selected = BACKEND_LIBRESPOT  # Xonos: Soloist è un programma per Linux\n",
+    )
+    _replace(
+        flow,
+        "        method_values = await session.form(\n"
+        "            [CONF_ENTRY_PLAYBACK_AUTH_METHOD],\n"
+        '            step_id="playback_auth",\n'
+        "            errors=errors,\n"
+        "        )\n"
+        "        method = str(method_values.get(CONF_PLAYBACK_AUTH_METHOD) or PLAYBACK_AUTH_APP)\n",
+        "        # Xonos: un passo che spiega la seconda approvazione (e mostra gli errori), poi il browser\n"
+        '        await session.form([], step_id="xonos_playback", errors=errors)\n'
+        "        method = PLAYBACK_AUTH_BROWSER\n",
+    )
+    _replace(
+        flow,
+        "async def _authorize_developer_key(\n",
+        "async def _xonos_client_id(session: SetupSession, setup_data: dict[str, Any]) -> str:\n"
+        '    """\n'
+        "    Xonos: chiede il Client ID dell'app Spotify della persona e lo tiene con l'account.\n"
+        "\n"
+        "    :param session: The setup session driving the flow.\n"
+        "    :param setup_data: The setup data collected so far, updated in place.\n"
+        '    """\n'
+        '    client_id = str(setup_data.get(CONF_XONOS_CLIENT_ID) or "")\n'
+        "    errors: dict[str, str] | None = None\n"
+        "    while True:\n"
+        "        values = await session.form(\n"
+        "            [\n"
+        "                ConfigEntry(\n"
+        "                    key=CONF_XONOS_CLIENT_ID,\n"
+        "                    type=ConfigEntryType.STRING,\n"
+        "                    required=True,\n"
+        "                    value=client_id or None,\n"
+        "                )\n"
+        "            ],\n"
+        '            step_id="xonos_client_id",\n'
+        "            errors=errors,\n"
+        "            translation_params=[HOSTED_CALLBACK_URL],\n"
+        "        )\n"
+        "        # incollato a volte con uno spazio o un a capo\n"
+        '        client_id = "".join(str(values.get(CONF_XONOS_CLIENT_ID) or "").split())\n'
+        '        if len(client_id) == 32 and all(char in "0123456789abcdefABCDEF" for char in client_id):\n'
+        "            setup_data[CONF_XONOS_CLIENT_ID] = client_id\n"
+        "            return client_id\n"
+        '        errors = {CONF_XONOS_CLIENT_ID: "xonos_client_id_invalid"}\n'
+        "\n\n"
+        "async def _authorize_developer_key(\n",
+    )
+    provider = folder / "provider.py"
+    _replace(provider, "    CONF_CLIENT_ID,\n", "    CONF_CLIENT_ID,\n    CONF_XONOS_CLIENT_ID,\n")
+    _replace(
+        provider,
+        "                app_var(\"spotify_client_id\"),  # Always use MA's global client ID\n",
+        "                # Xonos: senza la chiave di Music Assistant, il Client ID dell'app Spotify della persona\n"
+        '                app_var("spotify_client_id") or str(self.get_setup_value(CONF_XONOS_CLIENT_ID) or ""),\n',
+    )
+    _replace(
+        provider,
+        "        self.throttler.set_rate_limit(rate_limit=1, period=2)\n",
+        '        if app_var("spotify_client_id"):\n'
+        "            self.throttler.set_rate_limit(rate_limit=1, period=2)\n"
+        "        else:\n"
+        "            # Xonos: con la chiave della persona, i limiti di una chiave propria\n"
+        "            self.throttler.set_rate_limit(rate_limit=30, period=30)\n",
+    )
+
+
+def _texts(root: Path) -> None:
+    """
+    Mette i testi dei passi di Xonos (strings.json) nei file di traduzione di Music Assistant.
+
+    L'inglese è quello di riserva; le altre lingue sono quelle di Xonos, coi nomi di Music Assistant.
+    """
+    texts = json.loads(STRINGS.read_text(encoding="utf-8"))
+    for locale, strings in texts.items():
+        if strings.keys() != texts["en"].keys():
+            sys.exit(f"{STRINGS}: {locale} non ha le stesse voci dell'inglese")
+        path = root / "translations" / f"{locale}.json"
+        if not path.is_file():
+            sys.exit(f"{path}: Music Assistant non ha questa lingua")
+        translations = json.loads(path.read_text(encoding="utf-8"))
+        translations.update(strings)
+        path.write_text(json.dumps(translations, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":
