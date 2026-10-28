@@ -128,9 +128,9 @@ jobs:
             [ -f "$NOTE" ] && { cat "$NOTE"; echo; } >> notes.md
           done
           cat >> notes.md <<'NOTE'
-          Two APKs: `Xonos.apk` is the app, the same as on F-Droid. `Xonos-server.apk` also has Music Assistant inside, for those without a server (Music Assistant on this phone, in the settings); 64-bit phones only. With Obtainium, pick one by writing `Xonos-server` or `Xonos\.apk$` in "Filter APKs by regular expression".
+          Install `Xonos.apk`. `xonos-server-arm64-v8a.zip` is Music Assistant for the phone itself: Xonos downloads it on its own, only when you tap "Make Xonos your Music Assistant server" in the settings, and checks that it's signed like Xonos.
 
-          Due APK: `Xonos.apk` è l'app, la stessa di F-Droid. `Xonos-server.apk` ha anche Music Assistant dentro di sé, per chi non ha un server (Music Assistant su questo telefono, nelle impostazioni); solo telefoni a 64 bit. Con Obtainium se ne sceglie uno scrivendo `Xonos-server` o `Xonos\.apk$` in "Filter APKs by regular expression". In auto Xonos è tra le app musicali di Gearslip e di myCar.
+          Installa `Xonos.apk`. `xonos-server-arm64-v8a.zip` è Music Assistant per il telefono stesso: lo scarica Xonos da solo, solo quando tocchi "Fai diventare Xonos il tuo server Music Assistant" nelle impostazioni, e controlla che sia firmato come Xonos. In auto Xonos è tra le app musicali di Gearslip e di myCar.
           NOTE
 
       # Solo il ramo main pubblica una release: gli altri rami si compilano per controllo.
@@ -140,10 +140,11 @@ jobs:
           mkdir -p apk
           cp app/build/outputs/apk/release/app-release.apk apk/Xonos.apk
 
-      # La versione completa, Xonos-server.apk: la stessa app con Music Assistant dentro (server/), solo per
-      # la release (VERSION c'è solo allora) e solo arm64, i telefoni. Serve Python 3.13 come quello dell'app;
-      # ffmpeg e librespot si compilano con l'NDK e Rust della macchina e si tengono finché gli script non
-      # cambiano. Se non si compila, la release non parte: le due versioni escono insieme.
+      # Music Assistant sul telefono: il pacchetto che Xonos scarica su richiesta (server/package), solo per la
+      # release (VERSION c'è solo allora) e solo arm64, i telefoni. Firmato con la chiave di Xonos: l'app lo usa
+      # solo se è firmato come lei. Serve Python 3.13 come quello del pacchetto; ffmpeg e librespot si compilano
+      # con l'NDK e Rust della macchina e si tengono finché gli script non cambiano. Se non si costruisce, la
+      # release non parte: app e pacchetto escono insieme.
       - name: Prepara Python 3.13
         if: env.VERSION != ''
         uses: actions/setup-python@v6
@@ -164,17 +165,26 @@ jobs:
           path: server/build/librespot
           key: librespot-arm64-v8a-${{ hashFiles('server/librespot/build.sh') }}
 
-      - name: Compila Xonos-server.apk
+      - name: Costruisci e firma il pacchetto di Music Assistant
         if: env.VERSION != ''
         run: |
           export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
-          if ! gradle :app:assembleRelease -PxonosServer -PxonosServerAbis=arm64-v8a --no-daemon --stacktrace > build-server.log 2>&1; then
+          if ! gradle :server:assembleRelease -PxonosServerAbis=arm64-v8a --no-daemon --stacktrace > build-server.log 2>&1; then
             tail -n 200 build-server.log
             errors=$(grep -E "^e: |error:|ERROR|What went wrong" -A3 build-server.log | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
-            echo "::error title=Xonos-server.apk non compilato::$errors"
+            echo "::error title=Pacchetto di Music Assistant non costruito::$errors"
             exit 1
           fi
-          cp app/build/outputs/apk/release/app-release.apk apk/Xonos-server.apk
+          PACKAGE=$(sed -n 's/^xonosServerPackage=//p' gradle.properties)
+          ZIP=apk/xonos-server-arm64-v8a.zip
+          python3 server/package/make_payload.py --aar server/build/outputs/aar/server-release.aar --abi arm64-v8a \
+            --ndk "$ANDROID_NDK" --version "$PACKAGE" --out "$ZIP"
+          keytool -importkeystore -noprompt -srckeystore app/xonos.keystore -srcstorepass "$XONOS_KEYSTORE_PASSWORD" \
+            -srcalias "$XONOS_KEY_ALIAS" -destkeystore /tmp/xonos.p12 -deststoretype PKCS12 \
+            -deststorepass "$XONOS_KEYSTORE_PASSWORD" -destkeypass "$XONOS_KEYSTORE_PASSWORD"
+          openssl pkcs12 -in /tmp/xonos.p12 -passin env:XONOS_KEYSTORE_PASSWORD -nocerts -nodes -out /tmp/xonos.pem
+          openssl dgst -sha256 -sign /tmp/xonos.pem -out "$ZIP.sig" "$ZIP"
+          rm -f /tmp/xonos.p12 /tmp/xonos.pem
           ls -l apk
 
       - name: Pubblica la release
@@ -185,4 +195,7 @@ jobs:
           tag_name: v${{ env.VERSION }}
           name: Xonos ${{ env.VERSION }}
           body_path: notes.md
-          files: apk/*.apk
+          files: |
+            apk/*.apk
+            apk/*.zip
+            apk/*.sig

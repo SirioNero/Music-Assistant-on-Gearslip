@@ -1,20 +1,35 @@
 #!/usr/bin/env bash
-# Sull'emulatore (workflow "Server MA"): installa la build di prova con il server e fa tre prove.
-#  1. Il server da solo: mette un album di toni nella cartella dell'app, avvia Music Assistant
+# Sull'emulatore (workflow "Server MA"): il pacchetto di Music Assistant (cartella $PAYLOAD, firmato come le
+# app di prova) lo serve un piccolo server HTTP sul runner, che l'emulatore vede a 10.0.2.2:8000; Xonos lo
+# scarica da lì (file files/server-package-url dell'app) come dalla release di GitHub. Tre prove:
+#  1. Il server da solo: mette un album di toni nella cartella dell'app, scarica e avvia Music Assistant
 #     (ServerCheckActivity) e lo prova da fuori con check.py, attraverso adb forward.
-#  2. Xonos stesso, da capo (dati cancellati): "Usa Music Assistant su questo telefono", la cartella
-#     come servizio e il primo brano suonato dal lettore di Xonos (ServerCheckActivity --ez xonos true).
-#  3. La release, ridotta con R8 come quella che si pubblica, da capo e senza scorciatoie: il tocco sul
-#     tasto come lo farebbe una persona, poi un brano suonato dal lettore di Xonos (check.py --player).
+#  2. Xonos stesso, da capo (dati cancellati, quindi anche il pacchetto): "Usa Music Assistant su questo
+#     telefono", la cartella come servizio e il primo brano suonato dal lettore di Xonos
+#     (ServerCheckActivity --ez xonos true).
+#  3. La release, ridotta con R8 come quella che si pubblica, da capo e senza scorciatoie: i tocchi come li
+#     farebbe una persona (il tasto, "Scarica", la domanda di Android per la musica), poi un brano suonato
+#     dal lettore di Xonos (check.py --player).
 # Registro, logcat e risultati vanno in $OUT.
 set -uo pipefail
 OUT=${OUT:?}
+PAYLOAD=${PAYLOAD:?}
 PACKAGE=it.xonos.ma
 MUSIC=/data/user/0/$PACKAGE/files/music
+PACKAGE_URL=http://10.0.2.2:8000/
 mkdir -p "$OUT"
 
+python3 -m http.server 8000 --bind 127.0.0.1 --directory "$PAYLOAD" > "$OUT/http.txt" 2>&1 &
+HTTP=$!
+trap 'kill $HTTP 2>/dev/null' EXIT
 adb install -r -g app/build/outputs/apk/debug/app-debug.apk || exit 1
 python3 tools/server/tones.py "$OUT/music"
+
+# Il pacchetto si scarica dal runner (la build di prova è debuggable: si scrive con run-as).
+package_url() {
+    adb shell run-as "$PACKAGE" mkdir -p files
+    adb shell "echo $PACKAGE_URL | run-as $PACKAGE sh -c 'cat > files/server-package-url'"
+}
 
 copy_music() {
     adb shell rm -rf /data/local/tmp/music
@@ -80,13 +95,14 @@ tap() {
 
 # 1. Il server da solo.
 copy_music || { echo "La musica di prova non è arrivata intera"; exit 1; }
+package_url
 adb logcat -c
 adb logcat -v time > "$OUT/logcat.txt" 2>&1 &
 LOGCAT=$!
 adb shell am start -n "$PACKAGE/.ServerCheckActivity"
 state=$(wait_for "$OUT/logcat.txt" "Server: \(RUNNING\|FAILED\|STOPPED\)" 600)
 echo "== stato: ${state:-ancora in avvio dopo 10 minuti}"
-grep "XonosServer" "$OUT/logcat.txt"
+grep "XonosServer" "$OUT/logcat.txt" | head -n 80
 status=1
 if [ "$state" = "Server: RUNNING" ]; then
     adb forward tcp:8095 tcp:8095
@@ -98,10 +114,11 @@ adb exec-out run-as "$PACKAGE" cat files/music-assistant/musicassistant.log > "$
 # FFmpeg del telefono con https (mbedTLS), come per radio e podcast: un file di Music Assistant su GitHub.
 # Solo da leggere, non decide l'esito (dipende dalla rete).
 echo "== FFmpeg e https"
-ffmpeg_lib=$(adb shell run-as "$PACKAGE" readlink files/music-assistant-tools/ffmpeg | tr -d '\r')
-adb shell run-as "$PACKAGE" env LD_LIBRARY_PATH="${ffmpeg_lib%/*}" files/music-assistant-tools/ffmpeg -hide_banner -nostdin \
+server_dir=$(adb shell run-as "$PACKAGE" sh -c "'ls -d no_backup/music-assistant-server/*/'" | tr -d '\r' | head -n 1)
+server_dir=/data/user/0/$PACKAGE/${server_dir%/}
+adb shell run-as "$PACKAGE" env LD_LIBRARY_PATH="$server_dir/lib" /system/bin/linker64 "$server_dir/bin/ffmpeg" -hide_banner -nostdin \
     -i https://raw.githubusercontent.com/music-assistant/server/2.10.8/music_assistant/helpers/resources/announce.mp3 \
-    -f null - 2>&1 | grep -E "Duration|Stream|size=|rror|nvalid" | tee "$OUT/ffmpeg-https.txt"
+    -f null - 2>&1 | grep -E "Duration|Stream|size=|rror|nvalid|annot|denied" | tee "$OUT/ffmpeg-https.txt"
 kill "$LOGCAT" 2>/dev/null
 grep -E " (E|W)/python\.std(err|out)|AndroidRuntime" "$OUT/logcat.txt" | tail -n 60
 
@@ -110,6 +127,7 @@ echo "== Xonos con Music Assistant sul telefono"
 adb shell am force-stop "$PACKAGE"
 adb shell pm clear "$PACKAGE" >/dev/null
 copy_music || { echo "La musica di prova non è arrivata intera"; exit 1; }
+package_url
 adb logcat -c
 adb logcat -v time > "$OUT/logcat-xonos.txt" 2>&1 &
 LOGCAT=$!
@@ -127,7 +145,8 @@ fi
 
 # 3. La release, da capo, come la installa una persona: niente permessi dati in anticipo, la musica nella
 #    cartella Music del telefono (quella che propone il servizio dei file sul disco). La release non si
-#    lascia guardare dentro con run-as: per leggere token e lettore, sull'emulatore (google_apis) c'è root.
+#    lascia guardare dentro con run-as: per l'indirizzo del pacchetto e per leggere token e lettore,
+#    sull'emulatore (google_apis) c'è root.
 echo "== La release (R8) con Music Assistant sul telefono"
 # uiautomator legge lo schermo solo quando è fermo: niente animazioni.
 for scale in window_animation_scale transition_animation_scale animator_duration_scale; do
@@ -142,13 +161,20 @@ adb root >/dev/null
 adb wait-for-device
 DATA=/data/user/0/$PACKAGE
 ALLOW=com.android.permissioncontroller:id/permission_allow_button
+owner=$(adb shell stat -c %u:%g "$DATA" | tr -d '\r')
+context=$(adb shell stat -c %C "$DATA" | tr -d '\r')
+adb shell mkdir -p "$DATA/files"
+adb shell "echo $PACKAGE_URL > $DATA/files/server-package-url"
+adb shell chown -R "$owner" "$DATA/files"
+adb shell chcon -R "$context" "$DATA/files"
 adb logcat -c
 adb logcat -v time > "$OUT/logcat-release.txt" 2>&1 &
 LOGCAT=$!
 adb shell am start -n "$PACKAGE/.phone.MainActivity"
 release=1
 connected=false
-if wait_ui use_phone_server 60 && tap use_phone_server; then
+# "Fai diventare Xonos il tuo server Music Assistant", poi "Scarica" nella domanda con quanto pesa.
+if wait_ui make_phone_server 60 && tap make_phone_server && wait_ui download_phone_server 30 && tap download_phone_server; then
     # Android chiede il permesso per la musica del telefono: si tocca "Consenti".
     if wait_ui "$ALLOW" 30 && tap "$ALLOW"; then
         echo "permesso per la musica concesso"

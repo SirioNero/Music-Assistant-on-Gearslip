@@ -347,7 +347,7 @@ def _patch(root: Path) -> None:
             f'{indent}    sample_type="int",  # Xonos: PCM a 16 bit\n',
         )
     # Spotify: librespot per Android non sta nella cartella bin del servizio ma tra i programmi
-    # dell'app, che Xonos mette nel PATH (vedi server/librespot e LocalServer).
+    # del pacchetto, che Xonos mette nel PATH (vedi server/librespot e PhoneServer).
     spotify = root / "providers" / "spotify" / "helpers.py"
     _replace(
         spotify,
