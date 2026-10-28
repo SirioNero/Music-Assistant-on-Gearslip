@@ -43,14 +43,64 @@ PROVIDERS = [
     "universal_group",
     "universal_player",
     "wikipedia",
-    # musica
+    # musica: i file del telefono e i servizi le cui librerie ci sono per Android (vedi requirements.txt).
+    # Fuori: Apple Music (DRM), Deezer (per ora), NFS e SMB (vogliono mount), YouTube Music (deno),
+    # nicovideo (pydantic 2, in Rust), QQ Music (cryptography 47), BBC Sounds e iBroadcast (solo 3.14).
+    "abc_radio_network",
+    "ambient_sounds",
+    "ard_audiothek",
+    "audiobookshelf",
+    "bandcamp",
+    "digitally_incorporated",
+    "emby",
+    "filesystem_cloud",  # senza manifest: la base comune di Google Drive e OneDrive
+    "filesystem_google_drive",
     "filesystem_local",
+    "filesystem_onedrive",
+    "gpodder",
+    "internet_archive",
     "itunes_podcasts",
+    "jellyfin",
+    "musicme",
+    "neteasecloudmusic",
+    "nts",
+    "nugs",
+    "opensubsonic",
+    "orf_radiothek",
+    "overcast",
+    "pandora",
+    "phishin",
+    "plex",
+    "pocketcasts",
+    "podcast_index",
     "podcastfeed",
+    "qobuz",
     "radiobrowser",
+    "radioparadise",
+    "siriusxm",
+    "somafm",
+    "soundcloud",
+    "spotify",  # con librespot compilato per Android (server/librespot); Soloist è solo per Linux
+    "storytel",
+    "sverigesradio",
+    "tidal",
+    "tunein",
+    "webdav",
+    "zvuk_music",
+    # metadati e altro
+    "genius_lyrics",
+    "lastfm_recommendations",
+    "lastfm_scrobble",
+    "listenbrainz_scrobble",
+    "smart_playlist",
+    "subsonic_scrobble",
 ]
 
-# Cartelle e file del sorgente che sul telefono non servono.
+# Cartelle che altri servizi importano, ma che sul telefono non sono servizi da aggiungere: si copiano
+# senza manifest, così Music Assistant non le propone. Spotify Connect vuole go-librespot e l'mDNS.
+LIBRARIES = ["spotify_connect"]
+
+# Cartelle e file del sorgente che sul telefono non servono (bin: programmi per Linux e macOS).
 SKIP_NAMES = {"__pycache__", "bin"}
 
 
@@ -74,6 +124,8 @@ def main() -> None:
     if target.exists():
         shutil.rmtree(target)
     shutil.copytree(package, target, ignore=_ignore(package))
+    for library in LIBRARIES:
+        (target / "providers" / library / "manifest.json").unlink()
     _patch(target)
     rewritten = _python313(target)
     marker.write_text(_fingerprint(args.version))
@@ -84,7 +136,7 @@ def main() -> None:
 
 
 def _fingerprint(version: str) -> str:
-    return f"{version} {' '.join(PROVIDERS)} {Path(__file__).stat().st_mtime_ns}"
+    return f"{version} {' '.join(PROVIDERS + LIBRARIES)} {Path(__file__).stat().st_mtime_ns}"
 
 
 def _download(version: str, folder: Path) -> Path:
@@ -108,7 +160,8 @@ def _ignore(package: Path):
     def ignore(directory: str, names: list[str]) -> set[str]:
         skipped = {name for name in names if name in SKIP_NAMES}
         if Path(directory) == providers:
-            skipped |= {name for name in names if (providers / name).is_dir() and name not in PROVIDERS}
+            kept = set(PROVIDERS) | set(LIBRARIES)
+            skipped |= {name for name in names if (providers / name).is_dir() and name not in kept}
         return skipped
 
     return ignore
@@ -293,6 +346,18 @@ def _patch(root: Path) -> None:
             f"{indent}    sample_rate={rate},\n{indent}    bit_depth=16,\n{indent}    channels=2,\n"
             f'{indent}    sample_type="int",  # Xonos: PCM a 16 bit\n',
         )
+    # Spotify: librespot per Android non sta nella cartella bin del servizio ma tra i programmi
+    # dell'app, che Xonos mette nel PATH (vedi server/librespot e LocalServer).
+    spotify = root / "providers" / "spotify" / "helpers.py"
+    _replace(
+        spotify,
+        '    msg = f"Unable to locate Librespot for {system}/{architecture}"\n',
+        "    # Xonos: su Android librespot è tra i programmi dell'app, nel PATH.\n"
+        '    if (on_path := shutil.which("librespot")) and (librespot_binary := await check_librespot(on_path)):\n'
+        "        return librespot_binary\n\n"
+        '    msg = f"Unable to locate Librespot for {system}/{architecture}"\n',
+    )
+    _replace(spotify, "import re\nimport tempfile\n", "import re\nimport shutil\nimport tempfile\n")
 
 
 if __name__ == "__main__":

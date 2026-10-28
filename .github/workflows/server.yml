@@ -53,12 +53,18 @@ jobs:
         with:
           gradle-version: "8.14.3"
 
-      # ffmpeg si compila in una decina di minuti per ABI: si tiene finché lo script non cambia.
+      # ffmpeg e librespot si compilano in qualche minuto per ABI: si tengono finché lo script non cambia.
       - name: ffmpeg già compilato
         uses: actions/cache@v4
         with:
           path: server/build/ffmpeg
           key: ffmpeg-${{ hashFiles('server/ffmpeg/build.sh') }}
+
+      - name: librespot già compilato
+        uses: actions/cache@v4
+        with:
+          path: server/build/librespot
+          key: librespot-${{ hashFiles('server/librespot/build.sh') }}
 
       - name: Compila la build di prova
         run: |

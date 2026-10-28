@@ -1,7 +1,8 @@
 # I pacchetti Python del server di Music Assistant dentro Xonos, per Android con Python 3.13.
 # Le versioni sono quelle provate (tools/server/check.py); quelle con parti native sono le ultime che
-# Chaquopy compila per Android (numpy, pillow, cryptography, cffi). orjson, aiodns e zeroconf sono le
-# wheel di server/ma/wheels.py. Music Assistant stesso non è qui: lo prepara server/ma/prepare.py.
+# Chaquopy compila per Android (numpy, pillow, cryptography, cffi, pycryptodome). orjson, aiodns e
+# zeroconf sono le wheel di server/ma/wheels.py. Music Assistant stesso non è qui: lo prepara
+# server/ma/prepare.py.
 
 # Nativi, dall'indice di Chaquopy (o da PyPI per aiohttp)
 aiohttp==3.14.3
@@ -9,6 +10,7 @@ cffi==1.17.1
 cryptography==42.0.8
 numpy==1.26.2
 pillow==11.0.0
+pycryptodome==3.21.0
 
 # Al posto di quelli che per Android non ci sono (server/wheels)
 aiodns==4.0.4
@@ -59,3 +61,49 @@ text-unidecode==1.3
 typing-extensions==4.16.0
 xmltodict==1.0.4
 yarl==1.25.1
+
+# I servizi in più (prepare.py, PROVIDERS) e le loro dipendenze. gql senza [all], che porterebbe
+# botocore (decine di MB) per niente; pycryptodome (sopra) è la 3.21 di Chaquopy, Storytel chiede la 3.23.
+aioaudiobookshelf==0.1.25
+aiojellyfin==0.14.1
+annotated-doc==0.0.5
+anyio==4.15.1
+bandcamp-async-api==0.2.2
+bidict==0.24.1
+charset-normalizer==3.5.2
+defusedxml==0.7.1
+fake-useragent==2.2.0
+gql[aiohttp]==4.0.0
+graphql-core==3.2.13
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+liblistenbrainz==0.7.0
+lyricsgenius==3.12.2
+make-it-sync==2.1.1
+markdown-it-py==4.2.0
+mdurl==0.1.2
+onedrive-personal-sdk==0.1.7
+pkce==1.0.3
+plexapi==4.18.2
+py-opensonic==10.4.1
+pydantic==1.10.26
+pygments==2.21.0
+pylast==7.0.2
+python-dotenv==1.2.4
+python-engineio==4.15.0
+python-google-drive-api==0.1.0
+python-socketio==5.17.0
+requests==2.34.2
+rich==15.0.0
+shellingham==1.5.4
+simple-websocket==1.1.0
+soundcloudpy==0.1.4
+sxm==0.2.8
+tenacity==9.2.1
+typer==0.27.3
+ua-parser-builtins==202610
+ua-parser==1.0.2
+urllib3==2.8.0
+wsproto==1.3.2
+zvuk-music[async]==0.6.1
