@@ -37,8 +37,11 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   `curl https://api.github.com/repos/SirioNero/Music-Assistant-on-Gearslip/actions/runs?branch=...`
   (senza token: `gh` qui non è autenticato). Gli errori di compilazione finiscono anche in
   un'annotazione del check run. Non si può leggere l'elenco dei secret.
-- Release: solo da `main`, solo se l'app è cambiata, solo con la chiave. File `Xonos.apk`, tag
-  `v<versionName>`. La versione è scritta in `app/build.gradle.kts` e **va alzata a mano a ogni
+- Release: solo da `main`, solo se l'app è cambiata, solo con la chiave. File `Xonos.apk` e
+  `Xonos-server.apk` (la versione con Music Assistant dentro, solo arm64: `-PxonosServer
+  -PxonosServerAbis=arm64-v8a`; se non si compila la release non parte, così escono sempre insieme), tag
+  `v<versionName>`. Con due APK Obtainium chiede quale installare, a meno che nel filtro "Filter APKs by
+  regular expression" ci sia `Xonos-server` o `Xonos\.apk$` (lo dicono le note della release). La versione è scritta in `app/build.gradle.kts` e **va alzata a mano a ogni
   pubblicazione** che cambia l'app: `versionCode` +1 e `versionName` = `0.1.<versionCode>` (fino alla
   v0.1.36 il numero era quello del workflow; la prima scritta nel sorgente è la 37). Insieme si scrivono
   le note `fastlane/metadata/android/{en-US,it-IT}/changelogs/<versionCode>.txt` (massimo 500 caratteri),
@@ -299,6 +302,19 @@ Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
   volte non tocca niente se il server parte o gira (prima rifaceva i collegamenti a ffmpeg sotto i piedi del
   server). Provato sulla JVM con `PhoneServerCheckKt` e sull'emulatore con `ServerCheckActivity --ez xonos
   true` (solo debug: tasto, cartella come servizio, primo brano dal lettore di Xonos).
+- **La musica del telefono**: il modulo server dichiara `READ_MEDIA_AUDIO` (`READ_EXTERNAL_STORAGE` fino ad
+  Android 12), Xonos lo chiede al tocco sul tasto (`Host.askMusicFiles`) e il servizio dei file sul disco
+  (Filesystem (local disk)) propone `/storage/emulated/0/Music` invece di `/media` (`prepare.py`).
+- **ABI**: `xonosServerAbis` in `gradle.properties` (arm64-v8a e x86_64, quella dell'emulatore delle prove);
+  la release solo arm64-v8a. Con il server l'app ha solo quelle ABI (`abiFilters`): un telefono a 32 bit non
+  installa Xonos-server.apk, invece di avere un server che non parte.
+- **Le prove** (workflow "Server MA", `tools/server/emulator.sh`, a ogni cambio all'app su un ramo
+  `claude/`): 1. il server da solo, provato da fuori con `tools/server/check.py`; 2. la build di prova con
+  `ServerCheckActivity --ez xonos true`; 3. la release ridotta con R8 (firmata con la chiave di debug), da
+  capo come la usa una persona: uiautomator tocca il tasto (i testTag sono resource-id) e "Consenti" alla
+  domanda di Android (animazioni spente, sennò uiautomator non legge lo schermo), i toni nella cartella Music
+  del telefono, token e id del lettore letti con root dalle preferenze (l'emulatore google_apis lo permette),
+  poi `check.py --player` suona sul lettore di Xonos e guarda dalla sua coda che suoni.
 
 ## L'app sul telefono
 
@@ -307,7 +323,10 @@ Sendspin come Xonos riceve PCM 16 bit/48 kHz 0,4 s dopo play.
   Cerca, Libreria) con la loro pila di pagine; il lettore a schermo intero sta sopra tutto, e la sua
   vista (copertina, testo, coda) è nel modello.
 - Si suona con `Library.playMedia` sulla coda del telefono (id del lettore), dopo aver aspettato
-  `XonosApp.playerReady`, che il servizio accende quando API e Sendspin sono pronti. Stato e comandi del
+  `XonosApp.playerReady`, che il servizio accende quando API e Sendspin sono pronti e Music Assistant ha la
+  coda del telefono (`player_queues/get` con `available`, al massimo 10 s): MA registra il lettore un attimo
+  dopo il saluto di Sendspin, e col server sul telefono il primo play arrivava prima ("The player is not
+  available"). Stato e comandi del
   lettore passano dal MediaController del servizio: `MaPlayer` mette negli extra dei metadati uri, tipo,
   album e artista del brano (`MaPlayer.EXTRA_*`).
 - Le copertine sul telefono: indirizzi http dell'imageproxy con Coil (OkHttp dell'app, con timeout);
