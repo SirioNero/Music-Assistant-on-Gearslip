@@ -1,6 +1,6 @@
 name: Come F-Droid
 
-# Compila l'app come la compila F-Droid (senza chiave di firma e senza tools/, che la ricetta toglie) e la
+# Compila l'app come la compila F-Droid (senza chiave di firma e senza tools/ e server/, che la ricetta toglie) e la
 # controlla con i suoi strumenti: la ricetta (tools/fdroid), l'APK non firmato con la versione scritta nel
 # sorgente, nessuna libreria non libera.
 on:
@@ -38,7 +38,7 @@ jobs:
       - name: Compila come F-Droid
         run: |
           cp -r tools/fdroid /tmp/ricetta
-          rm -rf tools
+          rm -rf tools server
           gradle :app:assembleRelease --no-daemon
 
       - name: Controlla l'APK
