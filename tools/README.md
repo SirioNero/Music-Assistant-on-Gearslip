@@ -97,6 +97,21 @@ Poi:
 - `analyze_audio.py opus pcm` (dentro il container, che ha PyAV) decodifica i pacchetti salvati da
   `CaptureCheckKt` e misura quanto è pulito il suono: le tracce di prova sono sinusoidi.
 
+## Music Assistant sul telefono (`server/`)
+
+Il pacchetto che Xonos scarica con "Fai diventare Xonos il tuo server Music Assistant" (vedi `server/` e
+`server/package/make_payload.py`). Sul computer il suo server gira anche così, per le prove del banco
+(`PhoneServerCheckKt`): `python -m xonos_server --data <cartella>` con Python 3.13, i pacchetti di
+`server/requirements.txt` e Music Assistant preparato da `server/ma/prepare.py` nel `PYTHONPATH`.
+
+- `check.py --url http://127.0.0.1:8095 --music <cartella> [--token T] [--player ID]` prova un Music
+  Assistant appena installato: primo account (o il token), una cartella di musica come servizio, un lettore
+  Sendspin come quello di Xonos che deve ricevere audio vero; con `--player` suona invece sul lettore di
+  Xonos e guarda dalla sua coda che suoni.
+- `tones.py <cartella>` scrive un album di toni (WAV) per le prove.
+- `emulator.sh` è la prova del workflow "Server MA" sull'emulatore: il pacchetto servito dal runner, il server
+  da solo, la build di prova di Xonos, la release da capo come la usa una persona (vedi il commento in testa).
+
 ## Le traduzioni
 
 `python3 tools/check_strings.py` controlla che ogni lingua abbia le stesse chiavi dell'inglese, gli

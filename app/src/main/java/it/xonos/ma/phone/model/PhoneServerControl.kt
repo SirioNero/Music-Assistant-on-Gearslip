@@ -31,8 +31,11 @@ interface PhoneServerControl {
      */
     suspend fun download(progress: (done: Long, total: Long) -> Unit)
 
-    /** Toglie dal telefono il pacchetto e i dati di Music Assistant (account, servizi, libreria). */
-    fun remove()
+    /**
+     * Toglie dal telefono il pacchetto e i dati di Music Assistant (account, servizi, libreria). Lo ferma prima,
+     * se gira: ci vuole qualche secondo, fuori dal thread dello schermo.
+     */
+    suspend fun remove()
 
     /** Lo avvia, se non gira già, e aspetta che risponda; false se non parte (il perché in [error]). */
     suspend fun start(): Boolean

@@ -192,7 +192,7 @@ private class ScreenServer : PhoneServerControl {
 
     override suspend fun download(progress: (Long, Long) -> Unit) = Unit
 
-    override fun remove() = Unit
+    override suspend fun remove() = Unit
 
     override suspend fun start() = false
 

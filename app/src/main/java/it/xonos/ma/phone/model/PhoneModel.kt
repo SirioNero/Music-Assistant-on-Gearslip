@@ -1072,6 +1072,8 @@ class PhoneModel(
         page.phoneServerProgress = 0L to (page.phoneServerSize ?: -1L)
         downloading?.cancel()
         downloading = scope.launch {
+            // Se lo si sta ancora togliendo, prima si finisce.
+            removing?.join()
             var shown = 0L
             try {
                 server.download { done, total ->
@@ -1112,11 +1114,11 @@ class PhoneModel(
             settings.save(Settings.Config("", "", ""))
             repo.reconnect()
         }
-        server.remove()
         settings.phoneServerPassword = null
         page.phoneServerInstalled = false
         page.phoneServerSize = null
         page.phoneServerError = null
+        removing = scope.launch { server.remove() }
     }
 
     /** Per collegarsi a un altro Music Assistant: il modulo torna vuoto. Il server sul telefono resta com'è. */
@@ -1131,6 +1133,7 @@ class PhoneModel(
     }
 
     private var downloading: Job? = null
+    private var removing: Job? = null
 
     private fun newPassword(): String {
         val random = SecureRandom()

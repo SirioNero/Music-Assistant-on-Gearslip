@@ -46,15 +46,17 @@ class PhoneServer private constructor(context: Context, private val pkg: ServerP
     override suspend fun downloadSize(): Long? = pkg.size()
 
     override suspend fun download(progress: (Long, Long) -> Unit) {
-        stop()
+        withContext(Dispatchers.IO) { stop() }
         pkg.download(progress)
     }
 
-    override fun remove() {
+    // Fermarlo aspetta Music Assistant, e il pacchetto estratto sono migliaia di file: niente sul thread dello schermo.
+    override suspend fun remove() = withContext(Dispatchers.IO) {
         stop()
         pkg.remove()
         data.deleteRecursively()
         cache.deleteRecursively()
+        Unit
     }
 
     override suspend fun start(): Boolean = withContext(Dispatchers.IO) {
