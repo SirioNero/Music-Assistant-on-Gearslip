@@ -267,6 +267,7 @@ private class FakeHost(override val language: Language) : Host {
     override fun changeLanguage(language: Language) = Unit
     override val batteryRestricted = true
     override fun askBatteryExemption() = Unit
+    override fun askMusicFiles() = Unit
     override val version = "0.1.17"
 }
 

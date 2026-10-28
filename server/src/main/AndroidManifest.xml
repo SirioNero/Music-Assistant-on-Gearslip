@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- La musica del telefono, per il servizio di Music Assistant dei file sul disco (la cartella Music):
+     Xonos la chiede al tocco su "Usa Music Assistant su questo telefono". Da Android 13 il permesso
+     è solo per l'audio. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+</manifest>

@@ -358,6 +358,13 @@ def _patch(root: Path) -> None:
         '    msg = f"Unable to locate Librespot for {system}/{architecture}"\n',
     )
     _replace(spotify, "import re\nimport tempfile\n", "import re\nimport shutil\nimport tempfile\n")
+    # La cartella che propone il servizio dei file sul disco: sul telefono è quella della musica, che
+    # Xonos-server.apk chiede il permesso di leggere.
+    _replace(
+        root / "providers" / "filesystem_local" / "constants.py",
+        '    default_value="/media",\n',
+        '    default_value="/storage/emulated/0/Music",  # Xonos: la musica del telefono\n',
+    )
 
 
 if __name__ == "__main__":

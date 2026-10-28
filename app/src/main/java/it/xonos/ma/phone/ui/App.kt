@@ -71,6 +71,9 @@ interface Host {
 
     fun askBatteryExemption()
 
+    /** Chiede di leggere la musica del telefono: Music Assistant sul telefono la prende dalla cartella Music. */
+    fun askMusicFiles()
+
     /** La versione dell'app, in fondo alle impostazioni. */
     val version: String
 }

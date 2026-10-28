@@ -96,7 +96,7 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
         }
         Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             LanguagePicker(host)
-            if (model.phoneServerAvailable) PhoneServerCard(page, model)
+            if (model.phoneServerAvailable) PhoneServerCard(page, model, host)
             // Con Music Assistant sul telefono indirizzo e accesso li sa già Xonos.
             if (!model.usesPhoneServer(page)) {
                 FoundServers(page, model)
@@ -214,7 +214,7 @@ internal fun SettingsScreen(page: SettingsPage, model: PhoneModel, host: Host, o
  * Assistant svuotando il modulo.
  */
 @Composable
-private fun PhoneServerCard(page: SettingsPage, model: PhoneModel) {
+private fun PhoneServerCard(page: SettingsPage, model: PhoneModel, host: Host) {
     val focus = LocalFocusManager.current
     val inUse = model.usesPhoneServer(page)
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
@@ -240,6 +240,8 @@ private fun PhoneServerCard(page: SettingsPage, model: PhoneModel) {
                 Button(
                     onClick = {
                         focus.clearFocus()
+                        // La musica del telefono: il servizio dei file sul disco la legge dalla cartella Music.
+                        host.askMusicFiles()
                         model.usePhoneServer(page)
                     },
                     enabled = !page.checking,
