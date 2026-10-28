@@ -40,6 +40,7 @@ import it.xonos.ma.wrap
 import it.xonos.ma.BuildConfig
 import it.xonos.ma.R
 import it.xonos.ma.data.Connection
+import it.xonos.ma.data.MaException
 import it.xonos.ma.phone.MainActivity
 import it.xonos.ma.sendspin.AndroidAudio
 import it.xonos.ma.sendspin.AudioEngine
@@ -48,9 +49,13 @@ import it.xonos.ma.sendspin.StreamFormat
 import it.xonos.ma.sendspin.TimeFilter
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.guava.future
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import org.json.JSONObject
 import kotlin.math.min
 
 /**
@@ -126,7 +131,12 @@ class PlaybackService : MediaLibraryService() {
         scope.launch {
             combine(app.repo.connection, sendspin.phase) { connection, phase ->
                 connection is Connection.Connected && phase == SendspinClient.Phase.READY
-            }.collect { app.playerReady.value = it }
+            }.collectLatest { ready ->
+                // Music Assistant registra il lettore un attimo dopo il saluto di Sendspin: fino ad allora la
+                // coda risponde "The player is not available". Con il server sul telefono si arrivava prima.
+                if (ready) awaitQueue()
+                app.playerReady.value = ready
+            }
         }
         scope.launch { engine.outputting.collect(::onOutputting) }
         connectivity.registerDefaultNetworkCallback(networkCallback)
@@ -173,6 +183,21 @@ class PlaybackService : MediaLibraryService() {
             volume = settings.volume,
             muted = settings.muted,
         )
+    }
+
+    /** Aspetta che Music Assistant abbia la coda del telefono; dopo qualche secondo si va avanti lo stesso. */
+    private suspend fun awaitQueue() {
+        withTimeoutOrNull(QUEUE_WAIT_MS) {
+            while (true) {
+                val queue = try {
+                    app.repo.command("player_queues/get") { put("queue_id", app.settings.playerId) } as? JSONObject
+                } catch (e: MaException) {
+                    null
+                }
+                if (queue?.optBoolean("available") == true) break
+                delay(QUEUE_POLL_MS)
+            }
+        }
     }
 
     private fun onConnection(connection: Connection) {
@@ -429,5 +454,7 @@ class PlaybackService : MediaLibraryService() {
         const val RATE = 48_000
         const val FOCUS_GRACE_MS = 30_000L
         const val LOCK_TIMEOUT_MS = 6 * 60 * 60 * 1000L
+        const val QUEUE_WAIT_MS = 10_000L
+        const val QUEUE_POLL_MS = 200L
     }
 }
