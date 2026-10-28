@@ -15,6 +15,10 @@ val hasXonosKey = xonosKeystore.exists()
 val keystorePassword = System.getenv("XONOS_KEYSTORE_PASSWORD")?.ifBlank { null } ?: "xonos-android"
 val debugSigning = System.getenv("XONOS_DEBUG_SIGNING") == "true"
 
+// La versione con Music Assistant sul telefono (Xonos-server.apk): gradle -PxonosServer. Senza la proprietà,
+// come per Xonos.apk e F-Droid, l'app è quella di sempre e PhoneServer dice che il server non c'è.
+val withServer = providers.gradleProperty("xonosServer").isPresent && findProject(":server") != null
+
 android {
     namespace = "it.xonos.ma"
     compileSdk = 36
@@ -69,6 +73,12 @@ android {
         compose = true
     }
 
+    sourceSets {
+        getByName("main") {
+            java.srcDir(if (withServer) "src/withServer/java" else "src/withoutServer/java")
+        }
+    }
+
     lint {
         abortOnError = false
         checkReleaseBuilds = false
@@ -89,9 +99,9 @@ kotlin {
 
 // ffmpeg e ffprobe del server (modulo server) sono programmi: Android li deve estrarre dall'APK,
 // altrimenti non si possono eseguire.
-androidComponents {
-    onVariants(selector().withBuildType("debug")) { variant ->
-        variant.packaging.jniLibs.useLegacyPackaging.set(true)
+if (withServer) {
+    androidComponents {
+        onVariants { variant -> variant.packaging.jniLibs.useLegacyPackaging.set(true) }
     }
 }
 
@@ -102,8 +112,7 @@ baselineProfile {
 
 dependencies {
     baselineProfile(project(":baselineprofile"))
-    // Il server di Music Assistant sul telefono: per ora solo nella build di prova (ServerCheckActivity).
-    if (findProject(":server") != null) debugImplementation(project(":server"))
+    if (withServer) implementation(project(":server"))
     // Installa il Baseline Profile anche quando l'APK non arriva dal Play Store (Obtainium).
     implementation("androidx.profileinstaller:profileinstaller:1.4.1")
     implementation("androidx.media3:media3-session:1.11.1")

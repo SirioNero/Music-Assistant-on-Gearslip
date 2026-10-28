@@ -15,8 +15,10 @@ import it.xonos.ma.data.ScreenCache
 import it.xonos.ma.data.Settings
 import it.xonos.ma.phone.NsdFinder
 import it.xonos.ma.phone.model.PhoneModel
+import it.xonos.ma.phone.model.PhoneServerControl
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -31,6 +33,9 @@ class XonosApp : Application(), SingletonImageLoader.Factory {
     /** Vero quando il servizio ha fatto del telefono un lettore di Music Assistant (API e audio collegati). */
     val playerReady = MutableStateFlow(false)
 
+    /** Music Assistant sul telefono stesso, nella versione di Xonos che lo porta dentro di sé (null nelle altre). */
+    val phoneServer: PhoneServerControl? by lazy { PhoneServer.create(this) }
+
     /** Lo stato dell'app sul telefono: vive quanto l'app, così resta uguale se lo schermo ruota o cambia lingua. */
     val phone: PhoneModel by lazy {
         PhoneModel(
@@ -43,7 +48,16 @@ class XonosApp : Application(), SingletonImageLoader.Factory {
             { settings.playerId },
             playerReady,
             MainScope(),
+            phoneServer,
         )
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        // Se Xonos usa il Music Assistant sul telefono, lo riavvia con l'app: per lo schermo, per il
+        // servizio che suona, per Gearslip e per myCar, che arrivano anche ad app chiusa.
+        val server = phoneServer ?: return
+        if (settings.load().homeUrl == server.url) MainScope().launch { server.start() }
     }
 
     /** Le copertine sullo schermo del telefono, con la stessa connessione dell'API (ma un limite di tempo). */
