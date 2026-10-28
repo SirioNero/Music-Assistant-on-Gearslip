@@ -23,13 +23,14 @@ import urllib.request
 from pathlib import Path
 
 # I servizi (provider) che il server di Xonos porta con sé. Quelli "builtin" che Music Assistant
-# carica sempre ci devono essere tutti, tranne sendspin_source (vuole soxr, nativo, e serve a
-# ricevere audio da altri apparecchi). universal_group lo importa il nucleo.
+# carica sempre ci sono tutti, tranne sendspin_source (vuole soxr, nativo, e serve a ricevere audio
+# da altri apparecchi) e fanarttv e theaudiodb, che chiedono le immagini con una chiave di Music
+# Assistant: le sue chiavi (helpers/app_vars.py) ci sono solo nelle sue build ufficiali, e chiede di
+# non prenderle da lì. universal_group lo importa il nucleo.
 PROVIDERS = [
     # sempre caricati
     "builtin",
     "coverartarchive",
-    "fanarttv",
     "itunes_artwork",
     "loudness_analysis",
     "lrclib",
@@ -39,13 +40,13 @@ PROVIDERS = [
     "recommendations",
     "sendspin",
     "sync_group",
-    "theaudiodb",
     "universal_group",
     "universal_player",
     "wikipedia",
     # musica: i file del telefono e i servizi le cui librerie ci sono per Android (vedi requirements.txt).
     # Fuori: Apple Music (DRM), Deezer (per ora), NFS e SMB (vogliono mount), YouTube Music (deno),
-    # nicovideo (pydantic 2, in Rust), QQ Music (cryptography 47), BBC Sounds e iBroadcast (solo 3.14).
+    # nicovideo (pydantic 2, in Rust), QQ Music (cryptography 47), BBC Sounds e iBroadcast (solo 3.14),
+    # Qobuz e Tidal (entrano con una chiave dell'app di Music Assistant, vedi sopra).
     "abc_radio_network",
     "ambient_sounds",
     "ard_audiothek",
@@ -74,7 +75,6 @@ PROVIDERS = [
     "pocketcasts",
     "podcast_index",
     "podcastfeed",
-    "qobuz",
     "radiobrowser",
     "radioparadise",
     "siriusxm",
@@ -83,7 +83,6 @@ PROVIDERS = [
     "spotify",  # con librespot compilato per Android (server/librespot); Soloist è solo per Linux
     "storytel",
     "sverigesradio",
-    "tidal",
     "tunein",
     "webdav",
     "zvuk_music",
@@ -374,6 +373,9 @@ def _patch(root: Path) -> None:
         "        return ImageFont.load_default(size=size)\n    except TypeError:\n",
         "        return ImageFont.load_default(size=size)\n    except (TypeError, ImportError, OSError):  # Xonos: senza FreeType\n",
     )
+    # I consigli di Last.fm Music Assistant li aggiunge da solo, con la sua chiave: sul telefono si aggiungono
+    # a mano, con la chiave di Last.fm della persona.
+    _replace(root / "constants.py", '    ("lastfm_recommendations", False),\n', "")
 
 
 if __name__ == "__main__":
