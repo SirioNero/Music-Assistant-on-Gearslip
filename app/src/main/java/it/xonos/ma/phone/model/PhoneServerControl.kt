@@ -37,6 +37,12 @@ interface PhoneServerControl {
      */
     suspend fun remove()
 
+    /**
+     * Il registro di Music Assistant (le ultime righe di musicassistant.log, con le versioni in testa), da mandare a
+     * chi aiuta quando qualcosa non va: lì c'è perché un servizio non entra o un brano non suona.
+     */
+    suspend fun log(): String
+
     /** Lo avvia, se non gira già, e aspetta che risponda; false se non parte (il perché in [error]). */
     suspend fun start(): Boolean
 

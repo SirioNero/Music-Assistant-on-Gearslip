@@ -48,6 +48,8 @@
     <string name="phone_server_remove">Αφαίρεση από αυτό το τηλέφωνο</string>
     <string name="phone_server_remove_title">Αφαίρεση του Music Assistant από αυτό το τηλέφωνο;</string>
     <string name="phone_server_remove_text">Διαγράφονται επίσης οι υπηρεσίες και η βιβλιοθήκη του σε αυτό το τηλέφωνο. Μπορείτε να το κατεβάσετε ξανά όποτε θέλετε.</string>
+    <string name="phone_server_share_log">Κοινοποίηση του αρχείου καταγραφής του Music Assistant</string>
+    <string name="phone_server_log_subject">Αρχείο καταγραφής του Music Assistant από το Xonos</string>
     <string name="show_password">Εμφάνιση κωδικού</string>
     <string name="hide_password">Απόκρυψη κωδικού</string>
     <string name="save">Αποθήκευση και δοκιμή σύνδεσης</string>

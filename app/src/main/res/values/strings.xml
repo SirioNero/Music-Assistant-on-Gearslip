@@ -51,6 +51,8 @@
     <string name="phone_server_remove">Remove from this phone</string>
     <string name="phone_server_remove_title">Remove Music Assistant from this phone?</string>
     <string name="phone_server_remove_text">Its services and library on this phone are deleted too. You can download it again whenever you like.</string>
+    <string name="phone_server_share_log">Share the Music Assistant log</string>
+    <string name="phone_server_log_subject">Music Assistant log from Xonos</string>
     <string name="show_password">Show the password</string>
     <string name="hide_password">Hide the password</string>
     <string name="save">Save and test the connection</string>

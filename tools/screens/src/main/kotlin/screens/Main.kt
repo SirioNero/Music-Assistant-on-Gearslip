@@ -194,6 +194,8 @@ private class ScreenServer : PhoneServerControl {
 
     override suspend fun remove() = Unit
 
+    override suspend fun log() = ""
+
     override suspend fun start() = false
 
     override fun stop() = Unit
@@ -300,6 +302,7 @@ private class FakeHost(override val language: Language) : Host {
     override val batteryRestricted = true
     override fun askBatteryExemption() = Unit
     override fun askMusicFiles() = Unit
+    override fun shareText(subject: String, text: String) = Unit
     override val version = "0.1.17"
 }
 

@@ -158,6 +158,8 @@ private class WaitingServer(override val url: String) : PhoneServerControl {
         installed = false
     }
 
+    override suspend fun log() = ""
+
     override fun stop() {
         state = PhoneServerControl.State.STOPPED
     }
@@ -202,6 +204,8 @@ private object BrokenServer : PhoneServerControl {
     override suspend fun download(progress: (Long, Long) -> Unit) = throw java.io.IOException(DOWNLOAD)
 
     override suspend fun remove() = Unit
+
+    override suspend fun log() = ""
 
     override fun stop() = Unit
 

@@ -48,6 +48,8 @@
     <string name="phone_server_remove">从这部手机移除</string>
     <string name="phone_server_remove_title">要从这部手机移除 Music Assistant 吗？</string>
     <string name="phone_server_remove_text">它在这部手机上的服务和音乐库也会被删除。你可以随时重新下载。</string>
+    <string name="phone_server_share_log">分享 Music Assistant 日志</string>
+    <string name="phone_server_log_subject">来自 Xonos 的 Music Assistant 日志</string>
     <string name="show_password">显示密码</string>
     <string name="hide_password">隐藏密码</string>
     <string name="save">保存并测试连接</string>

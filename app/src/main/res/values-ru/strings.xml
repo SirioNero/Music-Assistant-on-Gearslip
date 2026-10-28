@@ -48,6 +48,8 @@
     <string name="phone_server_remove">Удалить с этого телефона</string>
     <string name="phone_server_remove_title">Удалить Music Assistant с этого телефона?</string>
     <string name="phone_server_remove_text">Его сервисы и медиатека на этом телефоне тоже будут удалены. Вы сможете снова скачать его в любой момент.</string>
+    <string name="phone_server_share_log">Поделиться журналом Music Assistant</string>
+    <string name="phone_server_log_subject">Журнал Music Assistant из Xonos</string>
     <string name="show_password">Показать пароль</string>
     <string name="hide_password">Скрыть пароль</string>
     <string name="save">Сохранить и проверить подключение</string>
