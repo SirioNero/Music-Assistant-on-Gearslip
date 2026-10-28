@@ -12,6 +12,8 @@ Dentro lo zip:
                i suoi moduli nativi (python3.13/lib-dynload), i certificati (cacert.pem)
     app/       Music Assistant preparato da ma/prepare.py e xonos_server.py
     site-packages/  i pacchetti di requirements.txt, installati per Android da Chaquopy
+    licenses/  i testi delle licenze (da licenses/ qui accanto, più quella di Xonos)
+    NOTICE.txt di chi è ogni parte, con quale licenza e dove sta il sorgente
     payload.json    versione, ABI e Python
 
 Lo zip è sempre uguale a parità di contenuto: voci in ordine e date fisse.
@@ -23,13 +25,18 @@ import argparse
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import zipfile
+from email.parser import HeaderParser
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
+SERVER = HERE.parent
+REPO_URL = "https://github.com/SirioNero/Music-Assistant-on-Gearslip"
 PYTHON = "3.13"
 FIXED_TIME = (1980, 1, 1, 0, 0, 0)
 # I programmi che Android installa dall'APK come librerie (lib<nome>.so): qui tornano programmi.
@@ -38,6 +45,20 @@ PROGRAMS = {"libffmpeg.so": "ffmpeg", "libffprobe.so": "ffprobe", "liblibrespot.
 SKIP_LIBS = {"libchaquopy_java.so"}
 TRIPLES = {"arm64-v8a": "aarch64-linux-android", "x86_64": "x86_64-linux-android"}
 MIN_SDK = 26
+# Le librerie di lib/ e a quale parte di NOTICE.txt appartengono (per inizio del nome).
+NATIVE = {
+    "libpython3": "Python",
+    "libssl_": "OpenSSL",
+    "libcrypto_": "OpenSSL",
+    "libsqlite3_": "SQLite",
+    "libavcodec": "FFmpeg",
+    "libavfilter": "FFmpeg",
+    "libavformat": "FFmpeg",
+    "libavutil": "FFmpeg",
+    "libswresample": "FFmpeg",
+    "libswscale": "FFmpeg",
+    "libc++_shared": "LLVM libc++",
+}
 
 
 def main() -> None:
@@ -59,9 +80,12 @@ def main() -> None:
             shutil.copyfile(args.launcher, python3)
         else:
             compile_launcher(Path(args.ndk), args.abi, root, python3)
+        write_notice(root, args.version, args.abi)
         write_zip(root, Path(args.out))
+        # Quanto occupa sul telefono, una volta estratto (Xonos chiede 4 volte lo zip libero, zip compreso).
+        unpacked = sum(path.stat().st_size for path in root.rglob("*") if path.is_file())
     size = Path(args.out).stat().st_size
-    print(f"pacchetto {args.version} per {args.abi}: {args.out}, {size / 1e6:.1f} MB")
+    print(f"pacchetto {args.version} per {args.abi}: {args.out}, {size / 1e6:.1f} MB, estratto {unpacked / 1e6:.1f} MB")
 
 
 def build(aar: Path, abi: str, version: str, root: Path) -> None:
@@ -105,6 +129,141 @@ def build(aar: Path, abi: str, version: str, root: Path) -> None:
         sys.exit(f"{aar}: mancano {', '.join(missing)} per {abi}")
     info = {"version": version, "abi": abi, "python": PYTHON}
     (root / "payload.json").write_text(json.dumps(info, indent=2) + "\n")
+
+
+def write_notice(root: Path, version: str, abi: str) -> None:
+    """NOTICE.txt e licenses/: di chi è ogni parte del pacchetto, con quale licenza e dove sta il sorgente."""
+    gradle = (SERVER / "build.gradle.kts").read_text()
+    ffmpeg_script = (SERVER / "ffmpeg" / "build.sh").read_text()
+    music_assistant = _value(gradle, r'musicAssistantVersion = "([^"]+)"')
+    chaquopy = _value(gradle, r'id\("com\.chaquo\.python"\) version "([^"]+)"')
+    ffmpeg = _value(ffmpeg_script, r"FFMPEG_VERSION=(\S+)")
+    mbedtls = _value(ffmpeg_script, r"MBEDTLS_VERSION=(\S+)")
+    librespot = _value((SERVER / "librespot" / "build.sh").read_text(), r"LIBRESPOT_COMMIT=(\S+)")
+    licenses = root / "licenses"
+    shutil.copytree(HERE / "licenses", licenses)
+    shutil.copyfile(SERVER.parent / "LICENSE", licenses / "Xonos-AGPL-3.0.txt")
+
+    unknown = sorted(
+        path.name for path in (root / "lib").glob("*.so") if not any(path.name.startswith(prefix) for prefix in NATIVE)
+    )
+    if unknown:
+        print(f"ATTENZIONE: librerie senza una voce in NOTICE.txt: {', '.join(unknown)}")
+    parts = [
+        (
+            "Xonos's own files: bin/python3, app/xonos_server.py, app/av, app/modern_colorthief.py,\n"
+            "app/music_assistant_frontend, and the orjson and aiodns stand-ins in site-packages (+xonos)",
+            "AGPL-3.0-or-later (licenses/Xonos-AGPL-3.0.txt)",
+            REPO_URL,
+        ),
+        (
+            f"Music Assistant {music_assistant} (app/music_assistant), changed for the phone by server/ma/prepare.py",
+            "Apache-2.0 (licenses/Apache-2.0.txt)",
+            f"https://github.com/music-assistant/server/tree/{music_assistant}",
+        ),
+        (
+            f"Python {PYTHON} for Android (lib/libpython3*.so, lib/python313.zip, lib/python{PYTHON}/lib-dynload),\n"
+            f"as built by Chaquopy {chaquopy}. Python's standard library includes other software (expat, libffi,\n"
+            "libmpdec, HACL*, bzip2, xz, zlib...): https://docs.python.org/3.13/license.html",
+            "PSF-2.0 (licenses/Python.txt); Chaquopy: MIT (licenses/Chaquopy.txt)",
+            f"https://github.com/chaquo/chaquopy/tree/{chaquopy}, https://www.python.org/downloads/source/",
+        ),
+        (
+            "OpenSSL 3, for Python and the Python packages (lib/libssl_*.so, lib/libcrypto_*.so)",
+            "Apache-2.0 (licenses/Apache-2.0.txt)",
+            "https://github.com/openssl/openssl, as built by Chaquopy",
+        ),
+        ("SQLite, for Python (lib/libsqlite3_*.so)", "public domain", "https://sqlite.org/src, as built by Chaquopy"),
+        (
+            f"FFmpeg {ffmpeg} (bin/ffmpeg, bin/ffprobe, lib/libav*.so, lib/libsw*.so), built by server/ffmpeg/build.sh\n"
+            "with --enable-version3, without GPL parts",
+            "LGPL-3.0-or-later (licenses/LGPL-3.0.txt and licenses/GPL-3.0.txt)",
+            f"https://ffmpeg.org/releases/ffmpeg-{ffmpeg}.tar.xz",
+        ),
+        (
+            f"Mbed TLS {mbedtls}, inside FFmpeg for https",
+            "Apache-2.0 or GPL-2.0-or-later (licenses/Mbed-TLS.txt)",
+            f"https://github.com/Mbed-TLS/mbedtls/releases/tag/mbedtls-{mbedtls}",
+        ),
+        (
+            "pkg_resources (site-packages/pkg_resources), from setuptools through Chaquopy's bootstrap",
+            "MIT (https://github.com/pypa/setuptools/blob/main/LICENSE)",
+            "https://github.com/pypa/setuptools",
+        ),
+        (
+            "librespot, Music Assistant's fork (bin/librespot), built by server/librespot/build.sh",
+            "MIT (licenses/librespot.txt)",
+            f"https://github.com/music-assistant/librespot/tree/{librespot}",
+        ),
+        (
+            "LLVM libc++ from the Android NDK (lib/libc++_shared.so), if present",
+            "Apache-2.0 WITH LLVM-exception (licenses/Apache-2.0.txt)",
+            "https://github.com/llvm/llvm-project",
+        ),
+    ]
+    lines = [
+        f"Music Assistant for Xonos: package {version} for {abi}",
+        "",
+        'Xonos downloads this package only when you tap "Make Xonos your Music Assistant server". It is built',
+        f"from source by the workflows of {REPO_URL} (folder server/,",
+        "with the exact versions and the build scripts). Its parts, their licenses and their sources:",
+        "",
+    ]
+    for what, license_name, source in parts:
+        lines += [what, f"    License: {license_name}", f"    Source: {source}", ""]
+    packages = _python_packages(root / "site-packages")
+    lines += [
+        "The Python packages in site-packages, each with its license in its .dist-info folder. Those built for",
+        "Android by Chaquopy (numpy, pillow, cryptography, cffi, pycryptodome and the chaquopy-* libraries) have",
+        f"their recipes at https://github.com/chaquo/chaquopy/tree/{chaquopy}/server/pypi/packages.",
+        "",
+    ]
+    for name, package_version, license_name in packages:
+        # Quelli scritti per Xonos (+xonos) stanno nel suo repository, gli altri su PyPI.
+        source = f"{REPO_URL}/tree/main/server/wheels" if package_version.endswith("+xonos") else f"https://pypi.org/project/{name}/{package_version}/"
+        lines.append(f"    {name} {package_version}: {license_name}. {source}")
+    (root / "NOTICE.txt").write_text("\n".join(lines) + "\n")
+    print(f"NOTICE.txt: {len(parts)} parti, {len(packages)} pacchetti Python")
+
+
+def _value(text: str, pattern: str) -> str:
+    match = re.search(pattern, text)
+    if not match:
+        sys.exit(f"Non trovo {pattern}")
+    return match.group(1)
+
+
+def _python_packages(site: Path) -> list[tuple[str, str, str]]:
+    """Nome, versione e licenza dei pacchetti di site-packages, dai loro METADATA."""
+    packages = []
+    for info in sorted(site.glob("*.dist-info")):
+        metadata = info / "METADATA"
+        if not metadata.is_file():
+            continue
+        fields = HeaderParser().parsestr(metadata.read_text(errors="replace"))
+        name, package_version = fields.get("Name", info.name), fields.get("Version", "?")
+        if package_version.endswith("+xonos"):
+            license_name = "AGPL-3.0-or-later, written for Xonos"
+        else:
+            license_name = _license(fields, info)
+        packages.append((name, package_version, license_name))
+    if not packages:
+        print("ATTENZIONE: in site-packages non ci sono .dist-info: NOTICE.txt non elenca i pacchetti")
+    return packages
+
+
+def _license(fields, info: Path) -> str:
+    expression = (fields.get("License-Expression") or "").strip()
+    if expression:
+        return expression
+    text = " ".join((fields.get("License") or "").split())
+    if 0 < len(text) <= 60:
+        return text
+    classifiers = [line.split(" :: ")[-1] for line in fields.get_all("Classifier") or [] if line.startswith("License ::")]
+    if classifiers:
+        return ", ".join(classifiers)
+    files = [path.name for path in info.rglob("*") if path.is_file() and re.match(r"(LICEN[CS]E|COPYING|NOTICE)", path.name, re.I)]
+    return f"see {', '.join(sorted(files))} in its .dist-info folder" if files else "see its source"
 
 
 def compile_launcher(ndk: Path, abi: str, root: Path, out: Path) -> None:
