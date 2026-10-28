@@ -330,7 +330,17 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   uscite audio), nel pacchetto `bin/librespot`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
   gli account Premium creati prima di dicembre 2024. Soloist, il motore ufficiale, è un programma per Linux
   (glibc, PipeWire/PulseAudio): non si può ridistribuire, va scaricato da Spotify sul telefono con il consenso
-  della persona e una sua chiave dell'API; da provare (attività in sospeso).
+  della persona e una sua chiave dell'API; da provare (attività in sospeso). Come lo usa Music Assistant (ramo
+  `dev`, ottobre 2026, `providers/spotify/backends/soloist.py` e `providers/spotify_connect/soloist/`): scarica,
+  solo col consenso, `https://soloist-builds.spotifycdn.com/soloist_release_{arm64|x86_64}.tar.gz`, controlla
+  l'ELF e lo aggiorna quando la build scade; la chiave personale va sulla riga di comando di `soloist`; l'audio
+  passa da un demone `pulseaudio` vero, privato di MA (`helpers/pulse_capture.py`: `module-pipe-sink` su un
+  FIFO, `pactl`, libpulse con ctypes), a 44,1 kHz s32le. Sul telefono servirebbero quindi: PulseAudio per
+  Android (si compila con l'NDK, come fa Termux), un ambiente glibc per `soloist` (ld.so e le librerie che
+  vuole, compresa libpulse) avviato senza `execve` (da Android 10 i file scaricati non si eseguono: un piccolo
+  caricatore che mappa ld.so e il programma e ci salta dentro), e le chiamate di sistema di glibc dentro il
+  filtro seccomp delle app Android (una vietata non dà ENOSYS ma SIGSYS: per esempio `clone3`). Prima prova
+  possibile senza la chiave: `soloist --version` sull'emulatore x86_64.
 - I task Gradle di ffmpeg e librespot **non dichiarano uscite**: alla prima esecuzione Gradle svuota le
   cartelle di uscita dei task, e con la cache di GitHub lo script trovava il suo segno (fuori dalla cartella)
   e non ricompilava, così ffmpeg mancava. Gli script controllano anche che i programmi ci siano.
