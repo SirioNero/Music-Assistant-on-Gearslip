@@ -350,7 +350,9 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   `zh_CN`); `_texts` li mette nei suoi `translations/*.json`. Verificato col server sul computer: il flusso
   attraverso l'API (primo passo, Client ID sbagliato, link di Spotify col Client ID e il ritorno giusto, testi in
   italiano), il flusso intero con la rete finta (anche riconfigura ed errore del browser) e il rinnovo col
-  Client ID della persona; in CI `check.py --spotify` sull'emulatore. Non provato: l'accesso vero a Spotify, la
+  Client ID della persona; in CI (Server MA, ramo `claude/spotify-telefono`) sull'emulatore Android il primo passo
+  `xonos_client_id` e il link di Spotify col Client ID (`check.py --spotify`), `librespot --version` del pacchetto
+  ("librespot 0.8.0") e la release che suona dal server sul telefono. Non provato: l'accesso vero a Spotify, la
   pagina di ritorno di music-assistant.io (dalla sandbox non si raggiunge) e librespot con un account vero.
   Regole di Spotify per le app personali (febbraio 2026): Premium del proprietario, al massimo 5 utenti
   (aggiunti in User Management), un Client ID in Development Mode per persona, e meno API: niente playlist di
