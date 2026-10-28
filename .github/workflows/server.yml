@@ -1,41 +1,111 @@
 name: Server MA
 
-# Il server di Music Assistant dentro Xonos (cartella server/). Per ora: quali pacchetti Python con parti
-# native esistono già compilati per Android (Python 3.14), nell'indice di Chaquopy o su PyPI. Dalla
-# sandbox di Claude quegli indici non si raggiungono.
+# Il server di Music Assistant dentro Xonos (cartella server/): compila la build di prova con il
+# server (Python 3.13 con Chaquopy, Music Assistant, ffmpeg compilato per Android), la installa su un
+# emulatore, avvia il server (ServerCheckActivity) e lo prova da fuori con tools/server/check.py:
+# primo account, una cartella con un album di toni, un lettore Sendspin come quello di Xonos, audio.
+# Registro del server, logcat e risultato finiscono nel riferimento nascosto
+# refs/xonos/server/<ramo con - al posto di />:
+#   git fetch origin refs/xonos/server/claude-server-ma && git archive FETCH_HEAD | tar -x -C <cartella>
+
 on:
   push:
-    branches: ["claude/server-ma"]
-    paths: ["server/**", ".github/workflows/server.yml"]
+    branches: ["claude/**"]
+    paths:
+      - "server/**"
+      - "tools/server/**"
+      - "app/src/debug/**"
+      - "*.gradle.kts"
+      - "app/build.gradle.kts"
+      - ".github/workflows/server.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  pacchetti:
+  server:
+    concurrency:
+      group: server-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      OUT: ${{ github.workspace }}/server-out
     steps:
-      - uses: actions/setup-python@v6
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+
+      - name: Prepara Java
+        uses: actions/setup-java@v5
         with:
-          python-version: "3.14"
+          distribution: temurin
+          java-version: 17
 
-      - name: Indice di Chaquopy
-        run: |
-          for p in pillow cryptography cffi numpy av zeroconf pycares brotli orjson aiohttp multidict yarl \
-                   frozenlist propcache soxr pycryptodome pycryptodomex lxml regex pydantic-core msgpack \
-                   bcrypt pynacl xxhash charset-normalizer rpds-py jiter ujson; do
-            files=$(curl -s -m 30 "https://chaquo.com/pypi-13.1/$p/" | grep -o 'href="[^"]*"' \
-              | sed 's/href="//; s/"$//; s/.*\///' | grep -E "cp31[345]|py3-none" | sort -V | tail -n 4 | tr '\n' ' ')
-            echo "$p: ${files:-(niente per 3.13-3.15)}"
-          done
+      # Chaquopy vuole sulla macchina lo stesso Python che mette nell'app.
+      - name: Prepara Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
 
-      - name: Cosa scarica pip per Android (arm64, Python 3.14)
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      # ffmpeg si compila in una decina di minuti per ABI: si tiene finché lo script non cambia.
+      - name: ffmpeg già compilato
+        uses: actions/cache@v4
+        with:
+          path: server/build/ffmpeg
+          key: ffmpeg-${{ hashFiles('server/ffmpeg/build.sh') }}
+
+      - name: Compila la build di prova
         run: |
-          python -m pip install -q --upgrade pip
-          for p in pillow cryptography cffi numpy av zeroconf orjson aiohttp multidict yarl frozenlist \
-                   propcache pycryptodome pycryptodomex lxml regex pydantic-core msgpack bcrypt pynacl; do
-            out=$(python -m pip download -q --no-deps --only-binary=:all: -d "w/$p" \
-              --platform android_24_arm64_v8a --platform android_23_arm64_v8a \
-              --platform android_21_arm64_v8a --platform any \
-              --python-version 3.14 --implementation cp \
-              --extra-index-url https://chaquo.com/pypi-13.1 "$p" 2>&1 | tail -n 1)
-            echo "$p: $(ls "w/$p" 2>/dev/null | tr '\n' ' ') ${out}"
-          done
+          set -o pipefail
+          mkdir -p "$OUT"
+          export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          echo "NDK: $ANDROID_NDK"
+          gradle :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee "$OUT/build.log"
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          ls -la "$APK"
+          unzip -l "$APK" | awk '{print $1, $4}' | grep -E "lib/|assets/chaquopy" | sort -k2 | tee "$OUT/apk.txt"
+
+      - name: Riassumi gli errori
+        if: failure()
+        run: |
+          errors=$(grep -E "^e: |error:|ERROR|What went wrong" -A3 "$OUT/build.log" | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+          if [ -n "$errors" ]; then echo "::error title=Compilazione non riuscita::$errors"; fi
+
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          pip install -q aiohttp
+
+      - name: Prova sull'emulatore
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 4
+          ram-size: 4096M
+          disk-size: 8G
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-boot-anim -camera-back none -camera-front none
+          script: bash tools/server/emulator.sh
+
+      - name: Pubblica in refs/xonos/server
+        if: always()
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$OUT"
+          cd "$OUT"
+          git init -q
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Server MA di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/xonos/server/${GITHUB_REF_NAME//\//-}"
