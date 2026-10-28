@@ -45,6 +45,7 @@ PROGRAMS = {"libffmpeg.so": "ffmpeg", "libffprobe.so": "ffprobe", "liblibrespot.
 SKIP_LIBS = {"libchaquopy_java.so"}
 TRIPLES = {"arm64-v8a": "aarch64-linux-android", "x86_64": "x86_64-linux-android"}
 MIN_SDK = 26
+PAGE_16K = 16384
 # Le librerie di lib/ e a quale parte di NOTICE.txt appartengono (per inizio del nome).
 NATIVE = {
     "libpython3": "Python",
@@ -81,6 +82,7 @@ def main() -> None:
         else:
             compile_launcher(Path(args.ndk), args.abi, root, python3)
         write_notice(root, args.version, args.abi)
+        report_alignment(root)
         write_zip(root, Path(args.out))
         # Quanto occupa sul telefono, una volta estratto (Xonos chiede 4 volte lo zip libero, zip compreso).
         unpacked = sum(path.stat().st_size for path in root.rglob("*") if path.is_file())
@@ -266,6 +268,43 @@ def _license(fields, info: Path) -> str:
     return f"see {', '.join(sorted(files))} in its .dist-info folder" if files else "see its source"
 
 
+def report_alignment(root: Path) -> None:
+    """I programmi e le librerie allineati a meno di 16 KB: sui telefoni con pagine da 16 KB non si caricano."""
+    short = []
+    elves = 0
+    for path in sorted(root.rglob("*")):
+        if not path.is_file():
+            continue
+        align = _elf_alignment(path)
+        if align is None:
+            continue
+        elves += 1
+        if align < PAGE_16K:
+            short.append(f"{path.relative_to(root)} ({align})")
+    print(f"ELF: {elves}, allineati a meno di 16 KB: {len(short)}")
+    for line in short[:60]:
+        print(f"    {line}")
+
+
+def _elf_alignment(path: Path) -> int | None:
+    """Il più piccolo allineamento dei segmenti PT_LOAD di un ELF a 64 bit; None se non è un ELF."""
+    with path.open("rb") as file:
+        header = file.read(64)
+        if len(header) < 64 or header[:4] != b"\x7fELF" or header[4] != 2:
+            return None
+        phoff = int.from_bytes(header[32:40], "little")
+        phentsize = int.from_bytes(header[54:56], "little")
+        phnum = int.from_bytes(header[56:58], "little")
+        file.seek(phoff)
+        table = file.read(phentsize * phnum)
+    aligns = []
+    for index in range(phnum):
+        entry = table[index * phentsize:(index + 1) * phentsize]
+        if int.from_bytes(entry[0:4], "little") == 1:  # PT_LOAD
+            aligns.append(int.from_bytes(entry[48:56], "little"))
+    return min(aligns) if aligns else None
+
+
 def compile_launcher(ndk: Path, abi: str, root: Path, out: Path) -> None:
     tools = ndk / "toolchains" / "llvm" / "prebuilt" / "linux-x86_64" / "bin"
     source = Path(__file__).with_name("python3.c")
@@ -277,6 +316,8 @@ def compile_launcher(ndk: Path, abi: str, root: Path, out: Path) -> None:
             "-fPIE",
             "-pie",
             "-Wl,--build-id=none",
+            # Si carica anche sui telefoni con pagine da 16 KB.
+            "-Wl,-z,max-page-size=16384",
             "-o",
             str(out),
             str(source),
