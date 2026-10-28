@@ -39,6 +39,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONArray
 import org.json.JSONObject
+import java.security.SecureRandom
 
 /** Le schede in fondo allo schermo. */
 enum class Tab { HOME, SEARCH, LIBRARY }
@@ -89,6 +90,8 @@ class PhoneModel(
     /** Vero quando il telefono è un lettore di Music Assistant: solo allora si può suonare. */
     private val ready: StateFlow<Boolean>,
     private val scope: CoroutineScope,
+    /** Music Assistant sul telefono stesso, nella versione di Xonos che lo porta dentro di sé; null nelle altre. */
+    private val phoneServer: PhoneServerControl? = null,
 ) {
     val connection: StateFlow<Connection> get() = repo.connection
 
@@ -985,6 +988,77 @@ class PhoneModel(
         signIn(page) { url -> account.createFirst(url, page.username, page.password, deviceName) }
     }
 
+    // ---------- Music Assistant sul telefono ----------
+
+    /** Questa versione di Xonos ha Music Assistant dentro di sé (Xonos-server.apk). */
+    val phoneServerAvailable: Boolean get() = phoneServer != null
+
+    /** Il modulo indica il Music Assistant sul telefono. */
+    fun usesPhoneServer(page: SettingsPage): Boolean = phoneServer != null && page.home == phoneServer.url
+
+    /**
+     * Avvia Music Assistant sul telefono e ci collega Xonos. La prima volta crea l'account (è
+     * l'amministratore, così si possono aggiungere i servizi): nome e password li sceglie Xonos e la
+     * password la tiene per sé, per rifarsi dare il token se lo perde. Poi è come con qualsiasi Music Assistant.
+     */
+    fun usePhoneServer(page: SettingsPage) {
+        val server = phoneServer ?: return
+        page.results = emptyList()
+        page.phoneServerError = null
+        page.setupNeeded = false
+        page.passwordShort = false
+        page.checking = true
+        scope.launch {
+            var connecting = false
+            try {
+                if (!server.start()) {
+                    page.phoneServerError = server.error.ifBlank { server.state.name }
+                    return@launch
+                }
+                val url = server.url
+                val password = settings.phoneServerPassword ?: newPassword().also { settings.phoneServerPassword = it }
+                val login = if (account.needsSetup(url)) {
+                    account.createFirst(url, PHONE_SERVER_USER, password, deviceName)
+                } else {
+                    account.login(url, PHONE_SERVER_USER, password, deviceName)
+                }
+                settings.username = login.user
+                page.home = url
+                page.remote = ""
+                page.useToken = false
+                page.token = login.token
+                page.username = login.user
+                page.password = ""
+                page.signedIn = login.user
+                page.tried = true
+                connecting = true
+                finish(page)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                page.results = listOf(ConnectionCheck.Result.Failed(ConnectionCheck.Place.HOME, e))
+            } finally {
+                if (!connecting) page.checking = false
+            }
+        }
+    }
+
+    /** Per collegarsi a un altro Music Assistant: il modulo torna vuoto. Il server sul telefono resta com'è. */
+    fun leavePhoneServer(page: SettingsPage) {
+        page.home = ""
+        page.remote = ""
+        page.token = ""
+        page.username = ""
+        page.signedIn = null
+        page.results = emptyList()
+        page.phoneServerError = null
+    }
+
+    private fun newPassword(): String {
+        val random = SecureRandom()
+        return (1..24).map { PASSWORD_CHARS[random.nextInt(PASSWORD_CHARS.length)] }.joinToString("")
+    }
+
     private fun tidy(page: SettingsPage) {
         page.home = Settings.normalizeUrl(page.home)
         page.remote = Settings.normalizeUrl(page.remote)
@@ -1118,6 +1192,10 @@ class PhoneModel(
 
         /** La password più corta che Music Assistant accetta per un account nuovo. */
         const val MIN_PASSWORD = 8
+
+        /** Il nome dell'account che Xonos si crea nel Music Assistant sul telefono. */
+        const val PHONE_SERVER_USER = "xonos"
+        private const val PASSWORD_CHARS = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
         /** Problemi che vengono dal server stesso: provare l'altro indirizzo non cambierebbe niente. */
         private val ANSWERED = setOf(Problem.BAD_LOGIN, Problem.SETUP_REQUIRED, Problem.REFUSED, Problem.DENIED, Problem.TOO_OLD)

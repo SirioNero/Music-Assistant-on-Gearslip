@@ -25,6 +25,8 @@ class Settings {
 
     var username: String? = null
 
+    var phoneServerPassword: String? = null
+
     var playerName: String = DEFAULT_NAME
         set(value) {
             field = value.trim().ifEmpty { DEFAULT_NAME }

@@ -77,6 +77,16 @@ class Settings(context: Context) {
             prefs.edit().putBoolean(KEY_MUTED, value).apply()
         }
 
+    /**
+     * La password dell'account che Xonos si è creato nel Music Assistant sul telefono (Xonos-server.apk):
+     * la sceglie Xonos, e la tiene per rifarsi dare il token se lo perde. Quel server risponde solo al telefono.
+     */
+    var phoneServerPassword: String?
+        get() = prefs.getString(KEY_PHONE_SERVER_PASSWORD, null)
+        set(value) {
+            prefs.edit().putString(KEY_PHONE_SERVER_PASSWORD, value).apply()
+        }
+
     /** Chiave con cui l'app firma gli indirizzi delle copertine: le serve solo per sé (vedi ArtworkProvider). */
     val artKey: ByteArray
         @Synchronized get() {
@@ -97,6 +107,7 @@ class Settings(context: Context) {
         private const val KEY_ART = "art_key"
         private const val KEY_LANGUAGE = "language"
         private const val KEY_USER = "username"
+        private const val KEY_PHONE_SERVER_PASSWORD = "phone_server_password"
 
         const val DEFAULT_NAME = "Xonos"
 

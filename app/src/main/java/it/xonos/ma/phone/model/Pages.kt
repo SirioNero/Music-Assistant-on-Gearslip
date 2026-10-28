@@ -189,6 +189,9 @@ class SettingsPage(home: String, remote: String, token: String, name: String, si
     /** Vero dopo il primo "Salva": da lì si dice se manca qualcosa. */
     var tried by mutableStateOf(false)
     var results by mutableStateOf<List<ConnectionCheck.Result>>(emptyList())
+
+    /** Perché Music Assistant sul telefono non è partito, se è successo. */
+    var phoneServerError by mutableStateOf<String?>(null)
 }
 
 /** "Aggiungi a una playlist": dove mettere [uri] (un brano, un album o una playlist), o una playlist nuova. */

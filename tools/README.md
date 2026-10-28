@@ -34,6 +34,7 @@ MA_TOKEN=... LANG_XONOS=it QUERIES="vasco,podcast morning" build/install/harness
 | `PlaylistCheckKt` | Le playlist modificabili: crea, aggiunge (un album diventa i suoi brani, i doppioni si saltano), toglie per posizione, `PlaylistRemover` con tocchi veloci, poi lo stesso dal `PhoneModel` ("Aggiungi a una playlist", nuova playlist, "Togli", "Elimina"). Cancella le playlist di prova |
 | `SearchCheckKt` | La ricerca del telefono: dopo quanto compaiono i risultati della libreria e dopo quanto quelli dei servizi (`QUERY`, separate da virgole). MA ricorda le ricerche: serve una parola nuova, e un servizio lento (`SEARCH_DELAY` del finto iTunes) |
 | `ServicesCheckKt` | I servizi di MA con il servizio finto `xonos_test`: elenco, icone, flusso (modulo con errore, accesso "nel browser", fine), opzioni, pulsante, riconfigura, rimozione; poi lo stesso dal `PhoneModel` (anche la fine ricavata al ritorno nell'app) e la lingua dei moduli |
+| `PhoneServerCheckKt` | "Usa Music Assistant su questo telefono" dal `PhoneModel`, contro un Music Assistant vuoto (di solito il server di Xonos avviato sul computer): primo account creato da Xonos, token e connessione; con il token perso si rientra con la password tenuta; "Usa un altro Music Assistant"; un server che non parte |
 
 `MA_URL` (predefinito `http://127.0.0.1:8095`) e `MA_TOKEN` indicano il server.
 
