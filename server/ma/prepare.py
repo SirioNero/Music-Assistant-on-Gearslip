@@ -531,6 +531,26 @@ def _spotify(root: Path) -> None:
     )
     provider = folder / "provider.py"
     _replace(provider, "    CONF_CLIENT_ID,\n", "    CONF_CLIENT_ID,\n    CONF_XONOS_CLIENT_ID,\n")
+    # Con un'app personale (Development Mode) Spotify dà i brani solo delle playlist della persona: per le
+    # altre (seguite, o di Spotify come Daily Mix) Music Assistant passa alla sua chiave, che qui non c'è.
+    # Si dice perché e cosa fare, invece di "There is nothing to play here.".
+    _replace(
+        provider,
+        "            except MediaNotFoundError:\n"
+        "                if use_global or not self.dev_session_active:\n"
+        "                    raise\n",
+        "            except MediaNotFoundError as err:\n"
+        '                if not app_var("spotify_client_id") and not is_liked_songs:\n'
+        "                    playlist = await self.get_playlist(prov_playlist_id)\n"
+        "                    if not playlist.is_editable:\n"
+        "                        raise MediaNotFoundError(\n"
+        "                            str(err),\n"
+        '                            translation_key="xonos_playlist_not_yours",\n'
+        '                            translation_owner="provider.spotify",\n'
+        "                        ) from err\n"
+        "                if use_global or not self.dev_session_active:\n"
+        "                    raise\n",
+    )
     _replace(
         provider,
         "                app_var(\"spotify_client_id\"),  # Always use MA's global client ID\n",
