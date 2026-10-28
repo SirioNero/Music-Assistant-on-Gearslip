@@ -8,6 +8,9 @@ o silenzio; esce con 1 se l'audio non arriva.
 
     python3 check.py --url http://127.0.0.1:8095 --music <cartella vista dal server> [--seconds 10]
 
+Con --player (e il --token dell'app) suona invece sul lettore vero di un'app, Xonos, e guarda dalla sua
+coda in Music Assistant se suona davvero: stato e secondi suonati.
+
 Sull'emulatore il server dentro Xonos si raggiunge con `adb forward tcp:8095 tcp:8095`. Serve aiohttp.
 """
 
@@ -36,6 +39,7 @@ def main() -> None:
     parser.add_argument("--url", default="http://127.0.0.1:8095")
     parser.add_argument("--music", help="La cartella con la musica, come la vede il server")
     parser.add_argument("--token", help="Un token del server, se l'account c'è già")
+    parser.add_argument("--player", help="Suona su questo lettore (quello di Xonos) invece che su uno di prova")
     parser.add_argument("--seconds", type=float, default=10)
     args = parser.parse_args()
     sys.exit(asyncio.run(check(args)))
@@ -62,6 +66,8 @@ async def check(args: argparse.Namespace) -> int:
                 return 1
             track = tracks[0]
             print(f"brani: {len(tracks)}; suono {track['name']} ({track['uri']})")
+            if args.player:
+                return await _play_on(api, args.player, track, args.seconds)
 
             player = Sendspin(http, ws_url, token)
             await player.start()
@@ -291,6 +297,37 @@ async def _wait_tracks(api: Api) -> list[dict[str, Any]]:
             break
         await asyncio.sleep(2)
     return tracks
+
+
+async def _play_on(api: Api, queue_id: str, track: dict[str, Any], seconds: float) -> int:
+    """Suona sul lettore di un'app e guarda dalla sua coda se suona: stato e secondi suonati."""
+    queue: dict[str, Any] = {}
+    for _ in range(60):
+        queue = await api.call("player_queues/get", queue_id=queue_id) or {}
+        if queue.get("available"):
+            break
+        await asyncio.sleep(2)
+    else:
+        print(f"ERRORE: il lettore {queue_id} non c'è in Music Assistant")
+        return 1
+    print(f"lettore {queue.get('display_name')} ({queue_id}) pronto")
+    await api.call("player_queues/play_media", queue_id=queue_id, media=track["uri"])
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        await asyncio.sleep(1)
+        queue = await api.call("player_queues/get", queue_id=queue_id) or {}
+    state = queue.get("state")
+    elapsed = queue.get("elapsed_time") or 0.0
+    if state == "playing":
+        # Il tempo della coda è quello dell'ultimo aggiornamento: da lì il brano è andato avanti.
+        elapsed += max(0.0, time.time() - (queue.get("elapsed_time_last_updated") or time.time()))
+    print(f"lettore {queue_id}: {state}, {elapsed:.1f} s suonati")
+    await api.call("player_queues/stop", queue_id=queue_id, ignore_errors=True)
+    if state != "playing" or elapsed < seconds / 2:
+        print("ERRORE: il lettore non suona")
+        return 1
+    print("suona")
+    return 0
 
 
 def _now_us() -> int:

@@ -1,9 +1,10 @@
 name: Server MA
 
-# Il server di Music Assistant dentro Xonos (cartella server/): compila la build di prova con il
-# server (Python 3.13 con Chaquopy, Music Assistant, ffmpeg compilato per Android), la installa su un
-# emulatore, avvia il server (ServerCheckActivity) e lo prova da fuori con tools/server/check.py:
-# primo account, una cartella con un album di toni, un lettore Sendspin come quello di Xonos, audio.
+# Il server di Music Assistant dentro Xonos (cartella server/): compila la build di prova e la release
+# con il server (Python 3.13 con Chaquopy, Music Assistant, ffmpeg compilato per Android), le installa su
+# un emulatore e le prova (tools/server/emulator.sh): il server da solo, provato da fuori con
+# tools/server/check.py (primo account, una cartella con un album di toni, un lettore Sendspin come
+# quello di Xonos, audio), poi Xonos stesso che lo usa e suona, nella build di prova e nella release.
 # Registro del server, logcat e risultato finiscono nel riferimento nascosto
 # refs/xonos/server/<ramo con - al posto di />:
 #   git fetch origin refs/xonos/server/claude-server-ma && git archive FETCH_HEAD | tar -x -C <cartella>
@@ -11,12 +12,13 @@ name: Server MA
 on:
   push:
     branches: ["claude/**"]
+    # Xonos-server.apk è tutta l'app più il server: la prova vale per ogni cambio all'app.
     paths:
       - "server/**"
       - "tools/server/**"
-      - "app/src/debug/**"
+      - "app/**"
       - "*.gradle.kts"
-      - "app/build.gradle.kts"
+      - "gradle.properties"
       - ".github/workflows/server.yml"
   workflow_dispatch:
 
@@ -66,16 +68,22 @@ jobs:
           path: server/build/librespot
           key: librespot-${{ hashFiles('server/librespot/build.sh') }}
 
-      - name: Compila la build di prova
+      # Anche la release, ridotta con R8 come quella che si pubblica: firmata con la chiave di debug, così
+      # si installa sull'emulatore.
+      - name: Compila la build di prova e la release
+        env:
+          XONOS_DEBUG_SIGNING: "true"
         run: |
           set -o pipefail
           mkdir -p "$OUT"
           export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
           echo "NDK: $ANDROID_NDK"
-          gradle :app:assembleDebug -PxonosServer --no-daemon --stacktrace 2>&1 | tee "$OUT/build.log"
-          APK=app/build/outputs/apk/debug/app-debug.apk
-          ls -la "$APK"
-          unzip -l "$APK" | awk '{print $1, $4}' | grep -E "lib/|assets/chaquopy" | sort -k2 | tee "$OUT/apk.txt"
+          gradle :app:assembleDebug :app:assembleRelease -PxonosServer --no-daemon --stacktrace 2>&1 | tee "$OUT/build.log"
+          ls -la app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release.apk
+          APK=app/build/outputs/apk/release/app-release.apk
+          # Dimensione vera e compressa di ciò che pesa: le librerie e Python. In fondo l'APK intero.
+          unzip -v "$APK" | awk '$8 ~ /^(lib|assets\/chaquopy)\// {print $1, $3, $8}' | sort -k3 | tee "$OUT/apk.txt"
+          stat -c "%s $APK" "$APK" | tee -a "$OUT/apk.txt"
 
       - name: Riassumi gli errori
         if: failure()
