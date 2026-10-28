@@ -233,7 +233,9 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 - Dalla 0.1.40 Xonos fa da ponte a myCar (`MyCarBridge`): per collegarsi all'auto senza fili myCar va lasciata
   fuori da Tailscale, e allora le sue connessioni verso un Music Assistant sulla tailnet (API, Sendspin, copertine)
   le apre Xonos, che resta dentro Tailscale. Il legame di myCar tiene Xonos sveglio e con la rete per il viaggio.
-  Si prova in CI dal lato di myCar: Car preview con `xonos_ref`, Release check `tailscale-out`.
+  Verificato in CI dal lato di myCar (Car preview con `xonos_ref`, Release check `tailscale-out`): con
+  Tailscale vero e myCar esclusa, myCar si collega a Music Assistant attraverso Xonos; nell'anteprima
+  suona un album con Sendspin dal ponte.
 
 ## L'app sul telefono
 
