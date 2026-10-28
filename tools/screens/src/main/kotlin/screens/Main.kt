@@ -32,6 +32,7 @@ import it.xonos.ma.phone.model.LibraryPage
 import it.xonos.ma.phone.model.Load
 import it.xonos.ma.phone.model.NowPlaying
 import it.xonos.ma.phone.model.PhoneModel
+import it.xonos.ma.phone.model.PhoneServerControl
 import it.xonos.ma.phone.model.PlayerLink
 import it.xonos.ma.phone.model.PlayerPanel
 import it.xonos.ma.phone.model.QueueEntry
@@ -130,8 +131,16 @@ private const val WIDTH = 1080
 private const val HEIGHT = 2340
 private const val DENSITY = 2.625f
 
-/** Una scena: prepara il modello (schede, pagine, lettore) e dice cosa sta suonando. */
-private class Scene(val now: NowPlaying? = PLAYING, val configured: Boolean = true, val setUp: PhoneModel.() -> Unit)
+/**
+ * Una scena: prepara il modello (schede, pagine, lettore) e dice cosa sta suonando. [server] è Music Assistant sul
+ * telefono (come su un telefono a 64 bit, dove la scheda c'è); null, come su uno a 32 bit.
+ */
+private class Scene(
+    val now: NowPlaying? = PLAYING,
+    val configured: Boolean = true,
+    val server: PhoneServerControl? = ScreenServer(),
+    val setUp: PhoneModel.() -> Unit,
+)
 
 private fun shoot(file: File, lang: String, scene: Scene) {
     Texts.language = lang
@@ -150,6 +159,7 @@ private fun shoot(file: File, lang: String, scene: Scene) {
         { "xonos-screens" },
         MutableStateFlow(true),
         CoroutineScope(SupervisorJob() + Dispatchers.Default),
+        scene.server,
     )
     scene.setUp(model)
     val host = FakeHost(Language.of(if (lang == "zh") "zh-CN" else lang))
@@ -169,6 +179,28 @@ private fun shoot(file: File, lang: String, scene: Scene) {
 }
 
 private const val SETTLE_NS = 2_500_000_000L
+
+/** Music Assistant sul telefono, non ancora scaricato: le schermate mostrano solo la scheda e la domanda. */
+private class ScreenServer : PhoneServerControl {
+    override val url = "http://127.0.0.1:8095"
+    override val state = PhoneServerControl.State.STOPPED
+    override val error = ""
+    override val installed = false
+    override val outdated = false
+
+    override suspend fun downloadSize() = PACKAGE_SIZE
+
+    override suspend fun download(progress: (Long, Long) -> Unit) = Unit
+
+    override fun remove() = Unit
+
+    override suspend fun start() = false
+
+    override fun stop() = Unit
+}
+
+/** Quanto pesa il pacchetto di Music Assistant per arm64, all'incirca. */
+private const val PACKAGE_SIZE = 74L * 1024 * 1024
 
 /** I Music Assistant "trovati nella rete" del benvenuto e delle impostazioni. */
 private val FOUND = listOf(
@@ -405,6 +437,15 @@ private val SCENES = listOf(
         push(settings)
     },
     "welcome" to Scene(now = null, configured = false) {},
+    // "Fai diventare Xonos il tuo server Music Assistant": la domanda con quanto pesa, poi il download.
+    "phone-server-ask" to Scene {
+        (page as HomePage).started = true
+        push(settingsPage().apply { phoneServerAsk = true; phoneServerSize = PACKAGE_SIZE })
+    },
+    "phone-server-download" to Scene {
+        (page as HomePage).started = true
+        push(settingsPage().apply { phoneServerProgress = PACKAGE_SIZE * 2 / 5 to PACKAGE_SIZE })
+    },
     "play-on" to Scene {
         (page as HomePage).started = true
         playerOpen = true
