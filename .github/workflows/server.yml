@@ -1,0 +1,41 @@
+name: Server MA
+
+# Il server di Music Assistant dentro Xonos (cartella server/). Per ora: quali pacchetti Python con parti
+# native esistono già compilati per Android (Python 3.14), nell'indice di Chaquopy o su PyPI. Dalla
+# sandbox di Claude quegli indici non si raggiungono.
+on:
+  push:
+    branches: ["claude/server-ma"]
+    paths: ["server/**", ".github/workflows/server.yml"]
+  workflow_dispatch:
+
+jobs:
+  pacchetti:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Indice di Chaquopy
+        run: |
+          for p in pillow cryptography cffi numpy av zeroconf pycares brotli orjson aiohttp multidict yarl \
+                   frozenlist propcache soxr pycryptodome pycryptodomex lxml regex pydantic-core msgpack \
+                   bcrypt pynacl xxhash charset-normalizer rpds-py jiter ujson; do
+            files=$(curl -s -m 30 "https://chaquo.com/pypi-13.1/$p/" | grep -o 'href="[^"]*"' \
+              | sed 's/href="//; s/"$//; s/.*\///' | grep -E "cp31[345]|py3-none" | sort -V | tail -n 4 | tr '\n' ' ')
+            echo "$p: ${files:-(niente per 3.13-3.15)}"
+          done
+
+      - name: Cosa scarica pip per Android (arm64, Python 3.14)
+        run: |
+          python -m pip install -q --upgrade pip
+          for p in pillow cryptography cffi numpy av zeroconf orjson aiohttp multidict yarl frozenlist \
+                   propcache pycryptodome pycryptodomex lxml regex pydantic-core msgpack bcrypt pynacl; do
+            out=$(python -m pip download -q --no-deps --only-binary=:all: -d "w/$p" \
+              --platform android_24_arm64_v8a --platform android_23_arm64_v8a \
+              --platform android_21_arm64_v8a --platform any \
+              --python-version 3.14 --implementation cp \
+              --extra-index-url https://chaquo.com/pypi-13.1 "$p" 2>&1 | tail -n 1)
+            echo "$p: $(ls "w/$p" 2>/dev/null | tr '\n' ' ') ${out}"
+          done
