@@ -11,6 +11,7 @@ import androidx.media3.session.SessionToken
 import it.xonos.ma.data.MaItem
 import it.xonos.ma.data.Services
 import it.xonos.ma.phone.model.ConnectionCheck
+import it.xonos.ma.phone.model.PhoneServerControl
 import it.xonos.ma.playback.PlaybackService
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -54,8 +55,13 @@ class ServerCheckActivity : Activity() {
         app.repo.acquire()
         thread(name = "server-check") {
             val started = SystemClock.elapsedRealtime()
-            thread(name = "server-start") { runBlocking { server.start() } }
-            var last: String? = null
+            thread(name = "server-start") {
+                // Se non parte prima ancora di dire "starting" (Python che non si avvia), lo stato resta STOPPED.
+                val ok = runCatching { runBlocking { server.start() } }.onFailure { say("Server: FAILED $it") }.getOrDefault(false)
+                if (!ok && server.state == PhoneServerControl.State.STOPPED) say("Server: FAILED ${server.error}".trim())
+            }
+            // STOPPED è lo stato di prima dell'avvio: non si dice.
+            var last: String? = PhoneServerControl.State.STOPPED.name
             while (open) {
                 val state = server.state.name
                 if (state != last) {
