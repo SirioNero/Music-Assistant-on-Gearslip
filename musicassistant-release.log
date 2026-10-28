@@ -1,0 +1,69 @@
+2026-10-28 20:40:30,055.055 INFO (music-assistant) [music_assistant] Starting Music Assistant Server (aa98c87ad4ca4fbd8baaed0d8e9175b5) version 0.0.0 - HA add-on: False - Safe mode: False
+2026-10-28 20:40:30,082.082 INFO (music-assistant) [music_assistant.cache] Initializing cache controller...
+2026-10-28 20:40:30,105.105 INFO (music-assistant) [ffmpeg] Detected ffmpeg version 7.1.5 
+2026-10-28 20:40:30,109.109 WARNING (music-assistant) [music_assistant.streams] 
+
+################################################################################
+Started streamserver on 127.0.0.1:8097
+This is the IP address that is communicated to players.
+If this is incorrect, audio will not play!
+See the documentation for how to configure the publish IP for the Streamserver
+in Settings --> System --> Streams
+################################################################################
+
+2026-10-28 20:40:30,196.196 INFO (music-assistant) [music_assistant.auth] Generated new JWT secret key
+2026-10-28 20:40:30,197.197 INFO (music-assistant) [music_assistant.auth] Authentication manager initialized (providers=1)
+2026-10-28 20:40:30,198.198 WARNING (music-assistant) [music_assistant.webserver] 
+
+################################################################################
+###                           SETUP REQUIRED                                 ###
+################################################################################
+
+Music Assistant is running in setup mode.
+Please complete the setup by visiting:
+
+    http://127.0.0.1:8095/setup
+
+################################################################################
+
+2026-10-28 20:40:30,230.230 INFO (music-assistant) [music_assistant] Loaded music provider Music Assistant
+2026-10-28 20:40:30,232.232 INFO (music-assistant) [music_assistant] Loaded metadata provider Cover Art Archive
+2026-10-28 20:40:30,236.236 INFO (music-assistant) [music_assistant] Loaded metadata provider iTunes Artwork
+2026-10-28 20:40:30,240.240 INFO (music-assistant) [music_assistant] Loaded audio_analysis provider Loudness Analysis
+2026-10-28 20:40:30,242.242 INFO (music-assistant) [music_assistant] Loaded metadata provider LRCLIB
+2026-10-28 20:40:30,297.297 INFO (music-assistant) [music_assistant] Loaded metadata provider MusicBrainz
+2026-10-28 20:40:30,297.297 INFO (music-assistant) [music_assistant.musicbrainz] MusicBrainz recommendations: scanning 3 days before/after today
+2026-10-28 20:40:30,312.312 INFO (music-assistant) [music_assistant] Loaded metadata provider Playlist Metadata
+2026-10-28 20:40:30,316.316 INFO (music-assistant) [music_assistant] Loaded plugin provider Endless Mix Playlists
+2026-10-28 20:40:30,316.316 INFO (music-assistant) [music_assistant] Loaded plugin provider Library Recommendations
+2026-10-28 20:40:30,319.319 INFO (music-assistant) [music_assistant] Loaded metadata provider Wikipedia
+2026-10-28 20:40:30,320.320 INFO (music-assistant) [music_assistant] Loaded player provider Sync Group Player
+2026-10-28 20:40:30,320.320 INFO (music-assistant) [music_assistant] Loaded player provider Universal Player
+2026-10-28 20:40:31,370.370 INFO (music-assistant) [music_assistant] Loaded player provider Sendspin
+2026-10-28 20:40:31,379.379 INFO (music-assistant) [music_assistant] Loaded music provider Ambient Sounds
+2026-10-28 20:40:31,380.380 INFO (music-assistant) [xonos] Music Assistant pronto sul telefono
+2026-10-28 20:40:31,583.583 INFO (music-assistant) [music_assistant.auth] Migrated existing playlog entries to first user: x4OvK-3baChutw02rlShLZMwILAvP5-TTnFWM_9zjmo
+2026-10-28 20:40:31,636.636 INFO (music-assistant) [music_assistant.webserver] First admin user created: xonos
+2026-10-28 20:40:31,641.641 INFO (music-assistant) [music_assistant.webserver] WebSocket client authenticated as xonos
+2026-10-28 20:40:31,643.643 INFO (music-assistant) [music_assistant.auth] Created long-lived token 'Xonos (sdk_gphone64_x86_64)' for user 'xonos'
+2026-10-28 20:40:31,644.644 WARNING (music-assistant) [music_assistant.webserver] Disconnecting WebSocket client due to token revocation: xonos
+2026-10-28 20:40:31,644.644 INFO (music-assistant) [music_assistant.auth] User 'xonos' logged out
+2026-10-28 20:40:31,651.651 INFO (music-assistant) [music_assistant.webserver] WebSocket client authenticated as xonos
+2026-10-28 20:40:31,652.652 INFO (music-assistant) [music_assistant.webserver] WebSocket client authenticated as xonos
+2026-10-28 20:40:31,693.693 INFO (music-assistant) [aiohttp.access] 127.0.0.1 [28/Oct/2026:20:40:31 +0000] "GET /sendspin HTTP/1.1" 101 0 "-" "Music Assistant/0.0.0 aiohttp/3.14.3 Python/3.13"
+2026-10-28 20:40:31,747.747 WARNING (music-assistant) [aiosendspin.server.connection.unknown-127.0.0.1] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.44): connected unencrypted (transition mode)
+2026-10-28 20:40:31,747.747 WARNING (music-assistant) [aiosendspin.server.connection.xonos-0a8beacae5cd] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.44): client/hello declared player supported_commands, superseded by client/state
+2026-10-28 20:40:31,776.776 WARNING (music-assistant) [aiosendspin.server.client.xonos-0a8beacae5cd] non-compliant client Xonos (Google Mobile Application, software Xonos 0.1.44): client/state used the legacy top-level 'state' field
+2026-10-28 20:40:31,785.785 INFO (music-assistant) [music_assistant.players] Player (type player) registered: xonos-0a8beacae5cd/Xonos
+2026-10-28 20:40:40,330.330 INFO (music-assistant) [music_assistant.music.genre] Genre mapping scan completed: 0 items mapped (0.0s)
+2026-10-28 20:40:40,492.492 INFO (music-assistant) [music_assistant.webserver] WebSocket client authenticated as xonos
+2026-10-28 20:40:40,493.493 INFO (music-assistant) [music_assistant.controllers.config.controller] Onboarding completed
+2026-10-28 20:40:40,595.595 INFO (music-assistant) [music_assistant] Loaded music provider Filesystem (local disk)
+2026-10-28 20:40:40,658.658 INFO (music-assistant) [music_assistant.Filesystem (local disk)] Found 2 changed/new items to process for Filesystem (local disk)
+2026-10-28 20:40:40,747.747 INFO (music-assistant) [music_assistant.Filesystem (local disk)] Found 0 changed/new items to process for Filesystem (local disk)
+2026-10-28 20:40:40,767.767 INFO (music-assistant) [music_assistant.music.genre] Genre mapping scan completed: 0 items mapped (0.0s)
+2026-10-28 20:40:42,664.664 INFO (music-assistant) [music_assistant.player_queues] User xonos requested playback.
+2026-10-28 20:40:42,778.778 INFO (music-assistant) [music_assistant.Sendspin.xonos-0a8beacae5cd] Setting active output protocol on Xonos to Native
+2026-10-28 20:40:42,847.847 INFO (music-assistant) [music_assistant.streams.audio] Start Queue Flow stream for Queue Xonos - crossfade: disabled 
+2026-10-28 20:40:44,555.555 INFO (music-assistant) [music_assistant.streams.audio] Finished Queue Flow stream for Queue Xonos
+2026-10-28 20:40:57,917.917 INFO (music-assistant) [music_assistant.Sendspin.xonos-0a8beacae5cd] Clearing active output protocol on Xonos
