@@ -360,6 +360,34 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   (allora il controllo del Premium di Music Assistant si salta). Music Assistant 2.10.8 manda quelle chiamate
   alla "sessione globale", che qui è la chiave della persona: rispondono "non trovato" (400/403/404 diventano
   `MediaNotFoundError`), senza fermare il servizio.
+- **Perché non suona** (pacchetto 2.10.8-3, Xonos 0.1.45): collegato Spotify, l'utente riceveva a ogni brano
+  "There is nothing to play here." (`no_playable_items` di `queue_loader.play_media`): Music Assistant scarta il
+  perché (un `MusicAssistantError` del servizio) e lo scrive solo nel suo registro. `_reasons` in `prepare.py` lo
+  fa dire: `xonos_no_playable_items` col motivo come argomento ("There is nothing to play here: track not found in
+  library: 999999"), `xonos_not_available` se il servizio non ha dato brani suonabili, e un errore `xonos_*` già
+  spiegato passa com'è. Con un'app personale (Development Mode) Spotify dà i brani (`playlists/{id}/items`) solo
+  delle playlist della persona (o collaborative): per le altre (seguite, di Spotify come Daily Mix) Music
+  Assistant passa alla sua chiave, che qui non c'è; ora `xonos_playlist_not_yours` (owner `provider.spotify`) dice di
+  copiare i brani in una propria playlist. Nelle Impostazioni "Condividi il registro di Music Assistant"
+  (`PhoneServer.log`: le ultime 96 KB di `musicassistant.log`, versioni in testa, condivisione di Android come
+  testo). Verificato: col server sul computer il motivo nel messaggio (`check.py`, anche in CI), con la rete finta
+  il messaggio solo per le playlist non proprie (non per le proprie né per i brani piaciuti); il banco JVM compila.
+  Poi l'utente: "qualsiasi brano non funziona". Un brano della libreria al play non passa da Spotify
+  (`get_library_item_by_prov_id`, poi `[track]`): se non suona è la sua mappatura `available` falsa, cioè
+  `is_playable` false da Spotify (`parsers.parse_track`), o il servizio non caricato (`available_providers`; per
+  esempio dopo un INVALID_CREDENTIALS di librespot, che lo scarica). Con l'app della persona Spotify non dà più
+  `country`/`product` dell'account: probabile che `is_playable` (con `market=from_token`) venga falso. Quindi
+  (`_xonos_playable` in `parsers.py`) un brano "non suonabile" si prova comunque, con un avviso nel registro (i primi
+  5), tranne `restrictions.reason == "explicit"` (il filtro della persona). Non scavalca i limiti per paese:
+  librespot li controlla da sé col paese e il catalogo dell'account (`available_for_user` in `metadata`, poi
+  "is not available"); il filtro degli espliciti invece con `--single-track` no, per questo resta qui. Al primo avvio
+  del servizio `_xonos_playable_again` rimette `available = 1` alle tracce Spotify di quell'istanza in
+  `provider_mappings`, tranne quelle esplicite (`json_extract(metadata, '$.explicit') = 1`: le rivede la
+  sincronizzazione), e svuota la sua cache, solo quella volta (segno `.xonos-playable-<istanza>` nei dati); se non
+  riesce lo scrive nel registro e il servizio parte lo stesso. E `xonos_service_down` dice quale servizio non è caricato.
+  Provato col server sul computer (servizio dei file spento: "Filesystem (local disk) isn't working right now", anche
+  in italiano), con la rete finta e col database vero di Music Assistant (`DatabaseConnection`). Da confermare col
+  registro dell'utente.
 - **Spotify**: il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`, 0.8.0)
   compilato per Android in `server/librespot/build.sh` (Rust con cargo-ndk, rustls al posto di OpenSSL, senza
   uscite audio), nel pacchetto `bin/librespot`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
@@ -399,7 +427,8 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   comandi della release (sul runner la chiave di debug di Android non è in `~/.android`), e un piccolo server
   HTTP sul runner serve il pacchetto (l'emulatore lo vede a `10.0.2.2:8000`). 1. il server da solo:
   `ServerCheckActivity` (solo debug) lo scarica e lo avvia, poi `tools/server/check.py` lo prova da fuori
-  (con `--spotify` anche il primo tratto del flusso di Spotify), FFmpeg con https e `librespot --version`;
+  (con `--spotify` anche il primo tratto del flusso di Spotify; e che "nothing to play" dica perché), FFmpeg con
+  https e `librespot --version`;
   2. la build di prova con `ServerCheckActivity --ez xonos true` (cartella come servizio, primo brano dal
   lettore di Xonos); 3. la release ridotta con R8, da capo come la usa una persona: uiautomator tocca il tasto e
   "Scarica" (i testTag sono resource-id; il dialogo è una finestra a sé e vuole `automationIds()` anche lui) e

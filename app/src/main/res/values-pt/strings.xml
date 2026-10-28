@@ -48,6 +48,8 @@
     <string name="phone_server_remove">Remover deste telefone</string>
     <string name="phone_server_remove_title">Remover o Music Assistant deste telefone?</string>
     <string name="phone_server_remove_text">Os serviços e a biblioteca dele neste telefone também são apagados. Você pode baixá-lo de novo quando quiser.</string>
+    <string name="phone_server_share_log">Compartilhar o registro do Music Assistant</string>
+    <string name="phone_server_log_subject">Registro do Music Assistant no Xonos</string>
     <string name="show_password">Mostrar a senha</string>
     <string name="hide_password">Ocultar a senha</string>
     <string name="save">Salvar e testar a conexão</string>

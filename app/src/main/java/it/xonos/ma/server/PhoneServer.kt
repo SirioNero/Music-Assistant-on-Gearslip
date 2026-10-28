@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.SystemClock
 import android.util.Log
+import it.xonos.ma.BuildConfig
 import it.xonos.ma.phone.model.PhoneServerControl
 import it.xonos.ma.phone.model.PhoneServerControl.State
 import kotlinx.coroutines.Dispatchers
@@ -11,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.io.File
+import java.io.RandomAccessFile
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -57,6 +59,24 @@ class PhoneServer private constructor(context: Context, private val pkg: ServerP
         data.deleteRecursively()
         cache.deleteRecursively()
         Unit
+    }
+
+    override suspend fun log(): String = withContext(Dispatchers.IO) {
+        val head = "Xonos ${BuildConfig.VERSION_NAME}, Music Assistant ${BuildConfig.SERVER_PACKAGE} (${pkg.abi}), " +
+            "Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}), ${state.name.lowercase()} $error".trim()
+        val file = File(data, "musicassistant.log")
+        "$head\n\n" + if (file.isFile) tail(file) else "(no log yet)"
+    }
+
+    /** Le ultime [LOG_BYTES] del registro, da una riga intera. */
+    private fun tail(file: File): String = RandomAccessFile(file, "r").use { reader ->
+        val length = reader.length()
+        val start = maxOf(0L, length - LOG_BYTES)
+        val bytes = ByteArray((length - start).toInt())
+        reader.seek(start)
+        reader.readFully(bytes)
+        val text = String(bytes, Charsets.UTF_8)
+        if (start > 0) text.substringAfter('\n') else text
     }
 
     override suspend fun start(): Boolean = withContext(Dispatchers.IO) {
@@ -182,6 +202,8 @@ class PhoneServer private constructor(context: Context, private val pkg: ServerP
         private const val POLL_MS = 250L
         private const val STOP_TIMEOUT_S = 15L
         private const val LAST_LINES = 20
+        /** Quanto registro si condivide: le ultime righe bastano, e stanno in una condivisione di Android. */
+        private const val LOG_BYTES = 96 * 1024
 
         /** Music Assistant sul telefono, dove può girare (un telefono a 64 bit); altrimenti null. */
         fun create(context: Context, http: OkHttpClient): PhoneServerControl? {

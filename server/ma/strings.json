@@ -9,7 +9,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Allow Spotify playback",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify asks for a second, one-time approval so that Music Assistant can play the audio: press Next and allow it in the browser.\n\nThe audio goes through librespot, which mostly works only with Spotify accounts created before December 2024.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Approve playback in your browser",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify opens in the browser again: sign in if asked and allow access."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify opens in the browser again: sign in if asked and allow access.",
+    "common.errors.xonos_no_playable_items": "There is nothing to play here: {0}",
+    "common.errors.xonos_not_available": "There is nothing to play here: the service gave no songs that can be played (for example, they aren't available in your country).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify gives your own app only the songs of your playlists, not of the ones you follow or of Spotify's own (such as Daily Mix). In Spotify, copy the songs into a playlist of yours and play that one.",
+    "common.errors.xonos_service_down": "There is nothing to play here: {0} isn't working right now. Music Assistant services say why."
   },
   "it": {
     "provider.spotify.setup_flow.xonos_client_id.title": "Il Client ID della tua app Spotify",
@@ -21,7 +25,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Consenti la riproduzione di Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify chiede una seconda approvazione, una volta sola, perché Music Assistant possa suonare l'audio: premi Avanti e consentila nel browser.\n\nL'audio passa da librespot, che funziona soprattutto con gli account Spotify creati prima di dicembre 2024.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Approva la riproduzione nel browser",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify si riapre nel browser: accedi se te lo chiede e consenti l'accesso."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify si riapre nel browser: accedi se te lo chiede e consenti l'accesso.",
+    "common.errors.xonos_no_playable_items": "Qui non c'è niente da suonare: {0}",
+    "common.errors.xonos_not_available": "Qui non c'è niente da suonare: il servizio non ha dato brani che si possano suonare (per esempio non sono disponibili nel tuo paese).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify dà alla tua app solo i brani delle tue playlist, non quelli delle playlist che segui né di quelle di Spotify (come Daily Mix). In Spotify copia i brani in una tua playlist e suona quella.",
+    "common.errors.xonos_service_down": "Qui non c'è niente da suonare: {0} in questo momento non funziona. Nei Servizi di Music Assistant c'è il perché."
   },
   "es": {
     "provider.spotify.setup_flow.xonos_client_id.title": "El Client ID de tu app de Spotify",
@@ -33,7 +41,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Permitir la reproducción de Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify pide una segunda aprobación, una sola vez, para que Music Assistant pueda reproducir el audio: pulsa Siguiente y permítela en el navegador.\n\nEl audio pasa por librespot, que funciona sobre todo con cuentas de Spotify creadas antes de diciembre de 2024.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Aprueba la reproducción en el navegador",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify se abre otra vez en el navegador: inicia sesión si te lo pide y permite el acceso."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify se abre otra vez en el navegador: inicia sesión si te lo pide y permite el acceso.",
+    "common.errors.xonos_no_playable_items": "Aquí no hay nada que reproducir: {0}",
+    "common.errors.xonos_not_available": "Aquí no hay nada que reproducir: el servicio no dio canciones que se puedan reproducir (por ejemplo, no están disponibles en tu país).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify solo le da a tu app las canciones de tus playlists, no las de las que sigues ni las del propio Spotify (como Daily Mix). En Spotify, copia las canciones a una playlist tuya y reproduce esa.",
+    "common.errors.xonos_service_down": "Aquí no hay nada que reproducir: {0} no funciona ahora mismo. En Servicios de Music Assistant se ve por qué."
   },
   "de": {
     "provider.spotify.setup_flow.xonos_client_id.title": "Die Client ID deiner Spotify-App",
@@ -45,7 +57,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Spotify-Wiedergabe erlauben",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify verlangt eine zweite, einmalige Freigabe, damit Music Assistant den Ton abspielen kann: Tippe auf Weiter und erlaube sie im Browser.\n\nDer Ton läuft über librespot, das vor allem mit Spotify-Konten funktioniert, die vor Dezember 2024 erstellt wurden.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Wiedergabe im Browser freigeben",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify öffnet sich wieder im Browser: Melde dich an, falls nötig, und erlaube den Zugriff."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify öffnet sich wieder im Browser: Melde dich an, falls nötig, und erlaube den Zugriff.",
+    "common.errors.xonos_no_playable_items": "Hier gibt es nichts abzuspielen: {0}",
+    "common.errors.xonos_not_available": "Hier gibt es nichts abzuspielen: Der Dienst hat keine abspielbaren Titel geliefert (zum Beispiel, weil sie in deinem Land nicht verfügbar sind).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify gibt deiner eigenen App nur die Titel deiner Playlists, nicht die der Playlists, denen du folgst, oder die von Spotify selbst (wie Daily Mix). Kopiere die Titel in Spotify in eine eigene Playlist und spiele diese ab.",
+    "common.errors.xonos_service_down": "Hier gibt es nichts abzuspielen: {0} funktioniert gerade nicht. Unter Music-Assistant-Dienste steht, warum."
   },
   "fr": {
     "provider.spotify.setup_flow.xonos_client_id.title": "Le Client ID de votre app Spotify",
@@ -57,7 +73,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Autoriser la lecture Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify demande une seconde autorisation, une seule fois, pour que Music Assistant puisse lire l'audio : appuyez sur Suivant et accordez-la dans le navigateur.\n\nL'audio passe par librespot, qui fonctionne surtout avec les comptes Spotify créés avant décembre 2024.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Approuvez la lecture dans le navigateur",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify s'ouvre de nouveau dans le navigateur : connectez-vous si on vous le demande et autorisez l'accès."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify s'ouvre de nouveau dans le navigateur : connectez-vous si on vous le demande et autorisez l'accès.",
+    "common.errors.xonos_no_playable_items": "Il n'y a rien à lire ici : {0}",
+    "common.errors.xonos_not_available": "Il n'y a rien à lire ici : le service n'a fourni aucun titre lisible (par exemple, ils ne sont pas disponibles dans votre pays).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify ne donne à votre propre app que les titres de vos playlists, pas ceux des playlists que vous suivez ni de celles de Spotify lui-même (comme Daily Mix). Dans Spotify, copiez les titres dans une playlist à vous et lisez celle-ci.",
+    "common.errors.xonos_service_down": "Il n'y a rien à lire ici : {0} ne fonctionne pas pour le moment. Les Services de Music Assistant indiquent pourquoi."
   },
   "pt_PT": {
     "provider.spotify.setup_flow.xonos_client_id.title": "O Client ID do seu app do Spotify",
@@ -69,7 +89,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Permitir a reprodução do Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "O Spotify pede uma segunda aprovação, só uma vez, para que o Music Assistant possa tocar o áudio: toque em Avançar e permita no navegador.\n\nO áudio passa pelo librespot, que funciona sobretudo com contas do Spotify criadas antes de dezembro de 2024.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Aprove a reprodução no navegador",
-    "provider.spotify.setup_flow.playback_browser_open.description": "O Spotify abre de novo no navegador: entre na sua conta se ele pedir e permita o acesso."
+    "provider.spotify.setup_flow.playback_browser_open.description": "O Spotify abre de novo no navegador: entre na sua conta se ele pedir e permita o acesso.",
+    "common.errors.xonos_no_playable_items": "Não há nada para tocar aqui: {0}",
+    "common.errors.xonos_not_available": "Não há nada para tocar aqui: o serviço não deu músicas que possam ser tocadas (por exemplo, não estão disponíveis no seu país).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "O Spotify só dá ao seu app as músicas das suas playlists, não das que você segue nem das do próprio Spotify (como Daily Mix). No Spotify, copie as músicas para uma playlist sua e toque essa.",
+    "common.errors.xonos_service_down": "Não há nada para tocar aqui: {0} não está funcionando agora. Em Serviços do Music Assistant aparece o motivo."
   },
   "el_GR": {
     "provider.spotify.setup_flow.xonos_client_id.title": "Το Client ID της εφαρμογής σας Spotify",
@@ -81,7 +105,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Επιτρέψτε την αναπαραγωγή του Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "Το Spotify ζητά μια δεύτερη έγκριση, μία φορά μόνο, ώστε το Music Assistant να μπορεί να παίζει τον ήχο: πατήστε Επόμενο και δώστε την στο πρόγραμμα περιήγησης.\n\nΟ ήχος περνά από το librespot, που λειτουργεί κυρίως με λογαριασμούς Spotify που δημιουργήθηκαν πριν από τον Δεκέμβριο του 2024.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Εγκρίνετε την αναπαραγωγή στο πρόγραμμα περιήγησης",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Το Spotify ανοίγει ξανά στο πρόγραμμα περιήγησης: συνδεθείτε αν σας ζητηθεί και επιτρέψτε την πρόσβαση."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Το Spotify ανοίγει ξανά στο πρόγραμμα περιήγησης: συνδεθείτε αν σας ζητηθεί και επιτρέψτε την πρόσβαση.",
+    "common.errors.xonos_no_playable_items": "Δεν υπάρχει τίποτα για αναπαραγωγή εδώ: {0}",
+    "common.errors.xonos_not_available": "Δεν υπάρχει τίποτα για αναπαραγωγή εδώ: η υπηρεσία δεν έδωσε τραγούδια που μπορούν να παιχτούν (για παράδειγμα, δεν είναι διαθέσιμα στη χώρα σας).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Το Spotify δίνει στη δική σας εφαρμογή μόνο τα τραγούδια των δικών σας playlist, όχι αυτών που ακολουθείτε ούτε του ίδιου του Spotify (όπως το Daily Mix). Στο Spotify αντιγράψτε τα τραγούδια σε μια δική σας playlist και παίξτε αυτήν.",
+    "common.errors.xonos_service_down": "Δεν υπάρχει τίποτα για αναπαραγωγή εδώ: το {0} δεν λειτουργεί αυτή τη στιγμή. Στις Υπηρεσίες του Music Assistant φαίνεται το γιατί."
   },
   "ru_RU": {
     "provider.spotify.setup_flow.xonos_client_id.title": "Client ID вашего приложения Spotify",
@@ -93,7 +121,11 @@
     "provider.spotify.setup_flow.xonos_playback.title": "Разрешите воспроизведение Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify просит второе, однократное разрешение, чтобы Music Assistant мог воспроизводить звук: нажмите «Далее» и дайте его в браузере.\n\nЗвук идёт через librespot, который работает в основном с аккаунтами Spotify, созданными до декабря 2024 года.",
     "provider.spotify.setup_flow.playback_browser_open.title": "Одобрите воспроизведение в браузере",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify снова откроется в браузере: войдите, если попросят, и разрешите доступ."
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify снова откроется в браузере: войдите, если попросят, и разрешите доступ.",
+    "common.errors.xonos_no_playable_items": "Здесь нечего воспроизводить: {0}",
+    "common.errors.xonos_not_available": "Здесь нечего воспроизводить: сервис не дал треков, которые можно воспроизвести (например, они недоступны в вашей стране).",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify даёт вашему приложению только треки ваших плейлистов, а не тех, на которые вы подписаны, и не плейлистов самого Spotify (например, Daily Mix). В Spotify скопируйте треки в свой плейлист и включите его.",
+    "common.errors.xonos_service_down": "Здесь нечего воспроизводить: {0} сейчас не работает. Причина указана в разделе «Сервисы Music Assistant»."
   },
   "zh_CN": {
     "provider.spotify.setup_flow.xonos_client_id.title": "你的 Spotify 应用的 Client ID",
@@ -105,6 +137,10 @@
     "provider.spotify.setup_flow.xonos_playback.title": "允许播放 Spotify",
     "provider.spotify.setup_flow.xonos_playback.description": "Spotify 需要再授权一次（仅此一次），Music Assistant 才能播放音频：点按“下一步”，然后在浏览器中允许。\n\n音频通过 librespot 播放，它主要适用于 2024 年 12 月之前创建的 Spotify 账号。",
     "provider.spotify.setup_flow.playback_browser_open.title": "在浏览器中批准播放",
-    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify 会再次在浏览器中打开：如有需要请登录，然后允许访问。"
+    "provider.spotify.setup_flow.playback_browser_open.description": "Spotify 会再次在浏览器中打开：如有需要请登录，然后允许访问。",
+    "common.errors.xonos_no_playable_items": "这里没有可播放的内容：{0}",
+    "common.errors.xonos_not_available": "这里没有可播放的内容：服务没有提供可以播放的歌曲（例如它们在你所在的国家/地区不可用）。",
+    "provider.spotify.errors.xonos_playlist_not_yours": "Spotify 只向你自己的应用提供你自己的播放列表中的歌曲，不包括你关注的播放列表和 Spotify 自己的播放列表（例如 Daily Mix）。请在 Spotify 中把这些歌曲复制到你自己的播放列表，然后播放那个播放列表。",
+    "common.errors.xonos_service_down": "这里没有可播放的内容：{0} 目前无法使用。原因可在“Music Assistant 服务”中查看。"
   }
 }

@@ -77,6 +77,13 @@ class MainActivity : ComponentActivity() {
 
             override fun askMusicFiles() = this@MainActivity.askMusicFiles()
 
+            override fun shareText(subject: String, text: String) {
+                val send = Intent(Intent.ACTION_SEND).setType("text/plain")
+                    .putExtra(Intent.EXTRA_SUBJECT, subject)
+                    .putExtra(Intent.EXTRA_TEXT, text)
+                runCatching { startActivity(Intent.createChooser(send, subject)) }
+            }
+
             override val version: String = BuildConfig.VERSION_NAME
         }
         setContent { XonosScreen(app.phone, link, host) }

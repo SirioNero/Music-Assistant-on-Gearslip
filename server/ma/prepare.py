@@ -383,8 +383,64 @@ def _patch(root: Path) -> None:
     # I consigli di Last.fm Music Assistant li aggiunge da solo, con la sua chiave: sul telefono si aggiungono
     # a mano, con la chiave di Last.fm della persona.
     _replace(root / "constants.py", '    ("lastfm_recommendations", False),\n', "")
+    _reasons(root)
     _spotify(root)
     _texts(root)
+
+
+def _reasons(root: Path) -> None:
+    """
+    Quando non c'è niente da suonare Music Assistant dice solo "There is nothing to play here.", e il
+    perché resta nel suo registro, che sul telefono nessuno vede. Qui lo dice: l'errore del servizio
+    (anche uno di Xonos, già spiegato, come le playlist Spotify non proprie) o che il servizio non ha
+    dato brani da suonare.
+    """
+    loader = root / "controllers" / "player_queues" / "queue_loader.py"
+    _replace(
+        loader,
+        "        shuffle_settled = False\n        # resolve all media items\n",
+        "        shuffle_settled = False\n"
+        "        skipped: MusicAssistantError | None = None  # Xonos: perché un elemento non si suona\n"
+        "        # resolve all media items\n",
+    )
+    _replace(
+        loader,
+        '            except (MusicAssistantError, ZeroDivisionError) as err:\n'
+        '                self.logger.warning("Skipping %s: %s", item, err)\n',
+        '            except (MusicAssistantError, ZeroDivisionError) as err:\n'
+        '                self.logger.warning("Skipping %s: %s", item, err)\n'
+        "                if isinstance(err, MusicAssistantError):\n"
+        "                    skipped = err\n",
+    )
+    _replace(
+        loader,
+        "        if not queue_items:\n"
+        '            raise MediaNotFoundError("No playable items found", translation_key="no_playable_items")\n',
+        "        if not queue_items:\n"
+        "            # Xonos: anche perché, invece del solo \"There is nothing to play here.\"\n"
+        '            if skipped is not None and str(skipped.translation_key).startswith("xonos_"):\n'
+        "                raise skipped\n"
+        "            if skipped is not None:\n"
+        "                reason = str(skipped) or type(skipped).__name__\n"
+        "                raise MediaNotFoundError(\n"
+        '                    f"No playable items found: {reason}",\n'
+        '                    translation_key="xonos_no_playable_items",\n'
+        "                    translation_args=[reason],\n"
+        "                )\n"
+        "            for found in media_items:\n"
+        "                for mapping in getattr(found, \"provider_mappings\", None) or ():\n"
+        "                    if self.mass.get_provider(mapping.provider_instance) is None:\n"
+        "                        try:\n"
+        "                            service = self.mass.get_provider_manifest(mapping.provider_domain).name\n"
+        "                        except KeyError:\n"
+        "                            service = mapping.provider_domain\n"
+        "                        raise MediaNotFoundError(\n"
+        '                            f"No playable items found: {service} is not loaded",\n'
+        '                            translation_key="xonos_service_down",\n'
+        "                            translation_args=[service],\n"
+        "                        )\n"
+        '            raise MediaNotFoundError("No playable items found", translation_key="xonos_not_available")\n',
+    )
 
 
 def _spotify(root: Path) -> None:
@@ -485,8 +541,101 @@ def _spotify(root: Path) -> None:
         "\n\n"
         "async def _authorize_developer_key(\n",
     )
+    # Con l'app della persona Spotify può dire "non suonabile" (is_playable) anche dei brani che si suonano, e allora
+    # non si suonava niente ("There is nothing to play here."). A suonare è librespot, che decide da sé: si prova
+    # comunque, tranne per il filtro dei contenuti espliciti della persona, e lo si scrive nel registro.
+    parsers = folder / "parsers.py"
+    _replace(
+        parsers,
+        "from music_assistant.helpers.util import infer_album_type, parse_title_and_version\n",
+        "from music_assistant.helpers.app_vars import app_var\n"
+        "from music_assistant.helpers.util import infer_album_type, parse_title_and_version\n",
+    )
+    _replace(
+        parsers,
+        '                available=not track_obj["is_local"] and track_obj["is_playable"],\n',
+        '                available=not track_obj["is_local"] and _xonos_playable(track_obj, provider),\n',
+    )
+    _replace(
+        parsers,
+        "def parse_playlist(playlist_obj: dict[str, Any], provider: SpotifyProvider) -> Playlist:\n",
+        "_xonos_noted: list[str] = []\n\n\n"
+        "def _xonos_playable(track_obj: dict[str, Any], provider: SpotifyProvider) -> bool:\n"
+        '    """\n'
+        "    Xonos: se un brano si può provare a suonare. Con l'app Spotify della persona Spotify può dire\n"
+        "    \"non suonabile\" anche di brani che si suonano; decide librespot, che suona. Il filtro dei contenuti\n"
+        "    espliciti della persona resta.\n"
+        '    """\n'
+        '    if track_obj["is_playable"] or app_var("spotify_client_id"):\n'
+        '        return bool(track_obj["is_playable"])\n'
+        '    restrictions = track_obj.get("restrictions") or {}\n'
+        '    if restrictions.get("reason") == "explicit":\n'
+        "        return False\n"
+        "    if len(_xonos_noted) < 5:\n"
+        '        _xonos_noted.append(str(track_obj.get("id")))\n'
+        "        provider.logger.warning(\n"
+        '            "Spotify says track %s is not playable (%s): trying it anyway",\n'
+        '            track_obj.get("id"),\n'
+        "            restrictions or \"no reason given\",\n"
+        "        )\n"
+        "    return True\n\n\n"
+        "def parse_playlist(playlist_obj: dict[str, Any], provider: SpotifyProvider) -> Playlist:\n",
+    )
     provider = folder / "provider.py"
     _replace(provider, "    CONF_CLIENT_ID,\n", "    CONF_CLIENT_ID,\n    CONF_XONOS_CLIENT_ID,\n")
+    # I brani già salvati "non suonabili" (in libreria e nella cache del servizio) tornano da provare.
+    _replace(
+        provider,
+        "            # try login which will raise if it fails (logs in global session)\n"
+        "            await self.login()\n",
+        "            # try login which will raise if it fails (logs in global session)\n"
+        "            await self.login()\n"
+        '            if not app_var("spotify_client_id"):\n'
+        "                await self._xonos_playable_again()\n",
+    )
+    _replace(
+        provider,
+        "    async def unload(self, is_removed: bool = False) -> None:\n",
+        "    async def _xonos_playable_again(self) -> None:\n"
+        '        """Xonos: una volta, i brani salvati "non suonabili" prima di parsers._xonos_playable tornano da provare."""\n'
+        '        marker = Path(self.mass.storage_path) / f".xonos-playable-{self.instance_id}"\n'
+        "        if marker.exists():\n"
+        "            return\n"
+        "        # Gli espliciti no: possono essere fuori per il filtro della persona; li rivede la sincronizzazione.\n"
+        "        try:\n"
+        "            await self.mass.music.database.execute_write(\n"
+        '                "UPDATE provider_mappings SET available = 1 "\n'
+        "                \"WHERE provider_instance = :instance AND media_type = 'track' AND available = 0 \"\n"
+        "                \"AND item_id NOT IN (SELECT item_id FROM tracks WHERE json_extract(metadata, '$.explicit') = 1)\",\n"
+        '                {"instance": self.instance_id},\n'
+        "            )\n"
+        "            await self.mass.cache.clear(provider_filter=self.instance_id)\n"
+        "        except Exception as err:\n"
+        '            self.logger.warning("Could not make the saved tracks playable again: %s", err)\n'
+        "            return\n"
+        "        marker.touch()\n\n"
+        "    async def unload(self, is_removed: bool = False) -> None:\n",
+    )
+    # Con un'app personale (Development Mode) Spotify dà i brani solo delle playlist della persona: per le
+    # altre (seguite, o di Spotify come Daily Mix) Music Assistant passa alla sua chiave, che qui non c'è.
+    # Si dice perché e cosa fare, invece di "There is nothing to play here.".
+    _replace(
+        provider,
+        "            except MediaNotFoundError:\n"
+        "                if use_global or not self.dev_session_active:\n"
+        "                    raise\n",
+        "            except MediaNotFoundError as err:\n"
+        '                if not app_var("spotify_client_id") and not is_liked_songs:\n'
+        "                    playlist = await self.get_playlist(prov_playlist_id)\n"
+        "                    if not playlist.is_editable:\n"
+        "                        raise MediaNotFoundError(\n"
+        "                            str(err),\n"
+        '                            translation_key="xonos_playlist_not_yours",\n'
+        '                            translation_owner="provider.spotify",\n'
+        "                        ) from err\n"
+        "                if use_global or not self.dev_session_active:\n"
+        "                    raise\n",
+    )
     _replace(
         provider,
         "                app_var(\"spotify_client_id\"),  # Always use MA's global client ID\n",

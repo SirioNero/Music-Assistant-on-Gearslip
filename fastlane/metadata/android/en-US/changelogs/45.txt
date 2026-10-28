@@ -1,0 +1,1 @@
+Music Assistant on the phone: Spotify songs are tried even when Spotify says your own app can't play them, and when there is nothing to play the message says why (for playlists you don't own: copy the songs into one of yours). New in Settings: "Share the Music Assistant log", to send what went wrong. Then tap "Update Music Assistant on this phone".

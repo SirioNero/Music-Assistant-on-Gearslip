@@ -223,6 +223,12 @@ private fun PhoneServerCard(page: SettingsPage, model: PhoneModel, host: Host) {
     val inUse = model.usesPhoneServer(page)
     val progress = page.phoneServerProgress
     var confirmRemove by remember { mutableStateOf(false) }
+    val logSubject = stringResource(R.string.phone_server_log_subject)
+    val shareLog = @Composable {
+        TextButton(onClick = { model.sharePhoneServerLog { host.shareText(logSubject, it) } }, modifier = Modifier.testTag("share_phone_server_log")) {
+            Text(stringResource(R.string.phone_server_share_log))
+        }
+    }
     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -265,6 +271,7 @@ private fun PhoneServerCard(page: SettingsPage, model: PhoneModel, host: Host) {
                     FilledTonalButton(onClick = { model.leavePhoneServer(page) }, enabled = !page.checking, modifier = Modifier.testTag("leave_phone_server")) {
                         Text(stringResource(R.string.phone_server_leave))
                     }
+                    shareLog()
                 }
                 page.phoneServerInstalled -> {
                     Button(
@@ -286,6 +293,7 @@ private fun PhoneServerCard(page: SettingsPage, model: PhoneModel, host: Host) {
                     TextButton(onClick = { confirmRemove = true }, enabled = !page.checking, modifier = Modifier.testTag("remove_phone_server")) {
                         Text(stringResource(R.string.phone_server_remove))
                     }
+                    shareLog()
                 }
                 else -> {
                     Button(
