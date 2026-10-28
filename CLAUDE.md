@@ -56,8 +56,8 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   senza chiave e passa ricetta e APK a `fdroid lint` e `fdroid scanner`. `dependenciesInfo` è spento
   (F-Droid rifiuta quel blocco). Build riproducibili: il workflow "Riproducibile" compila la release
   come F-Droid (la loro immagine `fdroidserver:buildserver-trixie`, OpenJDK 21, Gradle del wrapper,
-  senza `tools/`) e la confronta byte per byte con l'APK della release tolta la firma: per la 0.1.38
-  identici. Così la ricetta ha `Binaries` e `AllowedAPKSigningKeys` (SHA-256 del certificato
+  senza `tools/`) e la confronta byte per byte con l'APK della release tolta la firma: per la 0.1.38 e la
+  0.1.42 identici. Così la ricetta ha `Binaries` e `AllowedAPKSigningKeys` (SHA-256 del certificato
   `18ef3fc3…2c836`): F-Droid pubblica l'APK con la nostra firma e si passa da GitHub/Obtainium a F-Droid
   senza disinstallare. Dopo ogni release va lanciato a mano "Riproducibile": una versione non identica
   F-Droid non la pubblica. Il modello delle richieste di fdroiddata vuole in `commit` l'hash completo e
@@ -314,10 +314,11 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
 - Pesa 68,5 MB lo zip per arm64 (165 MB estratto), 72 MB per x86_64 (179 MB); Xonos chiede libero 4 volte lo zip,
   per zip ed estratto insieme. Solo 64 bit: Python 3.13 per Android non c'è
   per armeabi-v7a; su un telefono a 32 bit la scheda non c'è (`PhoneServer.create` dà null).
-- **Servizi** (`PROVIDERS` in `prepare.py`): 63, cioè tutti quelli le cui librerie esistono per Android e
-  che si importano col 3.13; fuori, con il motivo scritto lì, Apple Music (DRM), Deezer (per ora), NFS e SMB
-  (vogliono mount), YouTube Music (deno), nicovideo (pydantic 2), QQ Music (cryptography 47), BBC Sounds e
-  iBroadcast (solo 3.14). `LIBRARIES`: cartelle importate da altri ma non proponibili (Spotify Connect, senza
+- **Servizi** (`PROVIDERS` in `prepare.py`): 59, cioè tutti quelli le cui librerie esistono per Android, che
+  si importano col 3.13 e che non entrano con le chiavi di Music Assistant (sotto); fuori, con il motivo scritto
+  lì, Apple Music (DRM), Deezer (per ora), NFS e SMB (vogliono mount), YouTube Music (deno), nicovideo
+  (pydantic 2), QQ Music (cryptography 47), BBC Sounds e iBroadcast (solo 3.14), Qobuz, Tidal, fanart.tv e
+  TheAudioDB (dalla 2.10.8-2). `LIBRARIES`: cartelle importate da altri ma non proponibili (Spotify Connect, senza
   manifest). Per aggiungere un servizio: le sue `requirements` del manifest in `requirements.txt` con tutta
   la chiusura fissata. La chiusura per Android si calcola nella sandbox con `uv pip compile --python-version
   3.13 --python-platform aarch64-linux-android --only-binary :all: --find-links <wheel di wheels.py>
@@ -325,6 +326,38 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   che solo Chaquopy ha (numpy, pillow, cryptography, cffi, pycryptodome...). Poi si prova l'import di ogni
   servizio in un ambiente 3.13 con quegli stessi pacchetti. Dipendenze non dichiarate dai manifest esistono
   (WebDAV vuole `defusedxml`).
+- **Le chiavi di Music Assistant** (`helpers/app_vars.py`: Client ID di Spotify, chiavi di Tidal, Qobuz, Last.fm,
+  fanart.tv, TheAudioDB, AcoustID...) ci sono solo nelle sue build ufficiali (`app_secrets.json`, da un
+  repository privato), e Music Assistant chiede esplicitamente di non prenderle da lì: mai. Nel pacchetto
+  compilato dal sorgente `app_var()` dà "": Spotify rispondeva "client_id: not present" (segnalato dall'utente
+  sul telefono, 0.1.42). Quindi via i servizi che senza chiave non vanno (Qobuz, Tidal: niente alternativa per
+  la persona; fanart.tv e TheAudioDB, builtin, avrebbero fatto solo richieste rifiutate), i consigli di Last.fm
+  non si aggiungono più da soli (`DEFAULT_PROVIDERS`; con la chiave Last.fm della persona si aggiungono a mano),
+  e Spotify usa il Client ID della persona (sotto). Le configurazioni dei servizi tolti restano in
+  `settings.json` e Music Assistant le ignora (provato con i dati di un server 2.10.8-1).
+- **Spotify con il Client ID della persona** (`_spotify` in `prepare.py`, pacchetto 2.10.8-2, Xonos 0.1.43): il
+  flusso chiede per primo il Client ID di un'app Spotify della persona (passo `xonos_client_id`, 32 caratteri
+  esadecimali, salvato nei dati dell'account come `xonos_client_id` e riproposto quando si riconfigura), con
+  Redirect URI `https://music-assistant.io/callback` (la pagina di Music Assistant che rimanda al server, qui
+  `http://127.0.0.1:8095/setup_flow/callback/<flusso>`, che il browser del telefono raggiunge). Con quello entra e
+  rinnova i token (`login()` del provider), con i limiti di una chiave propria (30 richieste ogni 30 s invece di
+  1 ogni 2). Niente passo facoltativo per una chiave sviluppatore (è già quella), niente scelta del motore (solo
+  librespot), e la seconda approvazione (librespot) sempre nel browser: un passo `xonos_playback` la spiega e
+  mostra gli errori, poi il browser torna da solo a librespot su `127.0.0.1:5588` (atteso 5 minuti invece di 30 s);
+  l'abbinamento dall'app Spotify non troverebbe Music Assistant, che sul telefono non si annuncia. I testi dei
+  passi nuovi (e di "authenticate" e "playback_browser_open", che Music Assistant non traduce in italiano) sono in
+  `server/ma/strings.json` nelle 9 lingue di Xonos, coi nomi di Music Assistant (`pt_PT`, `el_GR`, `ru_RU`,
+  `zh_CN`); `_texts` li mette nei suoi `translations/*.json`. Verificato col server sul computer: il flusso
+  attraverso l'API (primo passo, Client ID sbagliato, link di Spotify col Client ID e il ritorno giusto, testi in
+  italiano), il flusso intero con la rete finta (anche riconfigura ed errore del browser) e il rinnovo col
+  Client ID della persona; in CI `check.py --spotify` sull'emulatore. Non provato: l'accesso vero a Spotify, la
+  pagina di ritorno di music-assistant.io (dalla sandbox non si raggiunge) e librespot con un account vero.
+  Regole di Spotify per le app personali (febbraio 2026): Premium del proprietario, al massimo 5 utenti
+  (aggiunti in User Management), un Client ID in Development Mode per persona, e meno API: niente playlist di
+  Spotify stesso (Daily Mix...), top tracks degli artisti, novità; `GET /me` senza `product` né `country`
+  (allora il controllo del Premium di Music Assistant si salta). Music Assistant 2.10.8 manda quelle chiamate
+  alla "sessione globale", che qui è la chiave della persona: rispondono "non trovato" (400/403/404 diventano
+  `MediaNotFoundError`), senza fermare il servizio.
 - **Spotify**: il fork di librespot di Music Assistant (`music-assistant/librespot`, ramo `mass`, 0.8.0)
   compilato per Android in `server/librespot/build.sh` (Rust con cargo-ndk, rustls al posto di OpenSSL, senza
   uscite audio), nel pacchetto `bin/librespot`; `prepare.py` fa cercare a MA `librespot` nel PATH. Va solo con
@@ -363,7 +396,8 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   il workflow crea una chiave usa e getta (RSA 2048) che firma le due app e il pacchetto x86_64 con gli stessi
   comandi della release (sul runner la chiave di debug di Android non è in `~/.android`), e un piccolo server
   HTTP sul runner serve il pacchetto (l'emulatore lo vede a `10.0.2.2:8000`). 1. il server da solo:
-  `ServerCheckActivity` (solo debug) lo scarica e lo avvia, poi `tools/server/check.py` lo prova da fuori;
+  `ServerCheckActivity` (solo debug) lo scarica e lo avvia, poi `tools/server/check.py` lo prova da fuori
+  (con `--spotify` anche il primo tratto del flusso di Spotify), FFmpeg con https e `librespot --version`;
   2. la build di prova con `ServerCheckActivity --ez xonos true` (cartella come servizio, primo brano dal
   lettore di Xonos); 3. la release ridotta con R8, da capo come la usa una persona: uiautomator tocca il tasto e
   "Scarica" (i testTag sono resource-id; il dialogo è una finestra a sé e vuole `automationIds()` anche lui) e
