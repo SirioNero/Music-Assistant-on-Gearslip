@@ -128,7 +128,8 @@ private fun watchdog(name: String, block: () -> Unit) {
 }
 
 private const val WIDTH = 1080
-private const val HEIGHT = 2340
+// Più alta con -Dxonos.height, per vedere intere le pagine lunghe (le impostazioni).
+private val HEIGHT = System.getProperty("xonos.height")?.toIntOrNull() ?: 2340
 private const val DENSITY = 2.625f
 
 /**
@@ -179,6 +180,11 @@ private fun shoot(file: File, lang: String, scene: Scene) {
 }
 
 private const val SETTLE_NS = 2_500_000_000L
+
+/** Music Assistant sul telefono, ed è quello a cui Xonos è collegato (il finto server delle schermate). */
+private class ServerInUse : PhoneServerControl by ScreenServer() {
+    override val url: String get() = Settings().load().homeUrl
+}
 
 /** Music Assistant sul telefono, non ancora scaricato: le schermate mostrano solo la scheda e la domanda. */
 private class ScreenServer : PhoneServerControl {
@@ -477,6 +483,12 @@ private val SCENES = listOf(
         push(FlowPage("Jellyfin", "jellyfin") { step }.apply { this.step = ready(step); values.putAll(initialValues(step.fields)); started = true })
     },
     "service-login" to Scene {
+        (page as HomePage).started = true
+        val step = FlowStep.from(JSONObject(FLOW_EXTERNAL))!!
+        push(FlowPage("Spotify", "spotify") { step }.apply { this.step = ready(step); started = true })
+    },
+    // Spotify sul Music Assistant del telefono: l'avviso sugli account recenti.
+    "spotify-phone" to Scene(server = ServerInUse()) {
         (page as HomePage).started = true
         val step = FlowStep.from(JSONObject(FLOW_EXTERNAL))!!
         push(FlowPage("Spotify", "spotify") { step }.apply { this.step = ready(step); started = true })

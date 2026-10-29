@@ -1,0 +1,1 @@
+Bitcoin donations: at the bottom of Settings, with "Copy" and "Open in wallet". Spotify on the phone's own Music Assistant: when you add it, a warning that it only plays with Premium accounts created before December 2024 (with newer accounts the music shows up but won't play; use Music Assistant on a computer or home server, where you can choose Soloist).

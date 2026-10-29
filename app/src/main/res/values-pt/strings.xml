@@ -57,6 +57,10 @@
     <string name="battery_ok">✓ O Android deixa o Xonos tocar mesmo com a tela desligada.</string>
     <string name="battery_button">Permitir em segundo plano</string>
     <string name="help_car">No carro, abra o Gearslip: o Xonos aparece entre os apps de música.</string>
+    <string name="donate_text">O Xonos é gratuito e sem anúncios. Se for útil para você, pode apoiá-lo com uma doação em bitcoin.</string>
+    <string name="donate_copy">Copiar</string>
+    <string name="donate_copied">Copiado</string>
+    <string name="donate_open">Abrir na carteira</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">São necessários pelo menos um endereço e o token.</string>
@@ -239,6 +243,7 @@
     <string name="flow_next">Avançar</string>
     <string name="flow_open_browser">Abrir no navegador</string>
     <string name="flow_external_wait">Termine no navegador e volte aqui: o Xonos continua sozinho.</string>
+    <string name="spotify_old_accounts">Neste telefone, o Spotify só toca com contas Premium criadas antes de dezembro de 2024 (o Spotify nunca informou o dia exato). Com uma conta mais nova, sua música aparece mas não toca: nesse caso, use o Music Assistant em um computador ou servidor em casa, onde você pode escolher o Soloist.</string>
     <string name="flow_working">Um momento…</string>
     <string name="flow_finished">Pronto: o serviço está configurado. As músicas podem levar alguns minutos para aparecer na biblioteca.</string>
     <string name="flow_done">Concluído</string>

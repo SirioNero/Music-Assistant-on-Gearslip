@@ -57,6 +57,10 @@
     <string name="battery_ok">✓ Android lässt Xonos auch bei ausgeschaltetem Bildschirm spielen.</string>
     <string name="battery_button">Im Hintergrund erlauben</string>
     <string name="help_car">Öffne im Auto Gearslip: Xonos ist bei den Musik-Apps.</string>
+    <string name="donate_text">Xonos ist kostenlos und werbefrei. Wenn es dir nützt, kannst du es mit einer Bitcoin-Spende unterstützen.</string>
+    <string name="donate_copy">Kopieren</string>
+    <string name="donate_copied">Kopiert</string>
+    <string name="donate_open">In Wallet öffnen</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Nötig sind mindestens eine Adresse und das Token.</string>
@@ -239,6 +243,7 @@
     <string name="flow_next">Weiter</string>
     <string name="flow_open_browser">Im Browser öffnen</string>
     <string name="flow_external_wait">Schließe im Browser ab und komm hierher zurück: Xonos macht von selbst weiter.</string>
+    <string name="spotify_old_accounts">Auf diesem Telefon spielt Spotify nur mit Premium-Konten, die vor Dezember 2024 angelegt wurden (einen genauen Tag hat Spotify nie genannt). Mit einem neueren Konto erscheint deine Musik, spielt aber nicht: Dann nutze Music Assistant auf einem Computer oder Heimserver, dort kannst du Soloist wählen.</string>
     <string name="flow_working">Einen Moment…</string>
     <string name="flow_finished">Fertig: Der Dienst ist bereit. Seine Musik kann ein paar Minuten brauchen, bis sie in der Bibliothek erscheint.</string>
     <string name="flow_done">Fertig</string>

@@ -57,6 +57,10 @@
     <string name="battery_ok">✓ Το Android αφήνει το Xonos να παίζει και με σβηστή οθόνη.</string>
     <string name="battery_button">Να επιτρέπεται στο παρασκήνιο</string>
     <string name="help_car">Στο αυτοκίνητο ανοίξτε το Gearslip: το Xonos είναι στις εφαρμογές μουσικής.</string>
+    <string name="donate_text">Το Xonos είναι δωρεάν και χωρίς διαφημίσεις. Αν σας είναι χρήσιμο, μπορείτε να το στηρίξετε με μια δωρεά σε bitcoin.</string>
+    <string name="donate_copy">Αντιγραφή</string>
+    <string name="donate_copied">Αντιγράφηκε</string>
+    <string name="donate_open">Άνοιγμα στο πορτοφόλι</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Χρειάζονται τουλάχιστον μία διεύθυνση και το διακριτικό.</string>
@@ -239,6 +243,7 @@
     <string name="flow_next">Επόμενο</string>
     <string name="flow_open_browser">Άνοιγμα στο πρόγραμμα περιήγησης</string>
     <string name="flow_external_wait">Ολοκληρώστε στο πρόγραμμα περιήγησης και επιστρέψτε εδώ: το Xonos συνεχίζει μόνο του.</string>
+    <string name="spotify_old_accounts">Σε αυτό το τηλέφωνο το Spotify παίζει μόνο με λογαριασμούς Premium που δημιουργήθηκαν πριν από τον Δεκέμβριο του 2024 (το Spotify δεν έδωσε ποτέ ακριβή ημερομηνία). Με νεότερο λογαριασμό η μουσική σας εμφανίζεται αλλά δεν παίζει: τότε χρησιμοποιήστε το Music Assistant σε υπολογιστή ή οικιακό διακομιστή, όπου μπορείτε να επιλέξετε το Soloist.</string>
     <string name="flow_working">Μια στιγμή…</string>
     <string name="flow_finished">Έτοιμο: η υπηρεσία είναι έτοιμη. Η μουσική της μπορεί να χρειαστεί λίγα λεπτά για να εμφανιστεί στη βιβλιοθήκη.</string>
     <string name="flow_done">Τέλος</string>

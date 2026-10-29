@@ -45,10 +45,11 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   v0.1.36 il numero era quello del workflow; la prima scritta nel sorgente è la 37). Insieme si scrivono
   le note `fastlane/metadata/android/{en-US,it-IT}/changelogs/<versionCode>.txt` (massimo 500 caratteri),
   che diventano anche il testo della release. Se il tag c'è già il workflow si ferma con un errore.
-- La chiave è nel secret `XONOS_KEYSTORE`: è quella di Plancia (alias `plancia`, password
-  `plancia-android`); il workflow prova da sé le password `xonos-android` e `plancia-android`. Senza
-  chiave la release resta non firmata (come la vuole F-Droid); con `XONOS_DEBUG_SIGNING=true` (le
-  misure) si firma con la chiave di debug.
+- La chiave è nel secret `XONOS_KEYSTORE` (è quella di Plancia, alias `plancia`), la sua password nel
+  secret `XONOS_KEYSTORE_PASSWORD`: senza, la compilazione si ferma. Repository e log dei workflow sono
+  pubblici: le password non si scrivono nei file e non passano da `GITHUB_ENV` (nei log un secret
+  diventa `***`, una variabile no). Senza chiave la release resta non firmata (come la vuole F-Droid);
+  con `XONOS_DEBUG_SIGNING=true` (le misure) si firma con la chiave di debug.
 - Licenza AGPL-3.0-or-later (`LICENSE`). Tutte le librerie sono Apache 2.0, compatibili. F-Droid: testi,
   icona e schermate in `fastlane/metadata/android/` (inglese e italiano), ricetta da proporre a
   fdroiddata in `tools/fdroid/it.xonos.ma.yml` (toglie `tools/` prima di compilare: le prove usano un
@@ -63,6 +64,16 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
   F-Droid non la pubblica. Il modello delle richieste di fdroiddata vuole in `commit` l'hash completo e
   chiede di decidere le build riproducibili prima dell'inclusione (dopo non si può). `apksigcopier`
   di Debian non verifica gli APK firmati solo v2 (cerca `META-INF/MANIFEST.MF`).
+- La richiesta a fdroiddata (verificato il 26 ottobre 2026): l'Inclusion Policy vuole tre mesi di
+  sviluppo attivo, salvo utenti dimostrati o altre app dello stesso autore già su F-Droid (di SirioNero
+  non ce ne sono), e i manutentori chiudono in poche ore le richieste più giovani. Il repository è nato
+  il 24 ottobre 2026: non prima del 24 gennaio 2027. Il modello (`Default.md`) chiede anche cosa ha
+  l'app in più di quelle simili, e chiudono anche per questo: su F-Droid ci sono già MassDroid
+  (`net.asksakis.massdroidv2`, anche Android Auto e Sendspin) ed Ensemble (`com.collotsspot.ensemble`).
+  Contro il codice scritto con l'IA non c'è una regola (una proposta aperta, fdroid/admin#699,
+  incoraggia a dirlo). Se GitLab chiede telefono o carta per la CI non si danno: si lascia una nota
+  nella richiesta. Un connettore GitLab non c'è: o a mano, o un token GitLab nelle impostazioni
+  dell'ambiente.
 - Strumenti: AGP 8.11.1, Kotlin 2.2.0, Gradle 8.14.3, compileSdk 36, targetSdk 34, minSdk 26,
   Media3 1.11.1, OkHttp 4.12.0, coroutines 1.10.2, Compose 1.9.4, Material 3 1.4.0, activity-compose
   1.10.1, Coil 3.3.0 (con coil-svg per le icone dei servizi), profileinstaller 1.4.1. Pacchetto `it.xonos.ma`.
@@ -404,6 +415,14 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   caricatore che mappa ld.so e il programma e ci salta dentro), e le chiamate di sistema di glibc dentro il
   filtro seccomp delle app Android (una vietata non dà ENOSYS ma SIGSYS: per esempio `clone3`). Prima prova
   possibile senza la chiave: `soloist --version` sull'emulatore x86_64.
+- **Gli account recenti** (registro dell'utente, 29 ottobre 2026, pacchetto 2.10.8-3): accesso a Spotify riuscito,
+  poi al primo brano librespot `Unable to load audio item: ... FaultyRequest(INVALID_CREDENTIALS)` e Music
+  Assistant scarica il servizio ("Spotify is not loaded" ai play dopo). Music Assistant scrive che librespot non va
+  con gli account creati da dicembre 2024; Spotify un giorno preciso non l'ha mai dato (un altro progetto parla
+  di "account degli ultimi due anni" da dicembre 2025, non confermato). Per questo, col server sul telefono, il
+  flusso di Spotify mostra in cima l'avviso `spotify_old_accounts` (`PhoneModel.onPhoneServer`: l'indirizzo
+  salvato è quello del server; con un altro Music Assistant no, lì si può scegliere Soloist), e il README lo
+  dice in ogni lingua. Scena `spotify-phone` in `tools/screens`.
 - I task Gradle di ffmpeg e librespot **non dichiarano uscite**: alla prima esecuzione Gradle svuota le
   cartelle di uscita dei task, e con la cache di GitHub lo script trovava il suo segno (fuori dalla cartella)
   e non ricompilava, così ffmpeg mancava. Gli script controllano anche che i programmi ci siano.
@@ -484,6 +503,9 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   `MaPlayer` le riceve come modifiche di Media3 (`COMMAND_CHANGE_MEDIA_ITEMS`) e mette negli extra del
   brano in corso da dove la coda si può cambiare (`EXTRA_EDITABLE_FROM`).
 - Impostazioni: i server trovati in rete, accesso con nome utente e password (o token), primo account.
+  In fondo le donazioni in bitcoin (`DONATION_ADDRESS` in `SettingsScreen.kt`, lo stesso indirizzo del
+  README e del campo `Bitcoin` della ricetta di F-Droid): "Copia" e "Apri nel portafoglio" (`bitcoin:`;
+  senza un portafoglio installato copia). La copia negli appunti è in `Platform.kt` (`rememberCopy`).
   I servizi di MA solo per gli admin (Impostazioni, e la Home vuota).
 - "Suona su": `PhoneModel.remote` è il lettore di MA comandato dallo schermo (null: il telefono); "suona"
   va lì. In auto non cambia niente: il menu suona sempre sulla coda del telefono. Se il telefono comincia
@@ -538,9 +560,9 @@ i valori assoluti; le prove usano gli id dei testTag (`Modifier.automationIds()`
 Fatte: app sul telefono con grafica moderna (riproduzione, mini-lettore, libreria, ricerca), testi
 sincronizzati sul telefono, fluidità (R8, Baseline Profile, elenchi fuori dal thread principale, meno
 ricomposizioni, schermate salvate), server trovati in rete e accesso con nome utente e password,
-gestione dei servizi di MA per gli admin, "Suona su" con passaggio della coda, playlist modificabili
-(aggiungi, togli, nuova, elimina) e coda modificabile (suona dopo, togli), Music Assistant sul telefono
-stesso scaricato su richiesta ("Fai diventare Xonos il tuo server Music Assistant", da provare sul telefono).
+gestione dei servizi di MA per gli admin, donazioni in bitcoin, "Suona su" con passaggio della coda, playlist
+modificabili (aggiungi, togli, nuova, elimina) e coda modificabile (suona dopo, togli), Music Assistant sul
+telefono stesso scaricato su richiesta ("Fai diventare Xonos il tuo server Music Assistant", da provare sul telefono).
 Proposto, non fatto: cercare dal telefono con mDNS/SSDP le casse che MA non vede e suggerire il
 servizio da aggiungere. Ancora da fare:
 

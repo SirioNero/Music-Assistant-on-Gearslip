@@ -57,6 +57,10 @@
     <string name="battery_ok">✓ Android deja que Xonos suene también con la pantalla apagada.</string>
     <string name="battery_button">Permitir en segundo plano</string>
     <string name="help_car">En el coche, abre Gearslip: Xonos aparece entre las apps de música.</string>
+    <string name="donate_text">Xonos es gratuito y no tiene anuncios. Si te resulta útil, puedes apoyarlo con una donación en bitcoin.</string>
+    <string name="donate_copy">Copiar</string>
+    <string name="donate_copied">Copiado</string>
+    <string name="donate_open">Abrir en la billetera</string>
 
     <!-- La prova della connessione -->
     <string name="test_incomplete">Hacen falta al menos una dirección y el token.</string>
@@ -239,6 +243,7 @@
     <string name="flow_next">Siguiente</string>
     <string name="flow_open_browser">Abrir en el navegador</string>
     <string name="flow_external_wait">Termina en el navegador y vuelve aquí: Xonos sigue solo.</string>
+    <string name="spotify_old_accounts">En este teléfono, Spotify solo suena con cuentas Premium creadas antes de diciembre de 2024 (Spotify nunca indicó el día exacto). Con una cuenta más reciente tu música aparece pero no se reproduce: en ese caso usa Music Assistant en un ordenador o un servidor de casa, donde puedes elegir Soloist.</string>
     <string name="flow_working">Un momento…</string>
     <string name="flow_finished">Listo: el servicio está preparado. Su música puede tardar unos minutos en aparecer en la biblioteca.</string>
     <string name="flow_done">Hecho</string>
