@@ -415,6 +415,14 @@ di Xonos suona dal server sul telefono; la release ridotta con R8, da capo come 
   caricatore che mappa ld.so e il programma e ci salta dentro), e le chiamate di sistema di glibc dentro il
   filtro seccomp delle app Android (una vietata non dà ENOSYS ma SIGSYS: per esempio `clone3`). Prima prova
   possibile senza la chiave: `soloist --version` sull'emulatore x86_64.
+- **Gli account recenti** (registro dell'utente, 29 ottobre 2026, pacchetto 2.10.8-3): accesso a Spotify riuscito,
+  poi al primo brano librespot `Unable to load audio item: ... FaultyRequest(INVALID_CREDENTIALS)` e Music
+  Assistant scarica il servizio ("Spotify is not loaded" ai play dopo). Music Assistant scrive che librespot non va
+  con gli account creati da dicembre 2024; Spotify un giorno preciso non l'ha mai dato (un altro progetto parla
+  di "account degli ultimi due anni" da dicembre 2025, non confermato). Per questo, col server sul telefono, il
+  flusso di Spotify mostra in cima l'avviso `spotify_old_accounts` (`PhoneModel.onPhoneServer`: l'indirizzo
+  salvato è quello del server; con un altro Music Assistant no, lì si può scegliere Soloist), e il README lo
+  dice in ogni lingua. Scena `spotify-phone` in `tools/screens`.
 - I task Gradle di ffmpeg e librespot **non dichiarano uscite**: alla prima esecuzione Gradle svuota le
   cartelle di uscita dei task, e con la cache di GitHub lo script trovava il suo segno (fuori dalla cartella)
   e non ricompilava, così ffmpeg mancava. Gli script controllano anche che i programmi ci siano.

@@ -1001,6 +1001,9 @@ class PhoneModel(
     /** Il modulo indica il Music Assistant sul telefono. */
     fun usesPhoneServer(page: SettingsPage): Boolean = phoneServer != null && page.home == phoneServer.url
 
+    /** Xonos è collegato al Music Assistant sul telefono (quello salvato, non il modulo). */
+    val onPhoneServer: Boolean get() = phoneServer != null && settings.load().homeUrl == phoneServer.url
+
     /** Passa a [share] (la condivisione di Android) il registro di Music Assistant sul telefono, per chi aiuta. */
     fun sharePhoneServerLog(share: (String) -> Unit) {
         val server = phoneServer ?: return

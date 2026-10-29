@@ -157,6 +157,8 @@ internal fun AddServiceScreen(page: AddServicePage, model: PhoneModel, host: Hos
 /** Un flusso: un modulo, un accesso nel browser, un'attesa, la fine. */
 @Composable
 internal fun FlowScreen(page: FlowPage, model: PhoneModel, host: Host) {
+    // Sul telefono Spotify ha solo librespot: va detto prima che la persona faccia tutti i passi.
+    val spotifyOnPhone = remember(page) { page.domain == "spotify" && model.onPhoneServer }
     Column(Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
         TitleBar(page.title, XIcons.Close) { model.back() }
         Loaded(page.step, host::describe, { model.reload(page) }) { step ->
@@ -164,6 +166,7 @@ internal fun FlowScreen(page: FlowPage, model: PhoneModel, host: Host) {
                 Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
+                if (spotifyOnPhone) Note(XIcons.Warning, stringResource(R.string.spotify_old_accounts))
                 step.title?.let { Text(it, style = MaterialTheme.typography.headlineSmall) }
                 step.description?.let { Markdown(it) }
                 when (step.type) {
