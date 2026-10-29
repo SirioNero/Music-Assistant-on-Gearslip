@@ -1,11 +1,14 @@
 package it.xonos.ma.phone
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
@@ -16,6 +19,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -71,6 +75,15 @@ class MainActivity : ComponentActivity() {
 
             override fun askBatteryExemption() = this@MainActivity.askBatteryExemption()
 
+            override fun askMusicFiles() = this@MainActivity.askMusicFiles()
+
+            override fun shareText(subject: String, text: String) {
+                val send = Intent(Intent.ACTION_SEND).setType("text/plain")
+                    .putExtra(Intent.EXTRA_SUBJECT, subject)
+                    .putExtra(Intent.EXTRA_TEXT, text)
+                runCatching { startActivity(Intent.createChooser(send, subject)) }
+            }
+
             override val version: String = BuildConfig.VERSION_NAME
         }
         setContent { XonosScreen(app.phone, link, host) }
@@ -120,8 +133,18 @@ class MainActivity : ComponentActivity() {
         runCatching { startActivity(intent) }
     }
 
+    /** La versione con il server lo dichiara nel manifest; da Android 13 il permesso è solo per l'audio. */
+    private fun askMusicFiles() {
+        val permission = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(permission), REQUEST_MUSIC_FILES)
+        }
+    }
+
     companion object {
         /** Nell'intent: apri il lettore a schermo intero. */
         const val EXTRA_PLAYER = "player"
+
+        private const val REQUEST_MUSIC_FILES = 1
     }
 }

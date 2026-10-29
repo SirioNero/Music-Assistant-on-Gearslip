@@ -195,7 +195,7 @@ private fun FlowForm(page: FlowPage, step: FlowStep, model: PhoneModel) {
                 CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
                 Spacer(Modifier.width(10.dp))
             }
-            Text(stringResource(if (step.lastStep == true) R.string.flow_finish else R.string.next))
+            Text(stringResource(if (step.lastStep == true) R.string.flow_finish else R.string.flow_next))
         }
     }
 }

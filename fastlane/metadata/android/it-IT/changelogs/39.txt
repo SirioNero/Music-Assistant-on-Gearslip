@@ -1,0 +1,1 @@
+Novità: myCar ora suona da sé la libreria di Music Assistant, con Xonos integrato. Se usi myCar, nelle sue impostazioni prende l'account di questa app con un tocco (o da sola la prima volta), senza riscrivere niente. Xonos passa l'account solo a myCar, controllandone la firma.

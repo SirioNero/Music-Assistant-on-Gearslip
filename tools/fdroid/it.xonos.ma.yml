@@ -23,6 +23,7 @@ Builds:
       - yes
     rm:
       - tools
+      - server
 
 AllowedAPKSigningKeys: 18ef3fc3c712aaed5748015693adad3c273af4b333c31bd511ae57e31cb2c836
 

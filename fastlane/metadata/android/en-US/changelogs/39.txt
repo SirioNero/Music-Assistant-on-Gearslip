@@ -1,0 +1,1 @@
+New: myCar can now play your Music Assistant library by itself, with Xonos built in. If you use myCar, its settings take this app's account with one tap (or on their own the first time), so there's nothing to type again. Xonos hands its account only to myCar, checking its signature.

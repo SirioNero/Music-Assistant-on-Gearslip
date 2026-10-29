@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!-- Solo nella build di prova: avvia il server di Music Assistant dentro Xonos, per le prove in CI. -->
+        <activity
+            android:name=".ServerCheckActivity"
+            android:exported="true" />
+    </application>
+</manifest>

@@ -1,0 +1,2 @@
+Corretto: «Crea l’account» su un Music Assistant appena installato non riusciva su Android.
+Corretto: un play subito dopo aver aperto l’app poteva fallire con «The player is not available»: ora Xonos aspetta che Music Assistant abbia la coda del telefono.

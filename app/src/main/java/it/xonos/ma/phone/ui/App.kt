@@ -71,6 +71,12 @@ interface Host {
 
     fun askBatteryExemption()
 
+    /** Chiede di leggere la musica del telefono: Music Assistant sul telefono la prende dalla cartella Music. */
+    fun askMusicFiles()
+
+    /** Un testo da mandare con la condivisione di Android (per esempio il registro di Music Assistant). */
+    fun shareText(subject: String, text: String)
+
     /** La versione dell'app, in fondo alle impostazioni. */
     val version: String
 }

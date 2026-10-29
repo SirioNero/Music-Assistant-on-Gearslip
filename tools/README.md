@@ -34,6 +34,7 @@ MA_TOKEN=... LANG_XONOS=it QUERIES="vasco,podcast morning" build/install/harness
 | `PlaylistCheckKt` | Le playlist modificabili: crea, aggiunge (un album diventa i suoi brani, i doppioni si saltano), toglie per posizione, `PlaylistRemover` con tocchi veloci, poi lo stesso dal `PhoneModel` ("Aggiungi a una playlist", nuova playlist, "Togli", "Elimina"). Cancella le playlist di prova |
 | `SearchCheckKt` | La ricerca del telefono: dopo quanto compaiono i risultati della libreria e dopo quanto quelli dei servizi (`QUERY`, separate da virgole). MA ricorda le ricerche: serve una parola nuova, e un servizio lento (`SEARCH_DELAY` del finto iTunes) |
 | `ServicesCheckKt` | I servizi di MA con il servizio finto `xonos_test`: elenco, icone, flusso (modulo con errore, accesso "nel browser", fine), opzioni, pulsante, riconfigura, rimozione; poi lo stesso dal `PhoneModel` (anche la fine ricavata al ritorno nell'app) e la lingua dei moduli |
+| `PhoneServerCheckKt` | "Fai diventare Xonos il tuo server Music Assistant" dal `PhoneModel`, contro un Music Assistant vuoto (di solito il server di Xonos avviato sul computer con `python -m xonos_server`): la domanda con quanto pesa il pacchetto, il download finto con l'avanzamento, poi primo account creato da Xonos, token e connessione; con il token perso si rientra con la password tenuta; "Usa un altro Music Assistant"; la rimozione; un download che non riesce e un server che non parte |
 
 `MA_URL` (predefinito `http://127.0.0.1:8095`) e `MA_TOKEN` indicano il server.
 
@@ -96,6 +97,21 @@ Poi:
   la ricerca risponde dopo 3 secondi, come un servizio lento (per `SearchCheckKt`).
 - `analyze_audio.py opus pcm` (dentro il container, che ha PyAV) decodifica i pacchetti salvati da
   `CaptureCheckKt` e misura quanto è pulito il suono: le tracce di prova sono sinusoidi.
+
+## Music Assistant sul telefono (`server/`)
+
+Il pacchetto che Xonos scarica con "Fai diventare Xonos il tuo server Music Assistant" (vedi `server/` e
+`server/package/make_payload.py`). Sul computer il suo server gira anche così, per le prove del banco
+(`PhoneServerCheckKt`): `python -m xonos_server --data <cartella>` con Python 3.13, i pacchetti di
+`server/requirements.txt` e Music Assistant preparato da `server/ma/prepare.py` nel `PYTHONPATH`.
+
+- `check.py --url http://127.0.0.1:8095 --music <cartella> [--token T] [--player ID]` prova un Music
+  Assistant appena installato: primo account (o il token), una cartella di musica come servizio, un lettore
+  Sendspin come quello di Xonos che deve ricevere audio vero; con `--player` suona invece sul lettore di
+  Xonos e guarda dalla sua coda che suoni.
+- `tones.py <cartella>` scrive un album di toni (WAV) per le prove.
+- `emulator.sh` è la prova del workflow "Server MA" sull'emulatore: il pacchetto servito dal runner, il server
+  da solo, la build di prova di Xonos, la release da capo come la usa una persona (vedi il commento in testa).
 
 ## Le traduzioni
 

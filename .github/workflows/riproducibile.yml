@@ -1,7 +1,7 @@
 name: Riproducibile
 
 # Compila Xonos come lo compila F-Droid (la stessa immagine Docker e lo stesso JDK delle prove di
-# fdroiddata, senza tools/ e senza chiave) e confronta l'APK con quello firmato della release: se è
+# fdroiddata, senza tools/ e server/ e senza chiave) e confronta l'APK con quello firmato della release: se è
 # identico a parte la firma, F-Droid può pubblicare l'APK con la nostra firma (build riproducibili),
 # e chi passa da GitHub/Obtainium a F-Droid non deve disinstallare. Parte a mano, o quando cambia
 # questo file su un ramo claude/**.
@@ -48,7 +48,7 @@ jobs:
 
       - name: Compila come F-Droid
         run: |
-          rm -rf tools
+          rm -rf tools server
           # Come gradlew-fdroid: la versione di Gradle scritta in gradle-wrapper.properties.
           URL=$(sed -n 's/^distributionUrl=//p' gradle/wrapper/gradle-wrapper.properties | sed 's/\\:/:/g')
           echo "Gradle: $URL"

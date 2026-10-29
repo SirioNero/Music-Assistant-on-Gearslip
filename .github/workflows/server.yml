@@ -1,0 +1,191 @@
+name: Server MA
+
+# Music Assistant sul telefono (cartella server/): costruisce il pacchetto che Xonos scarica con "Fai
+# diventare Xonos il tuo server Music Assistant" (Python 3.13 di Chaquopy, Music Assistant, FFmpeg e
+# librespot compilati per Android; server/package/make_payload.py), lo firma con una chiave di prova come le
+# app, e prova tutto su un emulatore (tools/server/emulator.sh), con il pacchetto scaricato davvero
+# da un piccolo server HTTP sul runner: il server da solo, provato da fuori con tools/server/check.py (primo
+# account, una cartella con un album di toni, un lettore Sendspin come quello di Xonos, audio), poi Xonos
+# stesso che lo usa e suona, nella build di prova e nella release ridotta con R8.
+# Registro del server, logcat e risultato finiscono nel riferimento nascosto
+# refs/xonos/server/<ramo con - al posto di />:
+#   git fetch origin refs/xonos/server/claude-server-ma && git archive FETCH_HEAD | tar -x -C <cartella>
+
+on:
+  push:
+    branches: ["claude/**"]
+    # Xonos scarica il pacchetto e lo avvia: la prova vale per ogni cambio all'app.
+    paths:
+      - "server/**"
+      - "tools/server/**"
+      - "app/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/server.yml"
+  workflow_dispatch:
+    inputs:
+      arm64:
+        description: "Dopo le prove, costruisci anche il pacchetto per i telefoni (arm64): peso, allineamento, NOTICE"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  server:
+    concurrency:
+      group: server-${{ github.ref }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      OUT: ${{ github.workspace }}/server-out
+    steps:
+      - name: Scarica il repository
+        uses: actions/checkout@v5
+
+      - name: Prepara Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # Chaquopy vuole sulla macchina lo stesso Python che mette nell'app.
+      - name: Prepara Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Prepara Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.3"
+
+      # ffmpeg e librespot si compilano in qualche minuto per ABI: si tengono finché lo script non cambia.
+      - name: ffmpeg già compilato
+        uses: actions/cache@v4
+        with:
+          path: server/build/ffmpeg
+          key: ffmpeg-${{ hashFiles('server/ffmpeg/build.sh') }}
+
+      - name: librespot già compilato
+        uses: actions/cache@v4
+        with:
+          path: server/build/librespot
+          key: librespot-${{ hashFiles('server/librespot/build.sh') }}
+
+      # Una chiave usa e getta al posto di quella di Xonos: firma le due app e il pacchetto, come nella release
+      # (RSA 2048, come la chiave vera). Xonos usa il pacchetto solo se è firmato come lui.
+      - name: Una chiave di prova
+        run: |
+          keytool -genkeypair -noprompt -keystore app/xonos.keystore -storepass xonos-android -keypass xonos-android \
+            -alias xonos -keyalg RSA -keysize 2048 -validity 30 -dname "CN=Xonos (prova)"
+          echo "XONOS_KEYSTORE_PASSWORD=xonos-android" >> "$GITHUB_ENV"
+          echo "XONOS_KEY_ALIAS=xonos" >> "$GITHUB_ENV"
+
+      # Il modulo server (l'AAR da cui nasce il pacchetto, per l'emulatore x86_64), l'app di prova e la release
+      # ridotta con R8 come quella che si pubblica, firmate con la chiave di prova.
+      - name: Compila il server, la build di prova e la release
+        run: |
+          set -o pipefail
+          mkdir -p "$OUT"
+          export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          echo "NDK: $ANDROID_NDK"
+          gradle :server:assembleRelease :app:assembleDebug :app:assembleRelease -PxonosServerAbis=x86_64 \
+            --no-daemon --stacktrace 2>&1 | tee "$OUT/build.log"
+          ls -la app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release.apk server/build/outputs/aar/
+
+      # Il pacchetto per l'emulatore, firmato come nella release (gli stessi comandi di build.yml) con la chiave
+      # che ha firmato le due app.
+      - name: Costruisci e firma il pacchetto
+        run: |
+          set -o pipefail
+          export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          VERSION=$(sed -n 's/^xonosServerPackage=//p' gradle.properties)
+          mkdir -p payload
+          python3 server/package/make_payload.py --aar server/build/outputs/aar/server-release.aar --abi x86_64 \
+            --ndk "$ANDROID_NDK" --version "$VERSION" --out payload/xonos-server-x86_64.zip | tee "$OUT/payload.txt"
+          keytool -importkeystore -noprompt -srckeystore app/xonos.keystore -srcstorepass "$XONOS_KEYSTORE_PASSWORD" \
+            -srcalias "$XONOS_KEY_ALIAS" -destkeystore /tmp/xonos.p12 -deststoretype PKCS12 \
+            -deststorepass "$XONOS_KEYSTORE_PASSWORD" -destkeypass "$XONOS_KEYSTORE_PASSWORD"
+          openssl pkcs12 -in /tmp/xonos.p12 -passin env:XONOS_KEYSTORE_PASSWORD -nocerts -nodes -out /tmp/xonos.pem
+          openssl dgst -sha256 -sign /tmp/xonos.pem -out payload/xonos-server-x86_64.zip.sig payload/xonos-server-x86_64.zip
+          rm -f /tmp/xonos.p12 /tmp/xonos.pem
+          # Cosa pesa nel pacchetto, per cartella; in fondo lo zip intero.
+          unzip -v payload/xonos-server-x86_64.zip | awk 'NF == 8 && $8 ~ /\// {split($8, p, "/"); size[p[1] "/" p[2]] += $3} END {for (k in size) print size[k], k}' \
+            | sort -rn | head -n 40 | tee -a "$OUT/payload.txt"
+          ls -l payload | tee -a "$OUT/payload.txt"
+          unzip -p payload/xonos-server-x86_64.zip NOTICE.txt > "$OUT/NOTICE.txt"
+
+      - name: Riassumi gli errori
+        if: failure()
+        run: |
+          errors=$(grep -E "^e: |error:|ERROR|What went wrong" -A3 "$OUT/build.log" | head -n 80 | sed -e 's/%/%25/g' -e 's/\r//g' | sed ':a;N;$!ba;s/\n/%0A/g') || true
+          if [ -n "$errors" ]; then echo "::error title=Compilazione non riuscita::$errors"; fi
+
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          pip install -q aiohttp
+
+      - name: Prova sull'emulatore
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 4
+          ram-size: 4096M
+          disk-size: 8G
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -no-boot-anim -camera-back none -camera-front none
+          script: PAYLOAD=payload bash tools/server/emulator.sh
+
+      # Il pacchetto che si pubblica è per arm64: a mano (ingresso arm64) lo si costruisce anche qui, dopo le
+      # prove, per vederne peso, allineamento dei programmi (16 KB) e NOTICE prima della release.
+      - name: ffmpeg per arm64 già compilato
+        if: always() && inputs.arm64
+        uses: actions/cache@v4
+        with:
+          path: |
+            server/build/ffmpeg/arm64-v8a
+            server/build/ffmpeg/.build-arm64-v8a
+          key: ffmpeg-arm64-v8a-${{ hashFiles('server/ffmpeg/build.sh') }}
+
+      - name: librespot per arm64 già compilato
+        if: always() && inputs.arm64
+        uses: actions/cache@v4
+        with:
+          path: |
+            server/build/librespot/arm64-v8a
+            server/build/librespot/.build-arm64-v8a
+          key: librespot-arm64-v8a-${{ hashFiles('server/librespot/build.sh') }}
+
+      - name: Il pacchetto per i telefoni (arm64)
+        if: always() && inputs.arm64
+        run: |
+          set -o pipefail
+          export ANDROID_NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          VERSION=$(sed -n 's/^xonosServerPackage=//p' gradle.properties)
+          gradle :server:assembleRelease -PxonosServerAbis=arm64-v8a --no-daemon -q > "$OUT/build-arm64.log" 2>&1 \
+            || { tail -n 80 "$OUT/build-arm64.log"; exit 1; }
+          mkdir -p payload-arm64
+          python3 server/package/make_payload.py --aar server/build/outputs/aar/server-release.aar --abi arm64-v8a \
+            --ndk "$ANDROID_NDK" --version "$VERSION" --out payload-arm64/xonos-server-arm64-v8a.zip | tee "$OUT/payload-arm64.txt"
+          unzip -p payload-arm64/xonos-server-arm64-v8a.zip NOTICE.txt > "$OUT/NOTICE-arm64.txt"
+
+      - name: Pubblica in refs/xonos/server
+        if: always()
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p "$OUT"
+          cd "$OUT"
+          git init -q
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Server MA di ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/xonos/server/${GITHUB_REF_NAME//\//-}"
