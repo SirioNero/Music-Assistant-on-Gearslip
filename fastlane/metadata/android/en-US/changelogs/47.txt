@@ -1,0 +1,1 @@
+Spotify with Soloist on your Music Assistant: when it answers "already playing something else" but no other player is actually playing Spotify (a listen left hanging, for example after the phone lost the network mid-song), Xonos now reloads Spotify by itself and plays. Reloading a service needs a Music Assistant administrator account.

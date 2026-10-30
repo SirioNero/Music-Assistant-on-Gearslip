@@ -106,6 +106,7 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 | `playback/Artwork.kt` | Copertine servite a Gearslip, alla notifica e al lettore come `content://` firmati; i file li tiene `data/ArtCache.kt` (una copertina chiesta da più parti insieme si scarica una volta sola) |
 | `data/SkipSender.kt` | Avanti, indietro e "salta a" mandati a MA uno alla volta, sempre verso l'ultimo brano chiesto; raccolti per 400 ms solo con i servizi a un flusso (`QueueItem.singleStream`) |
 | `data/PlaylistRemover.kt` | Toglie brani da una playlist: i tocchi vicini in un giro, il giro dopo solo quando il primo è applicato |
+| `data/SoloistUnlock.kt` | Spotify (Soloist) "già occupato" da un ascolto appeso: se nessun altro lettore lo suona, ricarica il servizio e riprova il comando (play, play_media, salti, ripresa dopo un calo di rete) |
 | `data/Lyrics.kt` | Il testo di un brano: lettore LRC (più tempi per riga, offset, tag, parole a tempo) e testo semplice |
 | `data/Cache.kt` | `ScreenCache`: le ultime schermate (Home, prime pagine della Libreria) su disco, mostrate subito all'apertura |
 | `data/Account.kt` | Accesso con nome utente e password (auth/login, poi un token suo con auth/token/create), primo account (POST /setup) |
@@ -226,6 +227,16 @@ prima di cominciare: le cose scritte qui sono già state verificate, non vanno r
 - Spotify in MA ha due motori: librespot (parte prima, 3 flussi, ma va solo con gli account creati
   prima di dicembre 2024) e Soloist (quello ufficiale: tutti gli account Premium, un flusso, audio alla
   velocità della musica). Si sceglie riconfigurando il servizio.
+- Soloist occupato (verificato nel codice di MA 2.10.8 e nel registro dell'utente, 30 ottobre 2026, su umbrel):
+  un'esecuzione sola per volta (`SoloistBackend._acquire_run`); se ne è in corso una per un altro brano, ogni
+  play riceve `soloist_session_busy` ("… is already playing something else. Spotify Soloist plays one thing at a
+  time, so stop the other player first"), con `translation_args` il nome del servizio. Un flusso che nessuno
+  ritira (il telefono scollegato a metà brano) tiene l'esecuzione finché il servizio non si ricarica. Gli errori
+  di MA portano `translation_key` e `translation_args` (in `MaException.key`/`args`). `SoloistUnlock`: se nessun
+  altro lettore suona Spotify (`player_queues/all`: `state` playing, `available`, brano con fonte spotify)
+  ricarica il servizio (`config/providers/reload`, solo admin) e riprova una volta; più errori entro 15 s, una
+  ricarica sola. `SoloistCheckKt` lo prova col servizio dei file al posto di Spotify (errore finto). In
+  `config/providers` il `name` dei servizi è spesso null: si ricaricano tutti quelli del dominio.
 
 ## Gearslip: cosa conta
 

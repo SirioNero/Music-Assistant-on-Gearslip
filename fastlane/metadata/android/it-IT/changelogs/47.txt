@@ -1,0 +1,1 @@
+Spotify con Soloist sul tuo Music Assistant: quando risponde «sta già suonando qualcos'altro» ma nessun altro lettore sta suonando Spotify (un ascolto rimasto appeso, per esempio dopo che il telefono ha perso la rete a metà brano), ora Xonos ricarica Spotify da solo e suona. Per ricaricare un servizio serve un account amministratore di Music Assistant.
