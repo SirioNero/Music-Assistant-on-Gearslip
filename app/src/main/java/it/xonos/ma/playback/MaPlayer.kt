@@ -25,6 +25,7 @@ import it.xonos.ma.data.MaRepository
 import it.xonos.ma.data.QueueItem
 import it.xonos.ma.data.QueueState
 import it.xonos.ma.data.SkipSender
+import it.xonos.ma.data.SoloistUnlock
 import it.xonos.ma.data.objects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -106,12 +107,17 @@ class MaPlayer(
     private class Expectation(val test: (QueueState?) -> Boolean, val future: SettableFuture<Void?>)
     private val expectations = mutableListOf<Expectation>()
 
+    /** Spotify (Soloist) occupato da un ascolto appeso: lo si sblocca e si riprova il comando. */
+    private val unlock = SoloistUnlock(repo)
+
     // Il salto in attesa (vedi [skip]): uno per volta, verso l'ultimo brano chiesto.
     private var pendingSkip: SettableFuture<Void?>? = null
     private val skips = SkipSender(scope) { index ->
-        repo.command("player_queues/play_index") {
-            put("queue_id", queueId)
-            put("index", index)
+        unlock.retrying(queueId) {
+            repo.command("player_queues/play_index") {
+                put("queue_id", queueId)
+                put("index", index)
+            }
         }
     }
 
@@ -380,14 +386,17 @@ class MaPlayer(
         Log.i(TAG, "Riprendo dopo ${away / 1000} s senza rete")
         scope.launch {
             try {
-                if (duration > 0 && target < duration - 2_000) {
-                    repo.command("player_queues/play_index") {
-                        put("queue_id", queueId)
-                        put("index", d.index)
-                        put("seek_position", target / 1000)
+                // Dopo un buco di rete l'ascolto di prima può tenere occupato Spotify (Soloist).
+                unlock.retrying(queueId) {
+                    if (duration > 0 && target < duration - 2_000) {
+                        repo.command("player_queues/play_index") {
+                            put("queue_id", queueId)
+                            put("index", d.index)
+                            put("seek_position", target / 1000)
+                        }
+                    } else {
+                        repo.command("player_queues/play") { put("queue_id", queueId) }
                     }
-                } else {
-                    repo.command("player_queues/play") { put("queue_id", queueId) }
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Ripresa non riuscita: ${e.message}")
@@ -611,9 +620,11 @@ class MaPlayer(
         handler.postDelayed({ if (expectations.remove(expectation)) future.set(null) }, EXPECT_TIMEOUT_MS)
         scope.launch {
             try {
-                repo.command(name) {
-                    put("queue_id", queueId)
-                    args()
+                unlock.retrying(queueId) {
+                    repo.command(name) {
+                        put("queue_id", queueId)
+                        args()
+                    }
                 }
                 checkExpectations()
             } catch (e: Exception) {

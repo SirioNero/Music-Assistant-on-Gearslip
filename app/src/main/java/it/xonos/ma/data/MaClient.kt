@@ -19,6 +19,9 @@ class MaException(
     val code: Int? = null,
     val problem: Problem = Problem.REFUSED,
     val detail: String? = null,
+    /** Il nome dell'errore per Music Assistant (`translation_key`) e i suoi argomenti, se li ha mandati. */
+    val key: String? = null,
+    val args: List<String> = emptyList(),
 ) : Exception(message)
 
 /**
@@ -232,7 +235,8 @@ class MaClient(
         }
         if (msg.has("error_code")) {
             val details = msg.str("details")
-            val error = MaException(details ?: "Comando rifiutato", msg.optInt("error_code"), Problem.REFUSED, details)
+            val args = msg.optJSONArray("translation_args")?.let { a -> (0 until a.length()).map { a.optString(it) } }.orEmpty()
+            val error = MaException(details ?: "Comando rifiutato", msg.optInt("error_code"), Problem.REFUSED, details, msg.str("translation_key"), args)
             if (id == "connection") {
                 // Per esempio "Setup required" (un Music Assistant appena installato, senza account): il server chiude subito dopo.
                 val setup = msg.optInt("error_code") == SETUP_REQUIRED || msg.str("translation_key") == "setup_required"
